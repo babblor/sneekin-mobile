@@ -1,0 +1,15 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/linux",
+    "cSpell.words": [
+      "chabad",
+      "DONT",
+      "dotenv",
+      "Kohen",
+      "Shabbos",
+      "Shliach",
+      "shluchim",
+      "yisrael"
+    ],
+    "dart.lineLength": 110,
+    "dart.flutterSdkPath": "~/fvm/versions/stable"
+  }
