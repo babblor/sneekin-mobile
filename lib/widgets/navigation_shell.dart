@@ -43,13 +43,17 @@ class NavigationShellState extends State<NavigationShell> {
             ? [
                 const UserHomeView(),
                 QrLoginView(),
-                const UserProfilePage(),
+                UserProfilePage(
+                    // user: app.user
+                    ),
               ]
             : [
                 const OrgDashboard(),
                 const OrgHomeView(),
 
-                const OrgDashboardView(),
+                OrgDashboardView(
+                    // org: app.org
+                    ),
                 // OrgDashboard(),
                 const AddOrgAppAccountPage(),
                 const CreateOrgView(),
@@ -67,7 +71,7 @@ class NavigationShellState extends State<NavigationShell> {
 
         return Scaffold(
           key: context.read<HelperServices>().globalScaffoldKey,
-          drawer: const CustomDrawerWidget(),
+          drawer: CustomDrawerWidget(),
           body: IndexedStack(
             index: _activeIndex,
             children: pages,

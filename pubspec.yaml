@@ -53,6 +53,9 @@ dependencies:
   fl_chart: 
   flutter_xlider :
   qr_code_scanner: ^1.0.1
+  toastification:
+  file_picker:
+  image_picker: 
 
 
   # The following adds the Cupertino Icons font to your application.

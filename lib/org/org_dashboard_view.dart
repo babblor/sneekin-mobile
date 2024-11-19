@@ -2,10 +2,17 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:sneekin/models/organization.dart';
+import 'package:sneekin/services/app_store.dart';
 import '../widgets/custom_app_bar.dart';
 
 class OrgDashboardView extends StatefulWidget {
-  const OrgDashboardView({super.key});
+  // Organization? org;
+  OrgDashboardView({super.key
+      // , this.org
+      });
 
   @override
   State<OrgDashboardView> createState() => _OrgDashboardViewState();
@@ -24,19 +31,38 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
 
   bool canEdit = false;
   bool isVerified = true;
+  String _uploadPanImage = 'No file chosen';
+
+  String _uploadCINImage = 'No file chosen';
+
+  String _uploadOrgLogoImage = 'No file chosen';
+
+  final ImagePicker _picker = ImagePicker();
+
+  /// Image Picker
+  Future<void> _pickImage(String isProfileOrAdharPan) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // _imageFile = File(image.path);
+      // _uploadProfileImage = await _getFileName(image.path);
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    orgCINController.text = "29ABCDE1234F1Z5";
-    orgPANController.text = "29ABCDE1234F1Z5";
-    orgGSTINController.text = "29ABCDE1234F1Z5";
+    final app = Provider.of<AppStore>(context, listen: false);
+    orgCINController.text = app.org?.org_cin ?? "N/A";
+    orgPANController.text = app.org?.org_pan ?? "N/A";
+    orgGSTINController.text = app.org?.org_gstin ?? "N/A";
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final app = Provider.of<AppStore>(context, listen: false);
     return SafeArea(
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -44,226 +70,425 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
         padding: const EdgeInsets.all(16),
         // margin: EdgeInsets.only(top: 48),
         decoration: BoxDecoration(color: theme.scaffoldBackgroundColor),
-        child: Column(
-          children: [
-            CustomAppBar(
-              onDrawerButtonPressed: () {
-                log("Button pressed");
-                Scaffold.of(context).openDrawer();
-              },
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.2,
-            ),
-            // Expanded(child: SizedBox()),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  top: -40, // Adjust the vertical offset as needed
-                  right: 0,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Notch background shape
-                      CustomPaint(
-                        size: const Size(80, 70), // Adjust the size to best match your design
-                        painter: NotchPainter(context: context),
-                      ),
-                      // Icon on top of the notch
-                    ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              CustomAppBar(
+                onDrawerButtonPressed: () {
+                  log("Button pressed");
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.1,
+              ),
+              // Expanded(child: SizedBox()),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    top: -40, // Adjust the vertical offset as needed
+                    right: 0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Notch background shape
+                        CustomPaint(
+                          size: const Size(80, 70), // Adjust the size to best match your design
+                          painter: NotchPainter(context: context),
+                        ),
+                        // Icon on top of the notch
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.secondaryHeaderColor,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Expanded(
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: theme.secondaryHeaderColor,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     child: Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            // crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        canEdit = !canEdit;
-                                      });
-                                    },
-                                    child: FaIcon(
-                                      FontAwesomeIcons.penToSquare,
-                                      color: theme.textTheme.headlineLarge?.color,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              Column(
-                                // crossAxisAlignment: CrossAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Meta",
-                                    textAlign: TextAlign.left,
-                                    style: GoogleFonts.inter(fontSize: 26, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.place_outlined,
-                                            color: theme.textTheme.bodyLarge?.color,
-                                            size: 12,
-                                          ),
-                                          const SizedBox(
-                                            width: 2,
-                                          ),
-                                          Text(
-                                            "Bengalore",
-                                            style: GoogleFonts.inter(
-                                                color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.phone_outlined,
-                                            color: theme.textTheme.bodyLarge?.color,
-                                            size: 12,
-                                          ),
-                                          const SizedBox(
-                                            width: 2,
-                                          ),
-                                          Text(
-                                            "+91 9999999999",
-                                            style: GoogleFonts.inter(
-                                                color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.email_outlined,
-                                            color: theme.textTheme.bodyLarge?.color,
-                                            size: 12,
-                                          ),
-                                          const SizedBox(
-                                            width: 2,
-                                          ),
-                                          Text(
-                                            "admin@meta.org",
-                                            style: GoogleFonts.inter(
-                                                color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          _buildTextField('CIN', '29ABCDE1234F1Z5', orgCINController, theme),
-                          const SizedBox(height: 10),
-                          _buildTextField('PAN', '29ABCDE1234F1Z5', orgPANController, theme),
-                          const SizedBox(height: 10),
-                          _buildTextField('GSTIN', '29ABCDE1234F1Z5', orgGSTINController, theme),
-                          const SizedBox(height: 30),
-                          if (canEdit)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              // crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                FaIcon(
-                                  FontAwesomeIcons.floppyDisk,
-                                  color: theme.textTheme.headlineLarge?.color,
-                                  size: 25,
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          canEdit = !canEdit;
+                                        });
+                                      },
+                                      child: FaIcon(
+                                        FontAwesomeIcons.penToSquare,
+                                        color: theme.textTheme.headlineLarge?.color,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Column(
+                                  // crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      app.org?.org_name ?? "N/A",
+                                      textAlign: TextAlign.left,
+                                      style: GoogleFonts.inter(fontSize: 26, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.place_outlined,
+                                              color: theme.textTheme.bodyLarge?.color,
+                                              size: 12,
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              app.org?.org_address == ""
+                                                  ? "N/A"
+                                                  : app.org?.org_address ?? "N/A",
+                                              style: GoogleFonts.inter(
+                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.phone_outlined,
+                                              color: theme.textTheme.bodyLarge?.color,
+                                              size: 12,
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              "+91 9999999999",
+                                              style: GoogleFonts.inter(
+                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.email_outlined,
+                                              color: theme.textTheme.bodyLarge?.color,
+                                              size: 12,
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              app.org?.org_email ?? "N/A",
+                                              style: GoogleFonts.inter(
+                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 )
                               ],
                             ),
-                          const SizedBox(
-                            height: 20,
-                          )
-                        ],
-                      ),
-                    ),
-                  ), // Placeholder height
-                ),
-                // Overflowing Orange Container
-
-                // Right-top notch
-                Positioned(
-                  top: -40,
-                  left: 35,
-                  child: Container(
-                      width: 120,
-                      height: 75,
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                      decoration: BoxDecoration(
-                        color: theme.textTheme.headlineLarge?.color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "M",
-                          style: GoogleFonts.inter(
-                              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+                            const SizedBox(height: 15),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            _buildTextField('CIN', '29ABCDE1234F1Z5', orgCINController, theme),
+                            const SizedBox(height: 10),
+                            _buildTextField('PAN', '29ABCDE1234F1Z5', orgPANController, theme),
+                            const SizedBox(height: 10),
+                            _buildTextField('GSTIN', '29ABCDE1234F1Z5', orgGSTINController, theme),
+                            const SizedBox(height: 30),
+                            _buildCINImage(),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            // _buildOrgLogoImage(),
+                            // SizedBox(
+                            //   height: 20,
+                            // ),
+                            _buildPANImage(),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            if (canEdit)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.floppyDisk,
+                                    color: theme.textTheme.headlineLarge?.color,
+                                    size: 25,
+                                  )
+                                ],
+                              ),
+                            const SizedBox(
+                              height: 20,
+                            )
+                          ],
                         ),
-                      )
-                      // orgLogoUrl != null
-                      //     ? CircleAvatar(
-                      //         radius: 10,
-                      //         backgroundImage: NetworkImage(
-                      //           orgLogoUrl!,
-                      //           // fit: BoxFit.cover, // Stretches the image to cover the circle
-                      //         ),
-                      //       )
-                      //     : CircleAvatar(
-                      //         radius: 10,
-                      //         backgroundImage: AssetImage(
-                      //           "assets/images/profile_picture.jpeg",
-                      //         ),
-                      //       ),
                       ),
-                ),
-              ],
-            ),
-          ],
+                    ), // Placeholder height
+                  ),
+                  // Overflowing Orange Container
+
+                  // Right-top notch
+                  Positioned(
+                    top: -40,
+                    left: 35,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 75,
+                          padding: const EdgeInsets.only(top: 10, bottom: 10),
+                          decoration: BoxDecoration(
+                            color: theme.textTheme.headlineLarge?.color,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              app.org?.org_name?[0] ?? "N/A",
+                              style: GoogleFonts.inter(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (canEdit)
+                          Positioned(
+                            bottom: -10,
+                            right: -10,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Handle edit action for organization name
+                                log("Organization edit button tapped!");
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: theme.textTheme.headlineLarge?.color,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.penToSquare,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPANImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Update PAN Document",
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, fontSize: canEdit ? 14 : 12, color: Colors.white),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('PAN Document');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadPanImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCINImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Update CIN Document",
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, fontSize: canEdit ? 14 : 12, color: Colors.white),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('CIN Document');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadCINImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrgLogoImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Update Profile Image",
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, fontSize: canEdit ? 14 : 12, color: Colors.white),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('Org Profile Image');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadOrgLogoImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

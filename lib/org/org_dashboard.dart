@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
+import 'package:sneekin/services/app_store.dart';
 
 import '../widgets/custom_app_bar.dart';
 
@@ -191,6 +194,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final org = Provider.of<AppStore>(context, listen: false).org;
     return SafeArea(
       child: Container(
         height: MediaQuery.of(context).size.height,
@@ -315,31 +319,55 @@ class _OrgDashboardState extends State<OrgDashboard> {
                         ),
                         SizedBox(
                           height: 80,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: dataSets.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedIndex = index;
-                                  });
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: selectedIndex == index
-                                        ? theme.textTheme.headlineLarge?.color
-                                        : Colors.grey,
-                                  ),
-                                  width: 50,
-                                  height: 50,
-                                  child: const Center(
-                                      child: FaIcon(FontAwesomeIcons.facebook, color: Colors.white)),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                  onTap: () => _showAddDetailsDialog(),
+                                  child: Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                          color: theme.textTheme.headlineLarge?.color,
+                                          shape: BoxShape.circle),
+                                      child: Center(
+                                          child: FaIcon(
+                                        FontAwesomeIcons.add,
+                                        color: Colors.white,
+                                        size: 20,
+                                      )))),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: dataSets.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedIndex = index;
+                                        });
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: selectedIndex == index
+                                              ? theme.textTheme.headlineLarge?.color
+                                              : Colors.grey,
+                                        ),
+                                        width: 50,
+                                        height: 50,
+                                        child: const Center(
+                                            child: FaIcon(FontAwesomeIcons.facebook, color: Colors.white)),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
                         ),
 
@@ -432,7 +460,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Meta",
+                                  org?.org_name ?? "N/A",
                                   style: GoogleFonts.inter(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
@@ -453,7 +481,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                       width: 5,
                                     ),
                                     Text(
-                                      "admin@meta.org",
+                                      org?.org_email ?? "N/A",
                                       style: GoogleFonts.inter(
                                           fontSize: 13, color: theme.textTheme.bodyLarge?.color),
                                     ),

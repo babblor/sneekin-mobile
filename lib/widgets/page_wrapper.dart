@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sneekin/widgets/custom_drawer.dart';
 import 'package:sneekin/widgets/custom_nav_shell.dart';
 
@@ -20,10 +21,13 @@ class _PageWrapperState extends State<PageWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    // final app = Provider.of(context, listen: true);
     return Scaffold(
       // backgroundColor: Colors.black,
       // backgroundColor: Colors.red,
-      drawer: const CustomDrawerWidget(),
+      drawer: CustomDrawerWidget(
+          // app: app,
+          ),
       body: widget.page,
       bottomNavigationBar: CustomNavigationBar(
         currentIndex: _activeIndex,

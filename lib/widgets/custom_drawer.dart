@@ -9,7 +9,10 @@ import 'package:sneekin/services/app_store.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class CustomDrawerWidget extends StatefulWidget {
-  const CustomDrawerWidget({super.key});
+  // AppStore app;
+  CustomDrawerWidget({super.key
+      // , required this.app
+      });
 
   @override
   _CustomDrawerWidgetState createState() => _CustomDrawerWidgetState();
@@ -31,6 +34,17 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
   void initState() {
     super.initState();
     // Initialize user data here if needed.
+    // final app = Provider.of(context, listen: false);
+    // _nameController.text = (app.isSignedIn ? app.user?.name : app.org?.org_name)!;
+    // _emailController.text = (app.isSignedIn ? app.user?.email_id : app.org?.org_email)!;
+    // // _phoneController.text = (widget.app.isSignedIn ? widget.app.user?. : widget.app.org?.org_name)!;
+    // if (app.isSignedIn) {
+    //   _age = (app.user?.age)!.toDouble();
+    // }
+    // log("widget.app.org?.org_address: ${app.org?.org_address}");
+    // if (app.isOrgSignedIn) {
+    //   _addressController.text = (app.org?.org_address == "" ? "N/A" : app.org?.org_address)!;
+    // }
   }
 
   bool canEdit = false;
@@ -41,7 +55,14 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
     final theme = Theme.of(context);
     final app = Provider.of<AppStore>(context, listen: false);
 
-    // _nameController.text = app.isSignedIn ? (app.user?.name ?? name) : (app.org?.org_name ?? name);
+    _nameController.text = app.isSignedIn ? (app.user?.name ?? name) : (app.org?.org_name ?? name);
+    _emailController.text = app.isSignedIn ? (app.user?.email_id ?? "N/A") : (app.org?.org_email ?? "N/A");
+    if (app.isOrgSignedIn) {
+      _addressController.text = (app.org?.org_address == "" ? "N/A" : app.org?.org_address)!;
+    }
+    if (app.isSignedIn) {
+      _age = app.user!.age?.toDouble() ?? 0.0;
+    }
 
     return SafeArea(
       child: Drawer(
@@ -72,12 +93,61 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
               ),
               const SizedBox(height: 30),
               Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: theme.iconTheme.color,
-                  child: FaIcon(FontAwesomeIcons.meta, size: 40, color: theme.textTheme.headlineLarge?.color),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: theme.iconTheme.color,
+                      child: Center(
+                        child: Text(
+                          app.isSignedIn
+                              ? (app.user?.name?.isNotEmpty == true ? app.user!.name![0] : "N/A")
+                              : (app.org?.org_name?.isNotEmpty == true ? app.org!.org_name![0] : "N/A"),
+                          style: GoogleFonts.inter(
+                            fontSize: 35,
+                            color: theme.textTheme.headlineLarge?.color,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (canEdit)
+                      Positioned(
+                        bottom: -5,
+                        right: -5,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Handle edit action here
+                            log("Edit button tapped!");
+                          },
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: FaIcon(
+                                FontAwesomeIcons.penToSquare,
+                                color: theme.textTheme.headlineLarge?.color,
+                                size: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
+
               const SizedBox(
                 height: 10,
               ),
@@ -145,7 +215,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                   : _buildIconField(Icons.place, _addressController, theme, false),
               if (canEdit)
                 SizedBox(
-                  height: 5,
+                  height: 25,
                 ),
               if (canEdit)
                 Padding(
@@ -157,8 +227,8 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                       GestureDetector(
                           onTap: () {},
                           child: FaIcon(
-                            FontAwesomeIcons.chevronRight,
-                            size: 18,
+                            FontAwesomeIcons.save,
+                            size: 24,
                             color: theme.textTheme.headlineLarge?.color,
                           )),
                     ],

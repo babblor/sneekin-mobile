@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/models/user.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -26,6 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController cinController = TextEditingController();
   final TextEditingController gstinController = TextEditingController();
   final TextEditingController panController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
   RangeValues _selectedRange = RangeValues(20, 25); // Initial range with 5-diff
   final double _fixedDifference = 5;
@@ -33,14 +37,75 @@ class _AuthScreenState extends State<AuthScreen> {
   String _gender = 'Male'; // Default value for gender
   double _age = 18.0; // Single age value
 
+  static const platform = MethodChannel('com.example.sneekin/path');
+
+  File? profileImage;
+
+  String _uploadProfileImage = 'No file chosen';
+
+  String _uploadPanImage = 'No file chosen';
+
+  String _uploadCINImage = 'No file chosen';
+
+  String _uploadOrgLogoImage = 'No file chosen';
+
+  final String _imageName = '';
+  File? _imageFile;
+
+  final ImagePicker _picker = ImagePicker();
+
+  /// Image Picker
+  Future<void> _pickImage(String isProfileOrAdharPan) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      _imageFile = File(image.path);
+      _uploadProfileImage = await _getFileName(image.path);
+      setState(() {});
+    }
+  }
+
+  /// Method channel for get original image name
+  Future<String> _getFileName(String filePath) async {
+    try {
+      final String fileName = await platform.invokeMethod('getFileName', {"path": filePath});
+      dev.log('My image file path is: $fileName');
+      return fileName;
+    } on PlatformException catch (e) {
+      dev.log("Failed to get file name: '${e.message}'.");
+      return "Unknown";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1F293F),
+      backgroundColor: const Color(0xFF1F2937),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1F2937),
+        elevation: 0,
+        title: Row(
+          children: [
+            GestureDetector(
+              child: Image.asset(
+                "assets/icons/launcher_icon.png",
+                height: 40,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              "Sneek",
+              style: GoogleFonts.inter(
+                fontSize: 17,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 25), // Spacer for status bar
+            const SizedBox(height: 20), // Spacer for status bar
             CustomTopBar(
               selectedTab: selectedTab,
               onTabSelected: (tab) {
@@ -87,6 +152,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: nameController,
           labelText: 'Name',
+          mandatory: true,
           hintText: 'Enter your name',
         ),
         const SizedBox(height: 20),
@@ -96,6 +162,7 @@ class _AuthScreenState extends State<AuthScreen> {
           controller: emailController,
           labelText: 'Email',
           hintText: 'Enter your email',
+          mandatory: true,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 35),
@@ -103,9 +170,22 @@ class _AuthScreenState extends State<AuthScreen> {
         // Gender Dropdown
         // _buildGenderDropdown(),
 
-        Text(
-          "Gender",
-          style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Gender",
+              style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+            ),
+            SizedBox(
+              width: 1,
+            ),
+            Text(
+              " *",
+              style: GoogleFonts.inter(color: Colors.red),
+            ),
+          ],
         ),
         SizedBox(
           height: 20,
@@ -126,9 +206,22 @@ class _AuthScreenState extends State<AuthScreen> {
         // Gender Dropdown
         // _buildGenderDropdown(),
 
-        Text(
-          "Age Group",
-          style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Age",
+              style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+            ),
+            SizedBox(
+              width: 1,
+            ),
+            Text(
+              " *",
+              style: GoogleFonts.inter(color: Colors.red),
+            ),
+          ],
         ),
         SizedBox(
           height: 15,
@@ -136,6 +229,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
         // Age Slider
         _buildAgeSlider(),
+
+        SizedBox(
+          height: 20,
+        ),
+
+        _buildProfileImage(),
+
+        SizedBox(
+          height: 80,
+        ),
 
         // const SizedBox(height: 40),
 
@@ -166,6 +269,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: nameController,
           labelText: 'Organization Name',
+          mandatory: true,
           hintText: 'Enter organization name',
         ),
         const SizedBox(height: 20),
@@ -173,6 +277,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: emailController,
           labelText: 'Organization Email',
+          mandatory: true,
           hintText: 'Enter organization email',
         ),
         const SizedBox(height: 20),
@@ -180,7 +285,16 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: gstinController,
           labelText: 'Organization GSTIN',
+          mandatory: true,
           hintText: 'Enter organization gstin',
+        ),
+        const SizedBox(height: 20),
+
+        _buildInputField(
+          controller: addressController,
+          labelText: 'Organization Address',
+          mandatory: false,
+          hintText: 'Enter organization address',
         ),
         const SizedBox(height: 20),
 
@@ -188,6 +302,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: cinController,
           labelText: 'Organization CIN',
+          mandatory: true,
           hintText: 'Enter CIN',
         ),
         const SizedBox(height: 20),
@@ -196,8 +311,30 @@ class _AuthScreenState extends State<AuthScreen> {
         _buildInputField(
           controller: panController,
           labelText: 'Organization PAN',
+          mandatory: true,
           hintText: 'Enter PAN',
         ),
+
+        SizedBox(
+          height: 20,
+        ),
+
+        _buildPANImage(),
+
+        SizedBox(
+          height: 20,
+        ),
+
+        _buildCINImage(),
+
+        SizedBox(
+          height: 20,
+        ),
+
+        _buildOrgLogoImage(),
+        SizedBox(
+          height: 80,
+        )
         // const SizedBox(height: 70),
         // // const Spacer(),
 
@@ -273,7 +410,7 @@ class _AuthScreenState extends State<AuthScreen> {
           min: 15,
           max: 60,
           divisions: 9,
-          activeColor: Colors.orange,
+          activeColor: Theme.of(context).textTheme.headlineLarge?.color,
           inactiveColor: Colors.white,
           labels: RangeLabels(
             _selectedRange.start.round().toString(),
@@ -304,7 +441,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   Container(
                     height: 10,
                     width: 2,
-                    color: Colors.orange,
+                    color: Theme.of(context).textTheme.headlineLarge?.color,
                   ),
                   SizedBox(height: 5),
                   Text(
@@ -368,24 +505,42 @@ class _AuthScreenState extends State<AuthScreen> {
     required TextEditingController controller,
     required String labelText,
     required String hintText,
+    required bool mandatory,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: GoogleFonts.inter(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: GoogleFonts.inter(color: Colors.white),
-        hintText: hintText,
-        hintStyle: GoogleFonts.inter(color: Colors.grey),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade600),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              labelText,
+              style: GoogleFonts.inter(color: Colors.white),
+            ),
+            if (mandatory)
+              Text(
+                " *",
+                style: GoogleFonts.inter(color: Colors.red),
+              ),
+          ],
         ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          style: GoogleFonts.inter(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: GoogleFonts.inter(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade600),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -465,6 +620,249 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       );
     });
+  }
+
+  Widget _buildProfileImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Profile Image",
+          style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('Profile Image');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadProfileImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPANImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "PAN Document",
+              style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+            ),
+            // SizedBox(
+            //   width: 1,
+            // ),
+            // Text(
+            //   " *",
+            //   style: GoogleFonts.inter(color: Colors.red),
+            // ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('PAN Document');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadPanImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCINImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "CIN Document",
+              style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+            ),
+            // SizedBox(
+            //   width: 1,
+            // ),
+            // Text(
+            //   " *",
+            //   style: GoogleFonts.inter(color: Colors.red),
+            // ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('CIN Document');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadCINImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrgLogoImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Profile Image",
+              style: GoogleFonts.inter(fontSize: 15, color: Colors.white),
+            ),
+            // SizedBox(
+            //   width: 1,
+            // ),
+            // Text(
+            //   " *",
+            //   style: GoogleFonts.inter(color: Colors.red),
+            // ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('Org Profile Image');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadOrgLogoImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   // Helper function to build submit button

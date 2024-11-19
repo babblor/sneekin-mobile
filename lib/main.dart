@@ -3,15 +3,18 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sneekin/auth/auth_screen.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/models/user.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/services/theme_services.dart';
+import 'package:toastification/toastification.dart';
 import 'services/router_services.dart';
 
 final ThemeData darkTheme = ThemeData(
@@ -86,6 +89,13 @@ final ThemeData lightTheme = ThemeData(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  try {
+    await dotenv.load(fileName: ".env.local");
+    log("Loaded .env.local file");
+  } catch (e) {
+    log("Error loading .env file: $e");
+  }
+
   if (!kIsWeb) {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocDir.path);
@@ -95,6 +105,8 @@ Future<void> main() async {
   Hive.registerAdapter(OrganizationAdapter());
   AuthServices authServices = AuthServices();
   AppStore appStore = AppStore();
+
+  await authServices.initialize();
 
   await appStore.initializeUserData();
   await appStore.initializeOrgData();
@@ -125,16 +137,18 @@ class MyApp extends StatelessWidget {
       builder: (context, theme, routerServices, child) {
         log("Current themeMode: ${theme.themeMode}");
 
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: theme.themeMode,
-          routerConfig: routerServices.getRouter(context),
+        return ToastificationWrapper(
+          child: MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: theme.themeMode,
+            routerConfig: routerServices.getRouter(context),
+          ),
         );
         // return MaterialApp(
         //   debugShowCheckedModeBanner: false,
-        //   home: OtpScreen(),
+        //   home: AuthScreen(),
         // );
       },
     );

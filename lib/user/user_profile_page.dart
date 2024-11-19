@@ -2,10 +2,18 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:sneekin/models/user.dart';
+import 'package:sneekin/services/app_store.dart';
 import '../widgets/custom_app_bar.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({super.key});
+  // User? user;
+  UserProfilePage({super.key
+
+      // , this.user
+      });
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -39,11 +47,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String? _appEmail;
   String? _appNumber;
 
+  String _uploadOrgLogoImage = 'No file chosen';
+
+  final ImagePicker _picker = ImagePicker();
+
+  /// Image Picker
+  Future<void> _pickImage(String isProfileOrAdharPan) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // _imageFile = File(image.path);
+      // _uploadProfileImage = await _getFileName(image.path);
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    emailController.text = "admin@meta.org";
+    final app = Provider.of<AppStore>(context, listen: false);
+    emailController.text = app.user?.email_id ?? "user@gmail.org";
     panController.text = "##00ABCD98";
     newPanController.text = "00ABCD98";
   }
@@ -156,6 +179,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final app = Provider.of<AppStore>(context, listen: false);
     return SafeArea(
       child: Container(
         decoration: BoxDecoration(color: theme.scaffoldBackgroundColor),
@@ -237,7 +261,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Alexa Rawles",
+                                        app.user?.name ?? "Alexa Rawles",
                                         style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(
@@ -271,15 +295,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                               _buildTextField('Email', emailController, theme),
                               const SizedBox(height: 10),
+                              if (canEdit)
+                                SizedBox(
+                                  height: 15,
+                                ),
                               _buildGenderDropdown(_gender, theme),
                               const SizedBox(
                                 height: 10,
                               ),
+                              if (canEdit)
+                                SizedBox(
+                                  height: 15,
+                                ),
                               _buildPhoneDropdown(_phone, theme),
                               const SizedBox(height: 10),
-
+                              if (canEdit)
+                                SizedBox(
+                                  height: 15,
+                                ),
                               _buildTextField('PAN', panController, theme),
                               // const SizedBox(height: 20),
+                              // SizedBox(
+                              //   height: 10,
+                              // ),
+                              // if (canEdit)
+                              //   SizedBox(
+                              //     height: 15,
+                              //   ),
+                              // _buildOrgLogoImage(),
                               const SizedBox(height: 30),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -377,20 +420,61 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   Positioned(
                     top: -35,
                     left: 35,
-                    child: Container(
-                      width: 110,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        color: theme.textTheme.headlineLarge?.color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "A",
-                          style: GoogleFonts.inter(
-                              fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 110,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: theme.textTheme.headlineLarge?.color,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              app.user?.name?[0] ?? "N/A",
+                              style: GoogleFonts.inter(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        if (canEdit)
+                          Positioned(
+                            bottom: -10,
+                            right: -10,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Handle edit button action here
+                                log("Edit button tapped!");
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: theme.textTheme.headlineLarge?.color,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: FaIcon(
+                                    FontAwesomeIcons.penToSquare,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -578,7 +662,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
         const SizedBox(width: 10),
         Expanded(
           child: DropdownButtonFormField<String>(
-            value: _gender, // Default value for gender
+            // value: _gender, // Default value for gender
+            value: Provider.of<AppStore>(context, listen: false).user?.gender,
             dropdownColor: theme.secondaryHeaderColor, // Dropdown background color
             decoration: InputDecoration(
               filled: true,
@@ -626,6 +711,58 @@ class _UserProfilePageState extends State<UserProfilePage> {
               color: theme.textTheme.bodyLarge?.color, // Icon color
               size: 15,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrgLogoImage() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Update Profile Image",
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, fontSize: canEdit ? 14 : 12, color: Colors.white),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 50,
+          width: double.infinity,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              color: Colors.grey,
+              width: 0.8,
+            ),
+          ),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _pickImage('Org Profile Image');
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(.4),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    'Choose File',
+                    style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+                  ),
+                ),
+              ),
+              Text(
+                _uploadOrgLogoImage,
+                style: GoogleFonts.inter(color: Theme.of(context).textTheme.headlineLarge?.color),
+              ),
+            ],
           ),
         ),
       ],

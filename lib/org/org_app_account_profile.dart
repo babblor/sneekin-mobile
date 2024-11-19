@@ -110,7 +110,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                   color: theme.textTheme.headlineLarge?.color),
                             ),
                             const SizedBox(
-                              width: 15,
+                              width: 25,
                             ),
                             GestureDetector(
                               onTap: () {
@@ -119,10 +119,10 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                   builder: (context) => const ApiKeysDialog(),
                                 );
                               },
-                              child: FaIcon(
-                                FontAwesomeIcons.key,
-                                color: theme.textTheme.headlineLarge?.color,
-                                size: 19,
+                              child: Icon(
+                                Icons.key,
+                                color: theme.textTheme.bodyLarge?.color,
+                                size: 25,
                               ),
                             )
                           ],
@@ -288,6 +288,9 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                             ),
                           ],
                         ),
+                        SizedBox(
+                          height: 15,
+                        )
                       ],
                     ),
                   ),
@@ -305,7 +308,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                         child: Text(
                           'F',
                           style: GoogleFonts.inter(
-                            fontSize: 15,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: theme.textTheme.bodyLarge?.color,
                           ),

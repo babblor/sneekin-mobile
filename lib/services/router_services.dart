@@ -98,7 +98,7 @@ class RouterServices with ChangeNotifier {
             name: 'user-profile-page',
             pageBuilder: (context, state) => MaterialPage(
               key: state.pageKey,
-              child: const PageWrapper(
+              child: PageWrapper(
                 page: UserProfilePage(),
                 isOrg: false,
               ),
@@ -147,7 +147,7 @@ class RouterServices with ChangeNotifier {
             name: 'org-dashboard-view',
             pageBuilder: (context, state) => MaterialPage(
               key: state.pageKey,
-              child: const PageWrapper(
+              child: PageWrapper(
                 page: OrgDashboardView(),
                 isOrg: true,
               ),
