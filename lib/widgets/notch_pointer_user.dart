@@ -1,26 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sneekin/models/org_app_account.dart';
+import 'package:sneekin/models/virtual_account.dart';
 
-class Notch extends StatelessWidget {
-  OrgAppAccount orgAccount;
+class UserNotch extends StatelessWidget {
+  VirtualAccount account;
 
-  Notch({super.key, required this.orgAccount});
+  UserNotch({super.key, required this.account});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return GestureDetector(
-      onTap: () {
-        context.go('/org-app-account-profile', extra: orgAccount);
-      },
+      // onTap: () {
+      //   context.go('/org-app-account-profile', extra: orgAccount);
+      // },
       child: Center(
         child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(color: theme.scaffoldBackgroundColor
-              // color: Colors.red,
+          margin: const EdgeInsets.only(top: 48),
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                spreadRadius: 2,
               ),
+            ],
+          ),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -53,7 +61,7 @@ class Notch extends StatelessWidget {
                             //   width: 15,
                             // ),
                             Text(
-                              orgAccount.name,
+                              account.orgAppName,
                               style: GoogleFonts.inter(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -73,33 +81,34 @@ class Notch extends StatelessWidget {
                   ),
                 ), // Placeholder height
               ),
-              // Positioned(
-              //   top: -26, // Adjust the vertical offset as needed
-              //   right: 0,
-              //   child: Stack(
-              //     alignment: Alignment.center,
-              //     children: [
-              //       // Notch background shape
-              //       CustomPaint(
-              //         size: const Size(60, 45), // Adjust the size to best match your design
-              //         painter: NotchPainter(context: context),
-              //       ),
-              //       // Icon on top of the notch
-              //       Padding(
-              //         padding: const EdgeInsets.only(left: 15.0, bottom: 12),
-              //         child: FaIcon(
-              //           orgAccount.mobile == null
-              //               ? FontAwesomeIcons.unlink
-              //               : orgAccount.mobile == true
-              //                   ? FontAwesomeIcons.mobileRetro
-              //                   : FontAwesomeIcons.globe,
-              //           size: 16,
-              //           color: theme.textTheme.headlineLarge?.color,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              Positioned(
+                top: -26, // Adjust the vertical offset as needed
+                right: 0,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Notch background shape
+                    CustomPaint(
+                      size: const Size(60, 45), // Adjust the size to best match your design
+                      painter: NotchPainter(context: context),
+                    ),
+                    // Icon on top of the notch
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0, bottom: 12),
+                      child: FaIcon(
+                        FontAwesomeIcons.globe,
+                        // account == null
+                        //     ? FontAwesomeIcons.unlink
+                        //     : account.mobile == true
+                        //         ? FontAwesomeIcons.mobileRetro
+                        //         : FontAwesomeIcons.globe,
+                        size: 16,
+                        color: theme.textTheme.headlineLarge?.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               Positioned(
                 top: 17,
@@ -112,25 +121,14 @@ class Notch extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
-                    child: orgAccount.logo == null || orgAccount.logo!.isEmpty
-                        ? Text(
-                            orgAccount.name[0],
-                            style: GoogleFonts.inter(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textTheme.bodyLarge?.color,
-                            ),
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              orgAccount.logo!,
-                              width: 60,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
+                      child: Text(
+                    account.username[0],
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.bodyLarge?.color,
+                    ),
+                  )),
                 ),
               ),
               // Right-top notch

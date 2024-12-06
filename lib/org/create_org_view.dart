@@ -1,10 +1,6 @@
-import 'dart:developer' as dev;
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/services/app_store.dart';
 
 class CreateOrgView extends StatefulWidget {
@@ -145,52 +141,52 @@ class _CreateOrgViewState extends State<CreateOrgView> {
     return Consumer<AppStore>(builder: (context, value, _) {
       return ElevatedButton(
         onPressed: () async {
-          if (nameController.text.isEmpty || cinController.text.isEmpty || panController.text.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Please fill all fields'),
-              ),
-            );
-            return;
-          }
-          var random = Random();
-          int fiveDigitNumber = 10000 + random.nextInt(90000);
+          // if (nameController.text.isEmpty || cinController.text.isEmpty || panController.text.isEmpty) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('Please fill all fields'),
+          //     ),
+          //   );
+          //   return;
+          // }
+          // var random = Random();
+          // int fiveDigitNumber = 10000 + random.nextInt(90000);
 
-          final resp = await value.storeOrgData(
-            org: Organization(
-                org_id: fiveDigitNumber,
-                org_name: nameController.text,
-                org_email: emailController.text,
-                org_gstin: gstinController.text,
-                org_pan: panController.text,
-                org_cin: cinController.text,
-                org_cin_url: "",
-                org_cin_verified: false,
-                org_gstin_url: "",
-                org_address: "",
-                org_gstin_verified: false,
-                org_logo_url: "",
-                org_pan_url: "",
-                org_pan_verified: false,
-                org_website_name: ""),
-          );
+          // final resp = await value.storeOrgData(
+          //   org: Organization(
+          //       org_id: fiveDigitNumber,
+          //       org_name: nameController.text,
+          //       org_email: emailController.text,
+          //       org_gstin: gstinController.text,
+          //       org_pan: panController.text,
+          //       org_cin: cinController.text,
+          //       org_cin_url: "",
+          //       org_cin_verified: false,
+          //       org_gstin_url: "",
+          //       org_address: "",
+          //       org_gstin_verified: false,
+          //       org_logo_url: "",
+          //       org_pan_url: "",
+          //       org_pan_verified: false,
+          //       org_website_name: ""),
+          // );
 
-          dev.log("resp: $resp");
+          // dev.log("resp: $resp");
 
-          if (resp == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Organization registered successfully.'),
-              ),
-            );
-            context.go("/root");
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Some error occurred.'),
-              ),
-            );
-          }
+          // if (resp == true) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('Organization registered successfully.'),
+          //     ),
+          //   );
+          //   context.go("/root");
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('Some error occurred.'),
+          //     ),
+          //   );
+          // }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFFF6500),

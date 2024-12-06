@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/auth/auth_screen.dart';
 import 'package:sneekin/auth/otp_page.dart';
+import 'package:sneekin/models/org_app_account.dart';
 import 'package:sneekin/org/add_org_app_account.dart';
 import 'package:sneekin/org/create_org_view.dart';
 import 'package:sneekin/org/org_app_account_profile.dart';
@@ -86,7 +87,7 @@ class RouterServices with ChangeNotifier {
             name: 'create-virtual-account',
             pageBuilder: (context, state) => MaterialPage(
               key: state.pageKey,
-              child: PageWrapper(
+              child: const PageWrapper(
                 page: QrLoginView(),
                 isOrg: false,
               ),
@@ -98,7 +99,7 @@ class RouterServices with ChangeNotifier {
             name: 'user-profile-page',
             pageBuilder: (context, state) => MaterialPage(
               key: state.pageKey,
-              child: PageWrapper(
+              child: const PageWrapper(
                 page: UserProfilePage(),
                 isOrg: false,
               ),
@@ -130,12 +131,12 @@ class RouterServices with ChangeNotifier {
             path: '/org-app-account-profile',
             name: 'org-app-account-profile',
             pageBuilder: (context, state) {
-              final orgAccount = state.extra as Map<String, dynamic>?;
+              final orgAccount = state.extra as OrgAppAccount;
               return MaterialPage(
                 key: state.pageKey,
                 child: PageWrapper(
                   page: OrgAppAccountProfile(
-                    orgAccount: orgAccount ?? {},
+                    orgAccount: orgAccount,
                   ),
                   isOrg: true,
                 ),
@@ -147,7 +148,7 @@ class RouterServices with ChangeNotifier {
             name: 'org-dashboard-view',
             pageBuilder: (context, state) => MaterialPage(
               key: state.pageKey,
-              child: PageWrapper(
+              child: const PageWrapper(
                 page: OrgDashboardView(),
                 isOrg: true,
               ),

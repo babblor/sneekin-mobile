@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrLoginView extends StatefulWidget {
+  const QrLoginView({super.key});
+
   @override
   _QrLoginViewState createState() => _QrLoginViewState();
 }
@@ -30,25 +32,6 @@ class _QrLoginViewState extends State<QrLoginView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.black,
-      //   elevation: 0,
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.help_outline, color: Colors.white),
-      //       onPressed: () {
-      //         // Handle help action
-      //       },
-      //     ),
-      //     IconButton(
-      //       icon: Icon(Icons.flash_off, color: Colors.white),
-      //       onPressed: () {
-      //         controller?.toggleFlash();
-      //       },
-      //     ),
-      //   ],
-      // ),
       body: Stack(
         children: [
           // Camera Preview
@@ -68,9 +51,9 @@ class _QrLoginViewState extends State<QrLoginView> {
               width: 250, // Fixed size of the scanning area
               height: 250,
               child: CustomPaint(
-                size: Size.square(250), // Matches the scanning area size
+                size: const Size.square(250), // Matches the scanning area size
                 painter: QRCornerPainter(
-                  cornerColor: Color(0xFFFF6500),
+                  cornerColor: const Color(0xFFFF6500),
                   strokeWidth: 5.0,
                 ),
               ),
@@ -97,7 +80,7 @@ class _QrLoginViewState extends State<QrLoginView> {
         });
 
         // Simulate a delay to show the loader
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 1), () {
           setState(() {
             isScanning = false; // Hide loader
             scannedData = scanData.code; // Store scanned data
@@ -120,20 +103,20 @@ class _QrLoginViewState extends State<QrLoginView> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          title: Text(
+          title: const Text(
             'Scanned Data',
             style: TextStyle(color: Colors.white),
           ),
           content: Text(
             data,
-            style: TextStyle(color: Colors.white70),
+            style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text(
+              child: const Text(
                 'Close',
                 style: TextStyle(color: Colors.purple),
               ),
@@ -166,11 +149,11 @@ class QRCornerPainter extends CustomPainter {
       ..strokeWidth = strokeWidth;
 
     // Length of the corner lines
-    final double cornerLength = 30.0; // Smaller for a compact scanning area
+    const double cornerLength = 30.0; // Smaller for a compact scanning area
 
     // Draw top-left corner
-    canvas.drawLine(Offset(0, 0), Offset(cornerLength, 0), paint); // Horizontal line
-    canvas.drawLine(Offset(0, 0), Offset(0, cornerLength), paint); // Vertical line
+    canvas.drawLine(const Offset(0, 0), const Offset(cornerLength, 0), paint); // Horizontal line
+    canvas.drawLine(const Offset(0, 0), const Offset(0, cornerLength), paint); // Vertical line
 
     // Draw top-right corner
     canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0), paint); // Horizontal line

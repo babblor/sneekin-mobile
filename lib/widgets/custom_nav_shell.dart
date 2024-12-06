@@ -48,10 +48,16 @@ class CustomNavigationBar extends StatelessWidget {
               ),
               BottomNavigationBarItem(
                 label: 'OrgHome',
-                icon: Icon(
-                  CustomOrgIcons.org_home_outline_rounded,
+                icon: Image.asset(
+                  "assets/images/paper-stack.png",
+                  height: 25,
+                  width: 25,
                   color: theme.textTheme.headlineLarge?.color,
                 ),
+                // Icon(
+                //   CustomOrgIcons.org_home_outline_rounded,
+                //   color: theme.textTheme.headlineLarge?.color,
+                // ),
                 // Center(
                 //   child: Row(
                 //     mainAxisSize: MainAxisSize.min, // Ensures minimal space is used

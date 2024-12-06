@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -77,96 +77,81 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  // _verifyOtp(String verificationCode, BuildContext context) async {
-  //   setState(() {
-  //     isOtpLoading = true;
-  //   });
-
-  //   // if (_phoneController.text.isEmpty && verificationCode == "") {
-  //   //   showToast(message: "Details missing.", type: ToastificationType.error);
-  //   //   return;
-  //   // }
-  //   // final result = await Provider.of<AuthServices>(context, listen: false)
-  //   //     .verifyOTP(phone: _phoneController.text, otp: verificationCode);
-
-  //   // log("result in OtpPage: ${result}");
-  //   // setState(() {
-  //   //   isError = false;
-  //   //   isOtpLoading = false;
-  //   // });
-
-  //   // if (result == "NEW_USER") {
-  //   //   setState(() {
-  //   //     _countdownTimer?.cancel();
-  //   //     countdownSeconds = 60;
-  //   //     isCountdownActive = false;
-  //   //   });
-  //   //   context.go("/creation");
-  //   // } else if (result == "EXISTING_USER" || result == "EXISTING_ORGANIZATION") {
-  //   //   setState(() {
-  //   //     _countdownTimer?.cancel();
-  //   //     countdownSeconds = 60;
-  //   //     isCountdownActive = false;
-  //   //   });
-  //   //   context.go("/root");
-  //   // } else if (result == false) {
-  //   //   setState(() {
-  //   //     isError = true;
-  //   //     isOtpLoading = false;
-  //   //   });
-  //   //   _shakeController.forward(from: 0);
-  //   // }
-  //   if (verificationCode == "1234") {
-  //     setState(() {
-  //       isError = false;
-  //       isOtpLoading = false;
-  //     });
-  //     context.go("/creation");
-  //   } else {
-  //     setState(() {
-  //       isError = true;
-  //       isOtpLoading = false;
-  //     });
-  //     _shakeController.forward(from: 0);
-  //   }
-
-  //   log('OTP Verified');
-  // }
-  void _verifyOtp(String verificationCode, BuildContext context) {
+  _verifyOtp(String verificationCode, BuildContext context) async {
+    final auth = Provider.of<AuthServices>(context, listen: false);
+    final app = Provider.of<AppStore>(context, listen: false);
     setState(() {
       isOtpLoading = true;
     });
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (verificationCode != "1234") {
-        // Example: "1234" is the correct OTP
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid OTP!')),
-        );
-        setState(() {
-          isError = true;
-          isOtpLoading = false;
-        });
-        _shakeController.forward(from: 0);
-      } else {
-        setState(() {
-          isError = false;
-          isOtpLoading = false;
-        });
+    if (_phoneController.text.isEmpty && verificationCode == "") {
+      showToast(message: "Details missing.", type: ToastificationType.error);
+      return;
+    }
+    final result = await auth.verifyOTP(phone: _phoneController.text, otp: verificationCode);
 
-        log('OTP Verified');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verified successfully!')),
-        );
-        setState(() {
-          _countdownTimer?.cancel();
-          countdownSeconds = 60;
-          isCountdownActive = false;
-        });
-        context.go("/creation");
-        // Navigate to the next page or perform desired action
-      }
+    log("result in OtpPage: $result");
+    setState(() {
+      isError = false;
+      isOtpLoading = false;
     });
+
+    if (result == "NEW_USER") {
+      setState(() {
+        _countdownTimer?.cancel();
+        countdownSeconds = 60;
+        isCountdownActive = false;
+      });
+      context.go("/creation");
+    } else if (result == "EXISTING_USER") {
+      setState(() {
+        _countdownTimer?.cancel();
+        countdownSeconds = 60;
+        isCountdownActive = false;
+      });
+
+      log("accessToken in OTPPage: ${app.app?.accessToken}");
+      if (app.app?.accessToken == null) {
+        log("appData is null so reinitializing it...");
+        await app.initializeAppData();
+      }
+
+      final resp = await auth.getProfile(accessToken: app.app?.accessToken ?? "");
+
+      if (resp == true) {
+        context.go("/root");
+      } else {
+        showToast(message: "Some error occurred. Try again later.", type: ToastificationType.error);
+      }
+    } else if (result == "EXISTING_ORGANIZATION") {
+      setState(() {
+        _countdownTimer?.cancel();
+        countdownSeconds = 60;
+        isCountdownActive = false;
+      });
+
+      log("accessToken in OTPPage: ${app.app?.accessToken}");
+      if (app.app?.accessToken == null) {
+        log("appData is null so reinitializing it...");
+        await app.initializeAppData();
+      }
+
+      final resp = await auth.getOrgProfile(accessToken: app.app?.accessToken ?? "");
+
+      if (resp == true) {
+        context.go("/root");
+      } else {
+        showToast(message: "Some error occurred. Try again later.", type: ToastificationType.error);
+      }
+    } else if (result == false) {
+      setState(() {
+        isError = true;
+        isOtpLoading = false;
+      });
+      _shakeController.forward(from: 0);
+    }
+
+    log('OTP Verified');
   }
 
   @override
@@ -184,7 +169,7 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
                 height: 40,
               ),
             ),
-            const SizedBox(width: 2),
+            const SizedBox(width: 8),
             Text(
               "Sneek",
               style: GoogleFonts.inter(
@@ -196,305 +181,268 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
         ),
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Banner Image Section with Controlled Height
+                SvgPicture.asset(
+                  "assets/images/otpbg.svg",
+                  width: MediaQuery.of(context).size.width,
+                  // height: MediaQuery.of(context).size.height * 0.3, // 30% of screen height
+                  fit: BoxFit.cover,
+                ),
+                // Title Section
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Top AppBar Section
-                      // Padding(
-                      //   padding: const EdgeInsets.all(15.0),
-                      //   child: Row(
-                      //     children: [
-                      //       GestureDetector(
-                      //         child: Image.asset(
-                      //           "assets/icons/launcher_icon.png",
-                      //           height: 40,
-                      //         ),
-                      //       ),
-                      //       const SizedBox(width: 2),
-                      //       Text(
-                      //         "Sneek",
-                      //         style: GoogleFonts.inter(
-                      //           fontSize: 17,
-                      //           color: Colors.white,
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      // Banner Image & Title Section
-                      Flexible(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              'assets/images/otp.webp',
-                              height: constraints.maxHeight * 0.35,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(height: 30),
-                            Text(
-                              "Secure Access Made Simple",
-                              style: GoogleFonts.inter(
-                                fontSize: 22,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 35),
-                              child: Text(
-                                "Log in with your mobile number and verify your OTP to proceed.",
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: Colors.grey[400],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        "Secure Access Made \nSimple",
+                        style: GoogleFonts.inter(
+                          fontSize: 27,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // PageView Section
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SizedBox(
-                          height: constraints.maxHeight * 0.4,
-                          child: PageView(
-                            controller: _pageController,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: phoneNumberWidget(constraints),
-                              ),
-                              otpAuthWidget(context, constraints),
-                            ],
-                          ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "Sharing is caring, but not when it comes to personal info. Protect your privacy.",
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          color: Colors.grey[400],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            );
-          },
+                // const SizedBox(height: 20), // Add consistent spacing
+                // const Spacer(),
+                // Main PageView Section
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      phoneNumberWidget(),
+                      otpAuthWidget(context),
+                    ],
+                  ),
+                ),
+                // const SizedBox(height: 20), // Bottom spacing
+              ],
+            ),
+          ),
         ),
       ),
       floatingActionButton: isError
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 15, right: 15),
-              child: GestureDetector(
-                onTap: () {
-                  if (code != null) {
-                    _verifyOtp(code!, context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Invalid OTP!')),
-                    );
-                  }
-                },
-                child: CircleAvatar(
+          ? GestureDetector(
+              onTap: () {
+                if (code != null) {
+                  _verifyOtp(code!, context);
+                } else {
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   const SnackBar(content: Text('Invalid OTP!')),
+                  // );
+                  showToast(message: "Invalid OTP!", type: ToastificationType.info);
+                }
+              },
+              child: Consumer<AuthServices>(builder: (context, auth, _) {
+                return CircleAvatar(
                   radius: 25,
                   backgroundColor: Theme.of(context).textTheme.headlineLarge?.color,
-                  child: Center(
-                    child: Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-                  ),
-                ),
-              ),
+                  child: auth.isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.chevron_right,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                );
+              }),
             )
           : null,
     );
   }
 
-  Widget otpAuthWidget(BuildContext context, BoxConstraints constraints) {
-    return SingleChildScrollView(
-      child: Consumer<AuthServices>(builder: (context, value, _) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "+91-${_phoneController.text}",
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Wrong number? ",
-                  style: GoogleFonts.inter(color: Colors.white),
-                ),
-                SizedBox(width: 5),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isSent = false;
-                      isError = false;
-                      countdownSeconds = 60;
-                      isCountdownActive = false;
-                      _countdownTimer?.cancel();
-                    });
-                    _pageController.animateToPage(
-                      0,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: FaIcon(
-                    FontAwesomeIcons.penToSquare,
-                    color: Theme.of(context).textTheme.headlineLarge?.color,
-                    size: 17,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            AnimatedBuilder(
-              animation: _shakeAnimation,
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(_shakeAnimation.value, 0),
-                  child: child,
-                );
-              },
-              child: OtpTextField(
-                numberOfFields: 4,
-                filled: true,
-                cursorColor: Colors.red,
-                fillColor: Color(0xFF1F2937),
-                enabledBorderColor: isError ? Colors.red : Colors.white,
-                borderColor: Colors.red,
-                textStyle: GoogleFonts.inter(
-                  color: isError ? Colors.red : Colors.white,
+  Widget otpAuthWidget(BuildContext context) {
+    return Consumer<AuthServices>(
+      builder: (context, value, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "+91-${_phoneController.text}",
+                style: GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
-                fieldWidth: constraints.maxWidth * 0.10,
-                onSubmit: (String verificationCode) {
-                  if (isError) {
-                    setState(() {
-                      code = verificationCode;
-                    });
-                    return;
-                  }
-                  _verifyOtp(verificationCode, context);
-                },
               ),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: isCountdownActive
-                  ? null
-                  : () {
-                      startCountdown();
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Wrong number? ",
+                    style: GoogleFonts.inter(color: Colors.white),
+                  ),
+                  const SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
                       setState(() {
                         isSent = false;
+                        isError = false;
+                        countdownSeconds = 60;
+                        isCountdownActive = false;
+                        _countdownTimer?.cancel();
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('OTP has been sent successfully!')),
+                      _pageController.animateToPage(
+                        0,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
                       );
                     },
-              child: Text(
-                isCountdownActive ? "Resend OTP in $countdownSeconds seconds" : "Resend OTP",
-                style: GoogleFonts.inter(color: Colors.white),
+                    child: Icon(
+                      Icons.edit,
+                      color: Theme.of(context).textTheme.headlineLarge?.color,
+                      size: 20,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            if (isOtpLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: LinearProgressIndicator(),
+              const SizedBox(height: 20),
+              AnimatedBuilder(
+                animation: _shakeAnimation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(_shakeAnimation.value, 0),
+                    child: child,
+                  );
+                },
+                child: OtpTextField(
+                  numberOfFields: 4,
+                  filled: true,
+                  fillColor: const Color(0xFF1F2937),
+                  cursorColor: Colors.red,
+                  borderColor: Colors.red,
+                  enabledBorderColor: isError ? Colors.red : Colors.white,
+                  textStyle: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onSubmit: (verificationCode) {
+                    if (isError) {
+                      setState(() {
+                        code = verificationCode;
+                      });
+                      return;
+                    }
+                    _verifyOtp(verificationCode, context);
+                  },
+                ),
               ),
-          ],
+              const SizedBox(height: 10),
+              if (isCountdownActive)
+                Text(
+                  "Resend OTP in $countdownSeconds seconds",
+                  style: GoogleFonts.inter(color: Colors.white),
+                )
+              else
+                TextButton(
+                  onPressed: () {
+                    startCountdown();
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(content: Text('OTP has been sent successfully!')),
+                    // );
+                    showToast(message: "OTP has been sent successfully!", type: ToastificationType.info);
+                  },
+                  child: Text(
+                    "Resend OTP",
+                    style: GoogleFonts.inter(color: Colors.white),
+                  ),
+                ),
+              if (value.isLoading)
+                Container(
+                  margin: const EdgeInsets.only(top: 20, bottom: 20, left: 20, right: 20),
+                  child: const LinearProgressIndicator(),
+                ),
+            ],
+          ),
         );
-      }),
+      },
     );
   }
 
-  Widget phoneNumberWidget(BoxConstraints constraints) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4.0),
-            child: Text(
-              "Enter 10 digit valid number",
-              style: GoogleFonts.inter(
-                fontSize: 16,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 25,
-          ),
-          Consumer<AuthServices>(builder: (context, auth, _) {
-            return TextFormField(
-              key: _phoneNumberKey,
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              autofocus: true,
-              style: GoogleFonts.inter(color: Colors.white),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your phone number';
-                }
-                if (value.length != 10) {
-                  return 'Please enter a valid phone number';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                labelStyle: GoogleFonts.inter(color: const Color(0xFFFF6500)),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFFF6500)),
+  Widget phoneNumberWidget() {
+    return Consumer<AuthServices>(
+      builder: (context, auth, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextFormField(
+                key: _phoneNumberKey,
+                controller: _phoneController,
+                enabled: !isSent,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                style: GoogleFonts.inter(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Enter your phone number...',
+                  hintStyle: GoogleFonts.inter(color: Colors.grey),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                  ),
                 ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFFF6500)),
-                ),
-              ),
-              onChanged: (value) async {
-                if (value.length == 10) {
-                  setState(() {
-                    isSent = true;
-                  });
-                  final result = await auth.sendOTP(phone: value);
-                  if (result == true) {
-                    startCountdown();
-                    _pageController.animateToPage(
-                      1,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
+                onChanged: (value) async {
+                  if (value.length == 10) {
+                    setState(() {
+                      isSent = true;
+                    });
+                    final result = await auth.sendOTP(phone: value);
+                    if (result == true) {
+                      startCountdown();
+                      _pageController.animateToPage(
+                        1,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    }
                   }
-                }
-              },
-            );
-          }),
-        ],
-      ),
+                },
+              ),
+              const SizedBox(
+                height: 75,
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 

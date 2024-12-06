@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sneekin/models/org_app_account.dart';
 
 class ApiKeysDialog extends StatefulWidget {
-  const ApiKeysDialog({super.key});
+  OrgAppAccount account;
+  ApiKeysDialog({super.key, required this.account});
 
   @override
   State<ApiKeysDialog> createState() => _ApiKeysDialogState();
@@ -73,7 +75,7 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: BorderSide.none,
                     ),
-                    hintText: "your-client-id",
+                    hintText: widget.account.clientId,
                     hintStyle: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
                   ),
                   style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
@@ -103,6 +105,54 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
           const SizedBox(height: 16.0),
 
           // Client Secret Field
+
+          Text(
+            "Client Website",
+            style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  readOnly: true,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: theme.scaffoldBackgroundColor,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: widget.account.clientWebsite != ""
+                        ? widget.account.clientWebsite
+                        : "no-client-website",
+                    hintStyle: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
+                  ),
+                  style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
+                child: Center(
+                  child: IconButton(
+                    onPressed: () {
+                      // Copy Client Secret logic
+                      Clipboard.setData(const ClipboardData(text: "your-client-website"));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Client website copied to clipboard")),
+                      );
+                    },
+                    icon: const Icon(Icons.copy, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16.0),
           Text(
             "Client Secret",
             style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
@@ -122,7 +172,7 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: BorderSide.none,
                     ),
-                    hintText: _isSecretHidden ? "*******" : "your-client-secret",
+                    hintText: _isSecretHidden ? "*******" : widget.account.clientSecret ?? "no-secret-keys",
                     hintStyle: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
                   ),
                   style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
@@ -159,8 +209,9 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
               ),
             ],
           ),
-
-          const SizedBox(height: 16.0),
+          const SizedBox(
+            height: 16,
+          ),
 
           // Warning message
           Row(

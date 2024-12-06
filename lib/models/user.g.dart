@@ -17,27 +17,24 @@ class UserAdapter extends TypeAdapter<User> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return User(
-      user_id: fields[0] as int?,
-      email_id: fields[1] as String?,
-      name: fields[2] as String?,
-      age: fields[3] as int?,
-      gender: fields[4] as String?,
-      created_at: fields[5] as String?,
-      updated_at: fields[6] as String?,
-      profile_image: fields[7] as String?,
-      keyclock_secret: fields[8] as String?,
-      email_verified: fields[9] as bool?,
+      id: fields[0] as int,
+      email: fields[1] as String,
+      name: fields[2] as String,
+      age: fields[3] as int,
+      gender: fields[4] as String,
+      profileImageUrl: fields[5] as String?,
+      mobileNumbers: (fields[6] as List).cast<MobileNumber>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, User obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.user_id)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.email_id)
+      ..write(obj.email)
       ..writeByte(2)
       ..write(obj.name)
       ..writeByte(3)
@@ -45,15 +42,9 @@ class UserAdapter extends TypeAdapter<User> {
       ..writeByte(4)
       ..write(obj.gender)
       ..writeByte(5)
-      ..write(obj.created_at)
+      ..write(obj.profileImageUrl)
       ..writeByte(6)
-      ..write(obj.updated_at)
-      ..writeByte(7)
-      ..write(obj.profile_image)
-      ..writeByte(8)
-      ..write(obj.keyclock_secret)
-      ..writeByte(9)
-      ..write(obj.email_verified);
+      ..write(obj.mobileNumbers);
   }
 
   @override
@@ -62,7 +53,46 @@ class UserAdapter extends TypeAdapter<User> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      other is UserAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+}
+
+class MobileNumberAdapter extends TypeAdapter<MobileNumber> {
+  @override
+  final int typeId = 1;
+
+  @override
+  MobileNumber read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return MobileNumber(
+      id: fields[0] as int,
+      mobileNumber: fields[1] as String,
+      countryCode: fields[2] as String,
+      is_org: fields[3] as bool,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, MobileNumber obj) {
+    writer
+      ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.mobileNumber)
+      ..writeByte(2)
+      ..write(obj.countryCode)
+      ..writeByte(3)
+      ..write(obj.is_org);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MobileNumberAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }

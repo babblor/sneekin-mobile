@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:sneekin/widgets/custom_drawer.dart';
 import 'package:sneekin/widgets/custom_nav_shell.dart';
 
@@ -19,25 +18,35 @@ class PageWrapper extends StatefulWidget {
 class _PageWrapperState extends State<PageWrapper> {
   int _activeIndex = 0;
 
+  bool _handlePop() {
+    if (_activeIndex != 0) {
+      // Reset to the default tab (index 0) instead of exiting the app
+      setState(() {
+        _activeIndex = 0;
+      });
+      _navigateToPage(0);
+      return false; // Prevent the app from popping
+    }
+    return true; // Allow the app to pop (exit)
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final app = Provider.of(context, listen: true);
-    return Scaffold(
-      // backgroundColor: Colors.black,
-      // backgroundColor: Colors.red,
-      drawer: CustomDrawerWidget(
-          // app: app,
-          ),
-      body: widget.page,
-      bottomNavigationBar: CustomNavigationBar(
-        currentIndex: _activeIndex,
-        isOrg: widget.isOrg,
-        onTap: (index) {
-          setState(() {
-            _activeIndex = index;
-          });
-          _navigateToPage(index);
-        },
+    return PopScope(
+      onPopInvoked: (popDisposition) => _handlePop(),
+      child: Scaffold(
+        drawer: const CustomDrawerWidget(),
+        body: widget.page,
+        bottomNavigationBar: CustomNavigationBar(
+          currentIndex: _activeIndex,
+          isOrg: widget.isOrg,
+          onTap: (index) {
+            setState(() {
+              _activeIndex = index;
+            });
+            _navigateToPage(index);
+          },
+        ),
       ),
     );
   }
@@ -51,7 +60,6 @@ class _PageWrapperState extends State<PageWrapper> {
           context.goNamed('org-dashboard');
           break;
         case 1:
-          // context.goNamed('org-dashboard');
           context.goNamed('org-home-view');
           break;
         case 2:

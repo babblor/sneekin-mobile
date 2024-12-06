@@ -1,17 +1,19 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cron/cron.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:sneekin/auth/auth_screen.dart';
+import 'package:sneekin/models/app.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/models/user.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/services/auth_services.dart';
+import 'package:sneekin/services/data_services.dart';
 import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/services/theme_services.dart';
 import 'package:toastification/toastification.dart';
@@ -91,7 +93,7 @@ Future<void> main() async {
 
   try {
     await dotenv.load(fileName: ".env.local");
-    log("Loaded .env.local file");
+    // log("Loaded .env.local file");
   } catch (e) {
     log("Error loading .env file: $e");
   }
@@ -102,7 +104,9 @@ Future<void> main() async {
   }
 
   Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(MobileNumberAdapter());
   Hive.registerAdapter(OrganizationAdapter());
+  Hive.registerAdapter(AppAdapter());
   AuthServices authServices = AuthServices();
   AppStore appStore = AppStore();
 
@@ -110,14 +114,18 @@ Future<void> main() async {
 
   await appStore.initializeUserData();
   await appStore.initializeOrgData();
+  await appStore.initializeAppData();
 
   log("Current logged in user status: ${appStore.isSignedIn}");
   log("Current logged in org status: ${appStore.isOrgSignedIn}");
+
+  // await Provider.of<AppStore>(context, listen: false).checkAuthToken(context);
 
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => ThemeServices()),
       ChangeNotifierProvider(create: (context) => HelperServices()),
+      ChangeNotifierProvider(create: (context) => DataServices()),
       ChangeNotifierProvider.value(value: authServices),
       ChangeNotifierProvider.value(value: appStore),
       ChangeNotifierProvider(create: (context) => RouterServices()),
@@ -131,11 +139,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log("MyApp built"); // For debugging rebuilds
+    // log("MyApp built"); // For debugging rebuilds
 
     return Consumer2<ThemeServices, RouterServices>(
       builder: (context, theme, routerServices, child) {
-        log("Current themeMode: ${theme.themeMode}");
+        // log("Current themeMode: ${theme.themeMode}");
+
+        final cron = Cron();
+
+        cron.schedule(Schedule.parse('*/3 * * * *'), () async {
+          log('checking auth token in every three minutes');
+          await Provider.of<AppStore>(context, listen: false).checkAuthToken(context);
+        });
 
         return ToastificationWrapper(
           child: MaterialApp.router(
@@ -148,7 +163,7 @@ class MyApp extends StatelessWidget {
         );
         // return MaterialApp(
         //   debugShowCheckedModeBanner: false,
-        //   home: AuthScreen(),
+        //   home: DummyScreen(),
         // );
       },
     );

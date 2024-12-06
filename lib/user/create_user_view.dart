@@ -1,13 +1,9 @@
-import 'dart:developer' as dev;
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sneekin/auth/custom_top_bar.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart'; // Import Syncfusion slider package
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../models/user.dart';
 // import '../../services/auth_services.dart'; // Import provider for AuthServices
 
 class CreateUserScreen extends StatefulWidget {
@@ -237,52 +233,52 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     return Consumer<AppStore>(builder: (context, value, _) {
       return ElevatedButton(
         onPressed: () async {
-          dev.log('Name: ${nameController.text}');
-          dev.log('Email: ${emailController.text}');
+          // dev.log('Name: ${nameController.text}');
+          // dev.log('Email: ${emailController.text}');
 
-          if (!_formKey.currentState!.validate()) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Fill all the fields.'),
-              ),
-            );
-            return; // Stop execution if validation fails
-          }
+          // if (!_formKey.currentState!.validate()) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('Fill all the fields.'),
+          //     ),
+          //   );
+          //   return; // Stop execution if validation fails
+          // }
 
-          var random = Random();
-          int fiveDigitNumber = 10000 + random.nextInt(90000);
+          // var random = Random();
+          // int fiveDigitNumber = 10000 + random.nextInt(90000);
 
-          final resp = await value.storeUserData(
-            user: User(
-                user_id: fiveDigitNumber,
-                name: nameController.text,
-                email_id: emailController.text,
-                gender: _gender,
-                age: _age.toInt(),
-                created_at: DateTime.now().toString(),
-                updated_at: DateTime.now().toString(),
-                profile_image: "",
-                keyclock_secret: "",
-                email_verified: false),
-          );
+          // final resp = await value.storeUserData(
+          //   user: User(
+          //       // user_id: fiveDigitNumber,
+          //       // name: nameController.text,
+          //       // email_id: emailController.text,
+          //       // gender: _gender,
+          //       // age: _age.toInt(),
+          //       // created_at: DateTime.now().toString(),
+          //       // updated_at: DateTime.now().toString(),
+          //       // profile_image: "",
+          //       // keyclock_secret: "",
+          //       // email_verified: false),
+          // );
 
-          dev.log("resp: $resp");
+          // dev.log("resp: $resp");
 
-          if (resp == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('User registered successfully.'),
-              ),
-            );
-            // value.refresh();
-            context.go("/root");
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Some error occurred.'),
-              ),
-            );
-          }
+          // if (resp == true) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('User registered successfully.'),
+          //     ),
+          //   );
+          //   // value.refresh();
+          //   context.go("/root");
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(
+          //       content: Text('Some error occurred.'),
+          //     ),
+          //   );
+          // }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFFF6500),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
 
 void showToast({required String message, required ToastificationType type}) {
@@ -6,8 +7,11 @@ void showToast({required String message, required ToastificationType type}) {
     type: type,
     style: ToastificationStyle.flat,
     autoCloseDuration: const Duration(seconds: 3),
-    title: Text(message),
-    alignment: Alignment.bottomCenter,
+    title: Text(
+      message,
+      style: GoogleFonts.inter(),
+    ),
+    alignment: Alignment.topCenter,
     direction: TextDirection.ltr,
     showIcon: true, // show or hide the icon
     primaryColor: Colors.white,
@@ -16,6 +20,7 @@ void showToast({required String message, required ToastificationType type}) {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
     margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     borderRadius: BorderRadius.circular(12),
+    borderSide: const BorderSide(color: Color(0xFFFF6500), width: 1),
     boxShadow: const [
       BoxShadow(
         color: Color(0x07000000),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/org/add_org_app_account.dart';
@@ -27,10 +29,11 @@ class NavigationShellState extends State<NavigationShell> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.microtask(() {
+      log("calling microtask for initializeOrgData in Nav shell");
       Provider.of<AppStore>(context, listen: false).initializeOrgData();
+      log("calling microtask for initializeUserData in Nav shell");
       Provider.of<AppStore>(context, listen: false).initializeUserData();
     });
   }
@@ -39,51 +42,81 @@ class NavigationShellState extends State<NavigationShell> {
   Widget build(BuildContext context) {
     return Consumer<AppStore>(
       builder: (context, app, child) {
+        log("initially isSigned in status: ${app.isSignedIn}");
+        log("initially isOrgSigned in status: ${app.isOrgSignedIn}");
+        if (app.isLoading) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).textTheme.headlineLarge?.color,
+              ),
+            ),
+          );
+        }
+
         final List<Widget> pages = app.isSignedIn
             ? [
                 const UserHomeView(),
-                QrLoginView(),
-                UserProfilePage(
-                    // user: app.user
-                    ),
+                const QrLoginView(),
+                const UserProfilePage(),
               ]
             : [
                 const OrgDashboard(),
                 const OrgHomeView(),
-
-                OrgDashboardView(
-                    // org: app.org
-                    ),
-                // OrgDashboard(),
+                const OrgDashboardView(),
                 const AddOrgAppAccountPage(),
                 const CreateOrgView(),
                 const VirtualAccountsOfOrgAppAccount(),
                 ShowOrgAppAccountsPage(),
               ];
 
-        if (app.isLoading) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) {
+              log("PopScope didPop: $didPop");
+              return;
+            }
 
-        return Scaffold(
-          key: context.read<HelperServices>().globalScaffoldKey,
-          drawer: CustomDrawerWidget(),
-          body: IndexedStack(
-            index: _activeIndex,
-            children: pages,
-          ),
-          bottomNavigationBar: CustomNavigationBar(
-            currentIndex: _activeIndex,
-            isOrg: !app.isSignedIn,
-            onTap: (index) {
-              setState(() {
-                _activeIndex = index;
-              });
-            },
+            log("Result: $result");
+
+            // Show a confirmation dialog
+            final shouldExit = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text("Exit App"),
+                  content: const Text("Are you sure you want to quit the app?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false), // Do not exit
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true), // Exit the app
+                      child: const Text("Yes"),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: Scaffold(
+            key: context.read<HelperServices>().globalScaffoldKey,
+            drawer: const CustomDrawerWidget(),
+            body: IndexedStack(
+              index: _activeIndex,
+              children: pages,
+            ),
+            bottomNavigationBar: CustomNavigationBar(
+              currentIndex: _activeIndex,
+              isOrg: !app.isSignedIn,
+              onTap: (index) {
+                setState(() {
+                  _activeIndex = index;
+                });
+              },
+            ),
           ),
         );
       },

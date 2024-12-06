@@ -8,7 +8,7 @@ part of 'organization.dart';
 
 class OrganizationAdapter extends TypeAdapter<Organization> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
   Organization read(BinaryReader reader) {
@@ -17,58 +17,73 @@ class OrganizationAdapter extends TypeAdapter<Organization> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Organization(
-      org_address: fields[11] as String?,
-      org_cin: fields[4] as String?,
-      org_cin_url: fields[7] as String?,
-      org_cin_verified: fields[13] as bool?,
-      org_email: fields[3] as String?,
-      org_gstin: fields[6] as String?,
-      org_gstin_url: fields[9] as String?,
-      org_gstin_verified: fields[14] as bool?,
-      org_id: fields[0] as int?,
-      org_logo_url: fields[10] as String?,
-      org_name: fields[1] as String?,
-      org_pan: fields[5] as String?,
-      org_pan_url: fields[8] as String?,
-      org_pan_verified: fields[12] as bool?,
-      org_website_name: fields[2] as String?,
+      id: fields[0] as int?,
+      name: fields[1] as String?,
+      websiteName: fields[2] as String?,
+      email: fields[3] as String?,
+      cin: fields[4] as String?,
+      pan: fields[5] as String?,
+      gstin: fields[6] as String?,
+      cinUrl: fields[7] as String?,
+      panUrl: fields[8] as String?,
+      gstinUrl: fields[9] as String?,
+      logo: fields[10] as String?,
+      address: fields[11] as String?,
+      isPanVerified: fields[12] as bool?,
+      isCinVerified: fields[13] as bool?,
+      isGstinVerified: fields[14] as bool?,
+      mobileNumbers: (fields[19] as List?)?.cast<MobileNumber>(),
+      totalWebsites: fields[16] as int?,
+      totalMobileApps: fields[17] as int?,
+      totalVirtualAccountUsers: fields[15] as int?,
+      isEmailVerified: fields[18] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Organization obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(20)
       ..writeByte(0)
-      ..write(obj.org_id)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.org_name)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.org_website_name)
+      ..write(obj.websiteName)
       ..writeByte(3)
-      ..write(obj.org_email)
+      ..write(obj.email)
       ..writeByte(4)
-      ..write(obj.org_cin)
+      ..write(obj.cin)
       ..writeByte(5)
-      ..write(obj.org_pan)
+      ..write(obj.pan)
       ..writeByte(6)
-      ..write(obj.org_gstin)
+      ..write(obj.gstin)
       ..writeByte(7)
-      ..write(obj.org_cin_url)
+      ..write(obj.cinUrl)
       ..writeByte(8)
-      ..write(obj.org_pan_url)
+      ..write(obj.panUrl)
       ..writeByte(9)
-      ..write(obj.org_gstin_url)
+      ..write(obj.gstinUrl)
       ..writeByte(10)
-      ..write(obj.org_logo_url)
+      ..write(obj.logo)
       ..writeByte(11)
-      ..write(obj.org_address)
+      ..write(obj.address)
       ..writeByte(12)
-      ..write(obj.org_pan_verified)
+      ..write(obj.isPanVerified)
       ..writeByte(13)
-      ..write(obj.org_cin_verified)
+      ..write(obj.isCinVerified)
       ..writeByte(14)
-      ..write(obj.org_gstin_verified);
+      ..write(obj.isGstinVerified)
+      ..writeByte(15)
+      ..write(obj.totalVirtualAccountUsers)
+      ..writeByte(16)
+      ..write(obj.totalWebsites)
+      ..writeByte(17)
+      ..write(obj.totalMobileApps)
+      ..writeByte(18)
+      ..write(obj.isEmailVerified)
+      ..writeByte(19)
+      ..write(obj.mobileNumbers);
   }
 
   @override

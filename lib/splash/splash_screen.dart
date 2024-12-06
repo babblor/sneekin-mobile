@@ -14,7 +14,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
+      // await Provider.of<AppStore>(context, listen: false).checkAuthToken(context);
       Provider.of<AppStore>(context, listen: false).checkAuth(context);
     });
   }
