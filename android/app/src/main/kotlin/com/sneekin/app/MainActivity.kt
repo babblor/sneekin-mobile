@@ -1,4 +1,4 @@
-package com.example.sneekin
+package com.sneekin.app
 
 import android.net.Uri
 import android.provider.OpenableColumns
