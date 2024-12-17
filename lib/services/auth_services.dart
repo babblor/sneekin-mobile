@@ -59,7 +59,7 @@ class AuthServices with ChangeNotifier {
   initialize() async {
     _dio = Dio(
       BaseOptions(
-        baseUrl: dotenv.env["BASE_API_URL"]!,
+        baseUrl: dotenv.env["MAIN_API_URL"]!,
         receiveTimeout: const Duration(seconds: 50),
         connectTimeout: const Duration(seconds: 50),
       ),
@@ -590,19 +590,21 @@ class AuthServices with ChangeNotifier {
 
   getUserVirtualAccounts() async {
     try {
+      _isLoading = true;
+      notifyListeners();
       if (appStore.app?.accessToken == null) {
         await appStore.initializeAppData();
       }
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
       final resp = await _dio!.get(
-        "/virtual-accounts",
+        "/virtual-accounts/new",
         options: Options(
           contentType: Headers.jsonContentType,
         ),
       );
       if (resp.statusCode == 200) {
-        log("getUserVirtualAccounts resp: ${resp.data}");
-        log("virtual account data: ${resp.data["userVirtualAccounts"]}");
+        // log("getUserVirtualAccounts resp: ${resp.data}");
+        // log("virtual account data: ${resp.data["userVirtualAccounts"]}");
         _userVirtualAccounts = (resp.data["userVirtualAccounts"] as List)
             .map((account) => VirtualAccount.fromJson(account))
             .toList();
@@ -641,7 +643,7 @@ class AuthServices with ChangeNotifier {
       }
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
       final resp = await _dio!.get(
-        "/org-app-accounts",
+        "/org-app-accounts/new",
         options: Options(
           contentType: Headers.jsonContentType,
         ),
@@ -1118,7 +1120,7 @@ class AuthServices with ChangeNotifier {
       if (mobile.isNotEmpty) data['mobile'] = mobile;
       if (email.isNotEmpty) data['email'] = email;
       if (clientWebsite.isNotEmpty) data['clientWebsite'] = clientWebsite;
-      data['isMobile'] = isMobile;
+      data['isMobileApp'] = isMobile;
 
       String? logoUrl;
 
@@ -1143,8 +1145,13 @@ class AuthServices with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
+      log("resp.data in createOrgAppsAccount: ${resp.data}");
+
       if (resp.statusCode == 200 || resp.statusCode == 201) {
         await getOrgAppsAccounts();
+        await getOrgProfile(accessToken: appStore.app?.accessToken ?? "");
+        // await appStore.initializeOrgData();
+        notifyListeners();
         return true;
       } else {
         showToast(message: "Failed to update org-apps-account.", type: ToastificationType.error);
@@ -1235,6 +1242,62 @@ class AuthServices with ChangeNotifier {
       notifyListeners();
       showToast(message: "An unexpected error occurred.", type: ToastificationType.error);
       log("Error: $e");
+      return false;
+    }
+  }
+
+  verifyQR({required String mobileID, required String qrCode}) async {
+    if (_isLoading) return;
+    try {
+      _isLoading = true;
+      notifyListeners();
+      Map<String, dynamic> data = {};
+
+      log("qrCode data in authServices: ${qrCode}");
+      log("mobileID data in authServices: ${mobileID}");
+      log("appClientID data in authServices: ${dotenv.env["SNEEK_CLIENT_ID"]!}");
+
+      // Conditionally add fields if they are not empty
+      if (mobileID.isNotEmpty) data['mobileID'] = int.parse(mobileID);
+      data['appClientID'] = dotenv.env["SNEEK_CLIENT_ID"]!;
+      if (qrCode.isNotEmpty) data['qrCode'] = qrCode;
+
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      // Make the POST request
+      final resp = await _dio!.post(
+        "/qr-code/verify-sneek-qr",
+        data: data,
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
+      );
+
+      _isLoading = false;
+      notifyListeners();
+
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        await getUserVirtualAccounts();
+        return true;
+      } else {
+        showToast(message: resp.data["message"] ?? "Failed to login", type: ToastificationType.error);
+        return false;
+      }
+    } on DioException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      showToast(
+        message: e.response?.data["message"] ?? "Network Error! Please try again later.",
+        type: ToastificationType.error,
+      );
+      log("DioException in verifyQR(): ${e.response?.data ?? e.toString()}");
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      showToast(message: "An unexpected error occurred.", type: ToastificationType.error);
+      log("Error in verifyQR(): $e");
       return false;
     }
   }

@@ -61,7 +61,7 @@ class Organization {
   final bool? isEmailVerified;
 
   @HiveField(19)
-  final List<MobileNumber>? mobileNumbers;
+  final List<MobileNumber> mobileNumbers;
 
   Organization(
       {this.id,
@@ -79,7 +79,7 @@ class Organization {
       this.isPanVerified,
       this.isCinVerified,
       this.isGstinVerified,
-      this.mobileNumbers,
+      required this.mobileNumbers,
       this.totalWebsites,
       this.totalMobileApps,
       this.totalVirtualAccountUsers,
@@ -107,8 +107,8 @@ class Organization {
       totalVirtualAccountUsers: json['totalVirtualAccountUsers'] as int?,
       totalWebsites: json['totalWebsites'] as int?,
       totalMobileApps: json['totalMobileApps'] as int?,
-      mobileNumbers: (json['mobileNumbers'] as List?)
-          ?.map((e) => MobileNumber.fromJson(e as Map<String, dynamic>))
+      mobileNumbers: (json['mobileNumbers'] as List)
+          .map((e) => MobileNumber.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -135,7 +135,7 @@ class Organization {
       'isEmailVerified': isEmailVerified,
       'totalWebsites': totalWebsites,
       'totalVirtualAccountUsers': totalVirtualAccountUsers,
-      'mobileNumbers': mobileNumbers?.map((e) => e.toJson()).toList(),
+      'mobileNumbers': mobileNumbers.map((e) => e.toJson()).toList(),
     };
   }
 }

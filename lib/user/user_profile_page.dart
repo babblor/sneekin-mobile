@@ -624,7 +624,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     log("user_profile_page.dart rebuilds");
     final theme = Theme.of(context);
-    final app = Provider.of<AppStore>(context, listen: false);
+    // final app = Provider.of<AppStore>(context, listen: false);
     // final auth = Provider.of<AuthServices>(context, listen: false);
 
     return SafeArea(
@@ -644,6 +644,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             panController.text = auth.userTaxProfile["panNumber"] ?? "";
             panNameController.text = auth.userTaxProfile["name"] ?? "";
             panAddressController.text = auth.userTaxProfile["address"] ?? "";
+            log("app.user?.profileImageUrl:${app.user?.profileImageUrl}");
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -813,7 +814,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               const SizedBox(
                                                 width: 15,
                                               ),
-                                              isVerified
+                                              app.user!.isEmailVerified
                                                   ? FaIcon(
                                                       FontAwesomeIcons.circleCheck,
                                                       size: canEdit ? 15 : 13,
@@ -1053,12 +1054,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     children: [
                                       // _buildTextField("PAN", panController, theme, app, showTaxProfile),
                                       _buildText("PAN", auth.userTaxProfile["panNumber"], context, theme, app,
-                                          showTaxProfile),
+                                          showTaxProfile, true, auth.userTaxProfile["isPanVerified"]),
                                       const SizedBox(
                                         height: 7,
                                       ),
                                       _buildText("NAME", auth.userTaxProfile["name"], context, theme, app,
-                                          showTaxProfile),
+                                          showTaxProfile, false, auth.userTaxProfile["isPanVerified"]),
                                       // _buildTextField("NAME", panNameController, theme, app, showTaxProfile),
                                       // _buildTextIconField(FontAwesomeIcons.locationDot, panAddressController,
                                       //     theme, app, showTaxProfile),
@@ -1201,8 +1202,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildText(
-      String label, String value, BuildContext context, ThemeData theme, AppStore app, bool show) {
+  Widget _buildText(String label, String value, BuildContext context, ThemeData theme, AppStore app,
+      bool show, bool showVerified, bool isPanVerified) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -1226,6 +1227,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
             color: theme.textTheme.bodyLarge?.color,
           ),
         ),
+        if (showVerified)
+          SizedBox(
+            width: 10,
+          ),
+        if (showVerified)
+          isPanVerified
+              ? FaIcon(
+                  FontAwesomeIcons.circleCheck,
+                  size: canEdit ? 15 : 13,
+                  color: Colors.green,
+                )
+              : FaIcon(FontAwesomeIcons.close, size: canEdit ? 15 : 13, color: Colors.red)
       ],
     );
   }

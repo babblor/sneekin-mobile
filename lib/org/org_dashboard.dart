@@ -297,6 +297,8 @@ class _OrgDashboardState extends State<OrgDashboard> {
                         );
                         return;
                       }
+                      log("Creating org-app-account with ${_nameController.text}, ${_mobileController.text}, ${_emailController.text}, ${_clientWebsiteController.text}, ${_logoImage}, ${isMobile}");
+
                       final result = await auth.createOrgAppsAccount(
                           name: _nameController.text,
                           mobile: _mobileController.text,
@@ -317,6 +319,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                           isMobile = false;
                         });
                         Navigator.pop(context);
+                        context.go("/org-home-view");
                       } else {
                         setState(() {
                           _nameController.clear();
@@ -360,7 +363,8 @@ class _OrgDashboardState extends State<OrgDashboard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // final org = Provider.of<AppStore>(context, listen: false).org;
+    // final org = Provider.of<AppStore>(context, listen: false);
+    // org.initializeOrgData();
     return SafeArea(
       child: Container(
         height: MediaQuery.of(context).size.height,
@@ -670,11 +674,22 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                       const SizedBox(
                                         width: 5,
                                       ),
-                                      Text(
-                                        app.org?.mobileNumbers?.first.mobileNumber ?? "N/A",
-                                        style: GoogleFonts.inter(
-                                            fontSize: 13, color: theme.textTheme.bodyLarge?.color),
-                                      ),
+                                      if (app.org?.mobileNumbers?.isNotEmpty ?? false)
+                                        Text(
+                                          app.org?.mobileNumbers?[0].mobileNumber ?? "N/A",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 13,
+                                            color: theme.textTheme.bodyLarge?.color,
+                                          ),
+                                        )
+                                      else
+                                        Text(
+                                          "N/A", // Default text in case mobileNumbers is null or empty
+                                          style: GoogleFonts.inter(
+                                            fontSize: 13,
+                                            color: theme.textTheme.bodyLarge?.color,
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ],

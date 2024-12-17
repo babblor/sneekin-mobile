@@ -16,6 +16,7 @@ import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/services/data_services.dart';
 import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/services/theme_services.dart';
+import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 import 'services/router_services.dart';
 
@@ -134,8 +135,22 @@ Future<void> main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Key _key = UniqueKey();
+
+  void restartApp() {
+    log("Restarting app");
+    setState(() {
+      _key = UniqueKey(); // Generate a new key
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,13 +162,24 @@ class MyApp extends StatelessWidget {
 
         final cron = Cron();
 
-        cron.schedule(Schedule.parse('*/3 * * * *'), () async {
+        cron.schedule(Schedule.parse('*/1 * * * *'), () async {
           log('checking auth token in every three minutes');
-          await Provider.of<AppStore>(context, listen: false).checkAuthToken(context);
+          final app = Provider.of<AppStore>(context, listen: false);
+          final isTokenValid = await app.checkAuthToken(context);
+          log("isTokenValid: ${isTokenValid}");
+          if (isTokenValid) {
+            await app.signOut(context);
+            showToast(
+              message: "Session has expired. Login again!",
+              type: ToastificationType.info,
+            );
+            restartApp();
+          }
         });
 
         return ToastificationWrapper(
           child: MaterialApp.router(
+            key: _key,
             debugShowCheckedModeBanner: false,
             theme: lightTheme,
             darkTheme: darkTheme,
@@ -161,10 +187,6 @@ class MyApp extends StatelessWidget {
             routerConfig: routerServices.getRouter(context),
           ),
         );
-        // return MaterialApp(
-        //   debugShowCheckedModeBanner: false,
-        //   home: DummyScreen(),
-        // );
       },
     );
   }

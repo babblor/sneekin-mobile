@@ -25,7 +25,7 @@ class OrgDashboardView extends StatefulWidget {
 class _OrgDashboardViewState extends State<OrgDashboardView> {
   final TextEditingController orgNameController = TextEditingController();
   // final TextEditingController orgEmailController = TextEditingController();
-  // final TextEditingController orgWebsiteController = TextEditingController();
+  final TextEditingController orgWebsiteController = TextEditingController();
   final TextEditingController orgCINController = TextEditingController();
   final TextEditingController orgPANController = TextEditingController();
   final TextEditingController orgGSTINController = TextEditingController();
@@ -35,6 +35,8 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
 
   bool canEdit = false;
   bool isVerified = true;
+
+  String? _phone;
   final String _uploadPanImage = 'No file chosen';
 
   final String _uploadCINImage = 'No file chosen';
@@ -120,6 +122,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
           );
         }
         orgNameController.text = app.org?.name ?? "N/A";
+        orgWebsiteController.text = app.org?.websiteName ?? "N/A";
         orgCINController.text = app.org?.cin ?? "N/A";
         orgPANController.text = app.org?.pan ?? "N/A";
         orgGSTINController.text = app.org?.gstin ?? "N/A";
@@ -220,21 +223,29 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildTextField2("Name", orgNameController, theme, app),
+                                    // if (!canEdit)
+                                    //   const SizedBox(
+                                    //     height: 10,
+                                    //   ),
+                                    if (canEdit)
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                    _buildTextField2("Website", orgWebsiteController, theme, app),
                                     if (!canEdit)
                                       const SizedBox(
-                                        height: 10,
+                                        height: 2,
                                       ),
                                     if (canEdit)
                                       const SizedBox(
                                         height: 15,
                                       ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.place_outlined,
@@ -254,34 +265,34 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                           ],
                                         ),
                                         const SizedBox(
-                                          width: 2,
+                                          width: 15,
                                         ),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Icon(
-                                              Icons.phone_outlined,
-                                              color: theme.textTheme.bodyLarge?.color,
-                                              size: 12,
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              // "+91 9999999999",
+                                        // Row(
+                                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                                        //   mainAxisAlignment: MainAxisAlignment.start,
+                                        //   children: [
+                                        //     Icon(
+                                        //       Icons.phone_outlined,
+                                        //       color: theme.textTheme.bodyLarge?.color,
+                                        //       size: 12,
+                                        //     ),
+                                        //     const SizedBox(
+                                        //       width: 5,
+                                        //     ),
+                                        //     Text(
+                                        //       // "+91 9999999999",
 
-                                              app.org?.mobileNumbers?.first.mobileNumber ?? "N/A",
-                                              style: GoogleFonts.inter(
-                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          width: 2,
-                                        ),
+                                        //       app.org?.mobileNumbers?.first.mobileNumber ?? "N/A",
+                                        //       style: GoogleFonts.inter(
+                                        //           color: theme.textTheme.bodyLarge?.color, fontSize: 11),
+                                        //     )
+                                        //   ],
+                                        // ),
+                                        // const SizedBox(
+                                        //   width: 2,
+                                        // ),
                                         Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Icon(
@@ -301,13 +312,15 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                         ),
                                       ],
                                     ),
-                                    if (!canEdit)
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
+                                    // if (!canEdit)
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+
+                                    _buildPhoneScrollable("Mobile", theme, app),
                                     if (canEdit)
                                       const SizedBox(
-                                        height: 25,
+                                        height: 5,
                                       ),
                                     StatefulBuilder(builder:
                                         (BuildContext context, void Function(void Function()) setState) {
@@ -350,6 +363,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                             log("orgGSTINController.text == app.org?.gstin: ${orgGSTINController.text == app.org?.gstin}");
                                             if (_orgLogoImage != null ||
                                                 orgNameController.text != app.org?.name ||
+                                                orgWebsiteController.text != app.org?.websiteName ||
                                                 orgCINController.text != app.org?.cin ||
                                                 (orgCINController.text.isNotEmpty && _orgCinImage != null) ||
                                                 orgPANController.text != app.org?.pan ||
@@ -360,7 +374,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                               // Proceed with update logic
                                               final result = await auth.updateOrganization(
                                                   name: orgNameController.text,
-                                                  websiteName: "",
+                                                  websiteName: orgWebsiteController.text,
                                                   email: "",
                                                   cin: orgCINController.text,
                                                   pan: orgPANController.text,
@@ -537,6 +551,76 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
     );
   }
 
+  Widget _buildPhoneScrollable(String label, ThemeData theme, AppStore app) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Left-aligned label
+        Text(
+          "Mobile",
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: canEdit ? 14 : 12, // Smaller font size when canEdit is false
+            color: theme.textTheme.bodyLarge?.color,
+          ),
+        ),
+        if (!canEdit)
+          const SizedBox(
+            width: 15,
+          ),
+        if (canEdit) const SizedBox(width: 20), // Space between label and numbers
+        // Right-aligned horizontal scrollable numbers
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: app.org?.mobileNumbers.map((mobile) {
+                    return GestureDetector(
+                      onTap: canEdit
+                          ? () {
+                              setState(() {
+                                _phone = mobile.mobileNumber;
+                              });
+                            }
+                          : null, // Disable tap when canEdit is false
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        margin: const EdgeInsets.only(right: 8), // Space between chips
+                        decoration: BoxDecoration(
+                          // color: mobile.mobileNumber == _phone
+                          //     ? theme.textTheme.headlineLarge?.color
+                          //     : theme.secondaryHeaderColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: mobile.mobileNumber == _phone
+                                ? const Color(0xFFFF6500)
+                                : theme.secondaryHeaderColor,
+                          ),
+                        ),
+                        child: Text(
+                          mobile.mobileNumber,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: mobile.mobileNumber == _phone
+                                ? theme.textTheme.headlineLarge?.color
+                                : theme.textTheme.bodyLarge?.color,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList() ??
+                  [],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTextField2(String label, TextEditingController controller, ThemeData theme, AppStore app) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -572,6 +656,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
               fontSize: canEdit ? 16 : 14, // Smaller font size when canEdit is false
             ),
             decoration: InputDecoration(
+              // contentPadding: canEdit ? EdgeInsets.all(5) : EdgeInsets.zero,
               filled: true,
               fillColor: canEdit ? theme.scaffoldBackgroundColor : theme.secondaryHeaderColor,
               hintText: null, // Remove hintText since label is outside

@@ -49,33 +49,11 @@ class CustomNavigationBar extends StatelessWidget {
               BottomNavigationBarItem(
                 label: 'OrgHome',
                 icon: Image.asset(
-                  "assets/images/paper-stack.png",
+                  "assets/images/websites-apps.webp",
                   height: 25,
                   width: 25,
-                  color: theme.textTheme.headlineLarge?.color,
+                  color: Color.fromRGBO(255, 94, 0, 1).withOpacity(1),
                 ),
-                // Icon(
-                //   CustomOrgIcons.org_home_outline_rounded,
-                //   color: theme.textTheme.headlineLarge?.color,
-                // ),
-                // Center(
-                //   child: Row(
-                //     mainAxisSize: MainAxisSize.min, // Ensures minimal space is used
-                //     children: [
-                //       FaIcon(
-                //         FontAwesomeIcons.globe,
-                //         color: theme.textTheme.headlineLarge?.color,
-                //       ),
-                //       SizedBox(
-                //         width: 4, // Adjust spacing between icons as needed
-                //       ),
-                //       FaIcon(
-                //         FontAwesomeIcons.mobile,
-                //         color: theme.textTheme.headlineLarge?.color,
-                //       ),
-                //     ],
-                //   ),
-                // ),
               ),
               BottomNavigationBarItem(
                 label: 'Org Profile',

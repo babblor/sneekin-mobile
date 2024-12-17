@@ -64,7 +64,7 @@ class _UserHomeViewState extends State<UserHomeView> {
       setState(() {
         // Filter accounts based on the query
         _filteredAccounts = _allUsersVirtualAccounts
-            .where((account) => account.orgAppName.toLowerCase().contains(query.toLowerCase()) ?? false)
+            .where((account) => account.orgAppName?.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       });
     }
@@ -159,7 +159,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    account.orgAppName[0],
+                                    account.username?[0] ?? "N/A",
                                     style: GoogleFonts.inter(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -172,7 +172,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                 height: 5,
                               ),
                               Text(
-                                account.orgAppName,
+                                account.lastLoginApp ?? "N/A",
                                 style: GoogleFonts.inter(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -265,7 +265,7 @@ class _UserHomeViewState extends State<UserHomeView> {
               if (_isHorizentalAccountShow)
                 Center(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 24),
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(16),
@@ -311,13 +311,13 @@ class _UserHomeViewState extends State<UserHomeView> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const SizedBox(
-                                            width: 10,
+                                            width: 20,
                                           ),
                                           Text(
-                                            _horizentalAccount?.orgAppName ?? "",
+                                            _horizentalAccount?.lastLoginApp ?? "",
                                             // "A",
                                             style: GoogleFonts.inter(
-                                              fontSize: 17,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: theme.textTheme.bodyLarge?.color,
                                               // fontWeight: FontWeight.w600,
@@ -340,7 +340,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         const SizedBox(
-                                          height: 20,
+                                          height: 15,
                                         ),
                                         Text(
                                           "Virtual ID: ${_horizentalAccount!.id}",
@@ -349,7 +349,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Mobile No: ${_horizentalAccount!.mobileNumber}",
                                           style: GoogleFonts.inter(
@@ -357,7 +357,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "App Name: ${_horizentalAccount!.orgAppName}",
                                           style: GoogleFonts.inter(
@@ -365,7 +365,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Username: ${_horizentalAccount!.username}",
                                           style: GoogleFonts.inter(
@@ -373,7 +373,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Created App: ${_horizentalAccount!.createdApp}",
                                           style: GoogleFonts.inter(
@@ -381,7 +381,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Last Login App: ${_horizentalAccount!.lastLoginApp}",
                                           style: GoogleFonts.inter(
@@ -389,7 +389,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Payment Status: ${_horizentalAccount!.paymentDueStatus}",
                                           style: GoogleFonts.inter(
@@ -397,7 +397,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 5),
                                         Text(
                                           "Last Login Time: ${_horizentalAccount!.lastLoginTime}",
                                           style: GoogleFonts.inter(
@@ -405,9 +405,9 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
-                                        const SizedBox(
-                                          height: 10,
-                                        )
+                                        // const SizedBox(
+                                        //   height: 10,
+                                        // )
                                       ],
                                     ),
                                   ),
@@ -506,6 +506,9 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
+                                              // SizedBox(
+                                              //   width: 15,
+                                              // ),
                                               Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
@@ -513,10 +516,11 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                     // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
+                                                      Text("   "),
                                                       Text(
-                                                        account.orgAppName,
+                                                        account.lastLoginApp ?? " N/A",
                                                         style: GoogleFonts.inter(
-                                                          fontSize: 17,
+                                                          fontSize: 14,
                                                           fontWeight: FontWeight.bold,
                                                           color: theme.textTheme.bodyLarge?.color,
                                                           // fontWeight: FontWeight.w600,
@@ -543,7 +547,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         const SizedBox(
-                                                          height: 20,
+                                                          height: 15,
                                                         ),
                                                         Text(
                                                           "Virtual ID: ${account.id}",
@@ -553,7 +557,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Mobile No: ${account.mobileNumber}",
                                                           style: GoogleFonts.inter(
@@ -562,7 +566,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "App Name: ${account.orgAppName}",
                                                           style: GoogleFonts.inter(
@@ -571,7 +575,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Username: ${account.username}",
                                                           style: GoogleFonts.inter(
@@ -580,7 +584,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Created App: ${account.createdApp}",
                                                           style: GoogleFonts.inter(
@@ -589,7 +593,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Last Login App: ${account.lastLoginApp}",
                                                           style: GoogleFonts.inter(
@@ -598,7 +602,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Payment Status: ${account.paymentDueStatus}",
                                                           style: GoogleFonts.inter(
@@ -607,7 +611,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(height: 8),
+                                                        const SizedBox(height: 5),
                                                         Text(
                                                           "Last Login Time: ${account.lastLoginTime}",
                                                           style: GoogleFonts.inter(
@@ -616,9 +620,9 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                 Theme.of(context).textTheme.bodyLarge?.color,
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        )
+                                                        // const SizedBox(
+                                                        //   height: 5,
+                                                        // )
                                                       ],
                                                     ),
                                                   ),

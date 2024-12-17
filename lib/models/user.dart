@@ -25,15 +25,18 @@ class User {
   @HiveField(6)
   final List<MobileNumber> mobileNumbers;
 
-  User({
-    required this.id,
-    required this.email,
-    required this.name,
-    required this.age,
-    required this.gender,
-    this.profileImageUrl,
-    required this.mobileNumbers,
-  });
+  @HiveField(7)
+  final bool isEmailVerified;
+
+  User(
+      {required this.id,
+      required this.email,
+      required this.name,
+      required this.age,
+      required this.gender,
+      this.profileImageUrl,
+      required this.mobileNumbers,
+      required this.isEmailVerified});
 
   // From JSON
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,6 +47,7 @@ class User {
       age: json['age'],
       gender: json['gender'],
       profileImageUrl: json['profileImageUrl'],
+      isEmailVerified: json['isEmailVerified'],
       mobileNumbers: (json['mobileNumbers'] as List<dynamic>).map((e) => MobileNumber.fromJson(e)).toList(),
     );
   }
@@ -57,6 +61,7 @@ class User {
       'age': age,
       'gender': gender,
       'profileImageUrl': profileImageUrl,
+      'isEmailVerified': isEmailVerified,
       'mobileNumbers': mobileNumbers.map((e) => e.toJson()).toList(),
     };
   }

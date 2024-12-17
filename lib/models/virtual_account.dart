@@ -7,32 +7,37 @@ class VirtualAccount {
   final int id;
   final String? name;
   final int? mobileID;
-  final int orgAppId;
-  final String orgAppName;
+  final int? orgAppId;
+  final String? orgAppName;
   final String? orgAppLogo;
   final String username;
-  final String createdApp;
-  final String lastLoginApp;
+  final String? createdApp;
+  final String? lastLoginApp;
   final DateTime? lastLoginTime;
   final int? ageGroup;
-  final String? paymentDueStatus;
+  final bool? paymentDueStatus;
   final String? mobileNumber;
   final String? countryCode;
+  final bool? isMobileApp;
+
+  final String? lastLoginAppLogo;
 
   VirtualAccount(
       {required this.id,
       this.name,
       this.mobileID,
-      required this.orgAppId,
-      required this.orgAppName,
+      this.orgAppId,
+      this.orgAppName,
       this.orgAppLogo,
       required this.username,
-      required this.createdApp,
-      required this.lastLoginApp,
+      this.createdApp,
+      this.lastLoginApp,
       this.lastLoginTime,
       this.ageGroup,
+      this.isMobileApp,
       this.paymentDueStatus,
       this.mobileNumber,
+      this.lastLoginAppLogo,
       this.countryCode});
 
   factory VirtualAccount.fromJson(Map<String, dynamic> json) => _$VirtualAccountFromJson(json);

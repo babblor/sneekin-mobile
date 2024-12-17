@@ -24,13 +24,14 @@ class UserAdapter extends TypeAdapter<User> {
       gender: fields[4] as String,
       profileImageUrl: fields[5] as String?,
       mobileNumbers: (fields[6] as List).cast<MobileNumber>(),
+      isEmailVerified: fields[7] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, User obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class UserAdapter extends TypeAdapter<User> {
       ..writeByte(5)
       ..write(obj.profileImageUrl)
       ..writeByte(6)
-      ..write(obj.mobileNumbers);
+      ..write(obj.mobileNumbers)
+      ..writeByte(7)
+      ..write(obj.isEmailVerified);
   }
 
   @override
@@ -53,7 +56,9 @@ class UserAdapter extends TypeAdapter<User> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+      other is UserAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
 
 class MobileNumberAdapter extends TypeAdapter<MobileNumber> {
@@ -94,5 +99,7 @@ class MobileNumberAdapter extends TypeAdapter<MobileNumber> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MobileNumberAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+      other is MobileNumberAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

@@ -82,7 +82,7 @@ class _AuthScreenState extends State<AuthScreen> {
     // nameController.dispose();
     // emailController.dispose();
     userEmailController.dispose();
-    userEmailController.dispose();
+    // userEmailController.dispose();
     orgEmailController.dispose();
     orgNameController.dispose();
     addressController.dispose();

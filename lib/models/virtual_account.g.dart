@@ -6,28 +6,26 @@ part of 'virtual_account.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VirtualAccount _$VirtualAccountFromJson(Map<String, dynamic> json) =>
-    VirtualAccount(
+VirtualAccount _$VirtualAccountFromJson(Map<String, dynamic> json) => VirtualAccount(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String?,
       mobileID: (json['mobileID'] as num?)?.toInt(),
-      orgAppId: (json['orgAppId'] as num).toInt(),
-      orgAppName: json['orgAppName'] as String,
+      orgAppId: (json['orgAppId'] as num?)?.toInt(),
+      orgAppName: json['orgAppName'] as String?,
       orgAppLogo: json['orgAppLogo'] as String?,
       username: json['username'] as String,
-      createdApp: json['createdApp'] as String,
-      lastLoginApp: json['lastLoginApp'] as String,
-      lastLoginTime: json['lastLoginTime'] == null
-          ? null
-          : DateTime.parse(json['lastLoginTime'] as String),
-      ageGroup: (json['ageGroup'] as num?)?.toInt(),
-      paymentDueStatus: json['paymentDueStatus'] as String?,
+      createdApp: json['createdApp'] as String?,
+      lastLoginApp: json['lastLoginApp'] as String?,
+      lastLoginTime: json['lastLoginTime'] == null ? null : DateTime.parse(json['lastLoginTime'] as String),
+      ageGroup: (json['age'] as num?)?.toInt(),
+      isMobileApp: json['isMobileApp'] as bool?,
+      paymentDueStatus: json['paymentDueStatus'] as bool?,
       mobileNumber: json['mobileNumber'] as String?,
+      lastLoginAppLogo: json['lastLoginAppLogo'] as String?,
       countryCode: json['countryCode'] as String?,
     );
 
-Map<String, dynamic> _$VirtualAccountToJson(VirtualAccount instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$VirtualAccountToJson(VirtualAccount instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'mobileID': instance.mobileID,
@@ -42,4 +40,6 @@ Map<String, dynamic> _$VirtualAccountToJson(VirtualAccount instance) =>
       'paymentDueStatus': instance.paymentDueStatus,
       'mobileNumber': instance.mobileNumber,
       'countryCode': instance.countryCode,
+      'isMobileApp': instance.isMobileApp,
+      'lastLoginAppLogo': instance.lastLoginAppLogo,
     };

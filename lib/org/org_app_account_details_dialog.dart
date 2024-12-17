@@ -128,8 +128,8 @@ class _OrgAppAccountDetailsDialogState extends State<OrgAppAccountDetailsDialog>
               decoration: BoxDecoration(
                   color: canEdit ? theme.secondaryHeaderColor : theme.scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(15),
-                  border:
-                      Border.all(width: 1, color: canEdit ? const Color(0xFFFF6500) : theme.secondaryHeaderColor)),
+                  border: Border.all(
+                      width: 1, color: canEdit ? const Color(0xFFFF6500) : theme.secondaryHeaderColor)),
               child: Column(
                 children: [
                   Row(
@@ -382,9 +382,7 @@ class _OrgAppAccountDetailsDialogState extends State<OrgAppAccountDetailsDialog>
                                         BorderSide(color: Colors.grey.shade400, width: 2), // Border on focus
                                   )
                                 : InputBorder.none,
-                            hintText: widget.account.clientWebsite != ""
-                                ? widget.account.clientWebsite
-                                : "no-client-website",
+                            hintText: widget.account.clientWebsite ?? "no-client-website",
                             hintStyle: GoogleFonts.inter(
                                 color: theme.textTheme.bodyLarge?.color, fontSize: canEdit ? 14 : 12),
                           ),

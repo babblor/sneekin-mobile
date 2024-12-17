@@ -91,9 +91,9 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                     onPressed: () {
                       // Copy Client ID logic
                       Clipboard.setData(const ClipboardData(text: "your-client-id"));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Client ID copied to clipboard")),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Client ID copied to clipboard")),
+                      // );
                     },
                     icon: const Icon(Icons.copy, color: Colors.white),
                   ),
@@ -125,9 +125,7 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: BorderSide.none,
                     ),
-                    hintText: widget.account.clientWebsite != ""
-                        ? widget.account.clientWebsite
-                        : "no-client-website",
+                    hintText: widget.account.clientWebsite ?? "no-client-website",
                     hintStyle: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
                   ),
                   style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
@@ -141,9 +139,9 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                     onPressed: () {
                       // Copy Client Secret logic
                       Clipboard.setData(const ClipboardData(text: "your-client-website"));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Client website copied to clipboard")),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Client website copied to clipboard")),
+                      // );
                     },
                     icon: const Icon(Icons.copy, color: Colors.white),
                   ),
@@ -199,9 +197,9 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                     onPressed: () {
                       // Copy Client Secret logic
                       Clipboard.setData(const ClipboardData(text: "your-client-secret"));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Client Secret copied to clipboard")),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text("Client Secret copied to clipboard")),
+                      // );
                     },
                     icon: const Icon(Icons.copy, color: Colors.white),
                   ),

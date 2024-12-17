@@ -32,7 +32,7 @@ class OrganizationAdapter extends TypeAdapter<Organization> {
       isPanVerified: fields[12] as bool?,
       isCinVerified: fields[13] as bool?,
       isGstinVerified: fields[14] as bool?,
-      mobileNumbers: (fields[19] as List?)?.cast<MobileNumber>(),
+      mobileNumbers: (fields[19] as List).cast<MobileNumber>(),
       totalWebsites: fields[16] as int?,
       totalMobileApps: fields[17] as int?,
       totalVirtualAccountUsers: fields[15] as int?,
@@ -92,7 +92,5 @@ class OrganizationAdapter extends TypeAdapter<Organization> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is OrganizationAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+      other is OrganizationAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
 }

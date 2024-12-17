@@ -8,8 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/models/user.dart';
 import 'package:sneekin/services/auth_services.dart';
-import 'package:sneekin/utils/toast.dart';
-import 'package:toastification/toastification.dart';
 
 import '../models/app.dart';
 
@@ -48,30 +46,25 @@ class AppStore with ChangeNotifier {
         bool hasExpired = JwtDecoder.isExpired(app?.accessToken! ?? "");
         log("Auth Token Status: $hasExpired");
         if (hasExpired) {
-          final resp = await signOut(context);
-          if (resp == true) {
-            context.go("/auth");
-            showToast(
-              message: "Session has expired. Login again!",
-              type: ToastificationType.info,
-            );
-            return;
-          }
+          // final resp = await signOut(context);
+          // if (resp == true) {
+          return true;
         }
       } catch (e) {
         log("Error checking token expiration: $e");
-        showToast(
-          message: "Invalid session token. Please login again!",
-          type: ToastificationType.error,
-        );
-        await signOut(context);
-        context.go('/auth');
-        return;
+        // showToast(
+        //   message: "Invalid session token. Please login again!",
+        //   type: ToastificationType.error,
+        // );
+        // await signOut(context);
+        // // context.go('/auth');
+        return true;
       }
     }
   }
 
   Future<void> checkAuth(BuildContext context) async {
+    log("running checkAuth()");
     if (_isSignedIn || _isOrgSignedIn) {
       context.go("/root");
     } else {
@@ -123,7 +116,7 @@ class AppStore with ChangeNotifier {
     }
 
     // Fetch user data
-    _org = _orgBox.get('org') ?? Organization();
+    _org = _orgBox.get('org') ?? Organization(mobileNumbers: []);
     log("org data initialized: ${_org?.name}");
 
     // Determine if user is signed in
@@ -264,7 +257,8 @@ class AppStore with ChangeNotifier {
       _user = null;
       _isSignedIn = false;
       _app = null;
-
+      // context.go("/auth");
+      _isLoading = false;
       notifyListeners();
       log("Current Appdata accessToken status: ${app?.accessToken}");
       return true;

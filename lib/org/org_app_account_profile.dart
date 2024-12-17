@@ -121,7 +121,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
       setState(() {
         // Filter accounts based on the query
         _filteredAccounts = _allUsersVirtualAccounts
-            .where((account) => account.orgAppName.toLowerCase().contains(query.toLowerCase()) ?? false)
+            .where((account) => account.username.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       });
     }
@@ -183,10 +183,10 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 25, left: 30),
                           child: Image.asset(
-                            "assets/images/paper-stack.png",
+                            "assets/images/websites-apps.webp",
                             height: 25,
                             width: 25,
-                            color: theme.textTheme.headlineLarge?.color,
+                            color: Color(0xFFFF6500).withOpacity(1),
                           ),
                         )
                       ],
@@ -353,7 +353,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                               ),
                             );
                           }
-                          if (auth.websiteVirtualAccounts.isEmpty) {
+                          if (auth.websiteVirtualAccounts.isEmpty || _filteredAccounts.isEmpty) {
                             return Center(
                               child: Column(
                                 children: [
@@ -435,13 +435,13 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                           _buildTableCell(
                                               (user.mobileID.toString() ?? 0.toString())), // Handle nulls
                                           _buildTableCell(user.orgAppId.toString()),
-                                          _buildTableCell(user.orgAppName),
+                                          _buildTableCell(user.orgAppName ?? "___"),
                                           _buildTableCell(user.username),
-                                          _buildTableCell(user.createdApp),
-                                          _buildTableCell(user.lastLoginApp),
+                                          _buildTableCell(user.createdApp ?? "___"),
+                                          _buildTableCell(user.lastLoginApp ?? "___"),
                                           _buildTableCell(user.lastLoginTime?.toIso8601String() ?? "___"),
                                           _buildTableCell((user.ageGroup.toString() ?? 0.toString())),
-                                          _buildTableCell(user.paymentDueStatus ?? "___"),
+                                          _buildTableCell((user.paymentDueStatus ?? false) as String),
                                         ],
                                       );
                                     }),
