@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +15,7 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = Provider.of<ThemeServices>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -44,8 +44,8 @@ class CustomAppBar extends StatelessWidget {
           ],
         ),
         IconButton(
-          icon:
-              Icon(Icons.light_mode_outlined, size: 25, color: Theme.of(context).textTheme.bodyLarge?.color),
+          icon: Icon(themeMode.isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              size: 25, color: Theme.of(context).textTheme.bodyLarge?.color),
           onPressed: () {
             context.read<ThemeServices>().toggleTheme();
             // Provider.of<ThemeServices>(context, listen: false).toggleTheme();

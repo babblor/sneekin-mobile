@@ -396,225 +396,223 @@ class _UserProfilePageState extends State<UserProfilePage> {
         String taxGender = 'M';
 
         return StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
-          return AlertDialog(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Update Tax Profile',
-                  style: theme.textTheme.headlineSmall?.copyWith(color: theme.textTheme.bodyLarge?.color),
-                ),
-                InkWell(
-                    onTap: () {
-                      setState() {
-                        hasUpdatedPanFilePicked = false;
-                        _updatedPanFile = null;
-                      }
-
-                      Navigator.pop(context);
-                      // showTaxProfile = false;
-                    },
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.red,
-                      size: 22,
-                    ))
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name Field
-                    Text(
-                      'PAN NUMBER',
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: panUpdatePanController,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                hintText: 'Enter your pan number',
-                                hintStyle: GoogleFonts.inter(fontSize: 13)),
-                            onSaved: (value) => pan_number = value,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            _pickUpdatedPanImage(setState);
-                          },
-                          child: CircleAvatar(
-                              backgroundColor: theme.textTheme.headlineLarge?.color,
-                              child: Icon(
-                                Icons.upload_file,
-                                color: hasUpdatedPanFilePicked ? Colors.green : Colors.white,
-                              )),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'GENDER',
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    // const SizedBox(height: 8),
-                    // Row(
-                    //   children: [
-                    //     _buildRadioButton('M', 'M'),
-                    //     const SizedBox(width: 10),
-                    //     _buildRadioButton('F', 'F'),
-                    //   ],
-                    // ),
-                    Row(
-                      children: [
-                        Radio<String>(
-                          value: 'M',
-                          groupValue: taxGender,
-                          activeColor: const Color(0xFFFF6500),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              log("new gender value: $newValue");
-                              taxUpdateGender = newValue!;
-                            });
-                          },
-                        ),
-                        Text(
-                          'M',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                          ),
-                        ),
-                        Radio<String>(
-                          value: 'F',
-                          groupValue: taxGender,
-                          activeColor: const Color(0xFFFF6500),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              log("new gender value: $newValue");
-                              taxGender = newValue!;
-                            });
-                          },
-                        ),
-                        Text(
-                          'F',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Text(
-                      'NAME',
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: panUpdateNameController,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          hintText: 'Enter your name',
-                          hintStyle: GoogleFonts.inter(fontSize: 13)),
-                      onSaved: (value) => name = value,
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-
-                    // App Number Field
-                    Text(
-                      'ADDRESS',
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: panUpdateAddressController,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          hintText: 'Enter your address',
-                          hintStyle: GoogleFonts.inter(fontSize: 13)),
-                      onSaved: (value) => address = value,
-                    ),
-
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              CircleAvatar(
-                backgroundColor: theme.textTheme.headlineLarge?.color,
-                child: Consumer<AuthServices>(builder: (context, auth, _) {
-                  return InkWell(
-                      onTap: () async {
-                        log("panUpdateAddressController.text: ${panUpdateAddressController.text}");
-                        log("panUpdateNameController.text: ${panUpdateNameController.text}");
-                        log("panUpdatePanController.text: ${panUpdatePanController.text}");
-                        log("taxUpdateGender: $taxUpdateGender");
-                        if (_updatedPanFile == null || _updatedPanFile!.path.isEmpty) {
-                          showToast(message: "Please upload pan file", type: ToastificationType.warning);
-                          return;
+          return Consumer<AuthServices>(builder: (context, auth, _) {
+            return AlertDialog(
+              backgroundColor: theme.scaffoldBackgroundColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Update Tax Profile',
+                    style: theme.textTheme.headlineSmall?.copyWith(color: theme.textTheme.bodyLarge?.color),
+                  ),
+                  InkWell(
+                      onTap: () {
+                        setState() {
+                          hasUpdatedPanFilePicked = false;
+                          _updatedPanFile = null;
                         }
-                        if (panUpdateAddressController.text.isEmpty &&
-                            panUpdateNameController.text.isEmpty &&
-                            panUpdatePanController.text.isEmpty &&
-                            taxUpdateGender == null) {
-                          showToast(message: "Nothing to update!", type: ToastificationType.error);
-                          return;
-                        }
-                        final result = await auth.updateUserTaxProfile(
-                            file: _updatedPanFile ?? File(""),
-                            pan_number: panUpdatePanController.text ?? "",
-                            name: panUpdateNameController.text ?? "",
-                            address: panUpdateAddressController.text ?? "",
-                            gender: taxUpdateGender ?? "");
-                        if (result == true) {
-                          await auth.getUserTaxProfile();
-                          Navigator.pop(context);
-                          setState() {
-                            _updatedPanFile = null;
-                            panUpdateAddressController.clear();
-                            panUpdateNameController.clear();
-                            panUpdatePanController.clear();
-                          }
 
-                          showToast(
-                              message: "Your tax profile has updated.", type: ToastificationType.success);
-                        }
+                        Navigator.pop(context);
+                        // showTaxProfile = false;
                       },
-                      child: auth.isLoading
-                          ? SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: CircularProgressIndicator(
-                                color: theme.textTheme.bodyLarge?.color,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.chevron_right_outlined,
-                              color: Colors.white,
-                              size: 24,
-                            ));
-                }),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 22,
+                      ))
+                ],
               ),
-            ],
-          );
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name Field
+                      Text(
+                        'PAN NUMBER',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: panUpdatePanController,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                  hintText: auth.userTaxProfile["panNumber"] ?? "Enter updated PAN...",
+                                  hintStyle: GoogleFonts.inter(fontSize: 13)),
+                              onSaved: (value) => pan_number = value,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              _pickUpdatedPanImage(setState);
+                            },
+                            child: CircleAvatar(
+                                backgroundColor: theme.textTheme.headlineLarge?.color,
+                                child: Icon(
+                                  Icons.upload_file,
+                                  color: hasUpdatedPanFilePicked ? Colors.green : Colors.white,
+                                )),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'GENDER',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'M',
+                            groupValue: taxGender,
+                            activeColor: const Color(0xFFFF6500),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                log("new gender value: $newValue");
+                                taxUpdateGender = newValue!;
+                              });
+                            },
+                          ),
+                          Text(
+                            'M',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                            ),
+                          ),
+                          Radio<String>(
+                            value: 'F',
+                            groupValue: taxGender,
+                            activeColor: const Color(0xFFFF6500),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                log("new gender value: $newValue");
+                                taxGender = newValue!;
+                              });
+                            },
+                          ),
+                          Text(
+                            'F',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        'NAME',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: panUpdateNameController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            hintText: auth.userTaxProfile["name"] ?? "Enter updated name...",
+                            hintStyle: GoogleFonts.inter(fontSize: 13)),
+                        onSaved: (value) => name = value,
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      // App Number Field
+                      Text(
+                        'ADDRESS',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: panUpdateAddressController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            hintText: auth.userTaxProfile["address"] ?? "Enter updated address...",
+                            hintStyle: GoogleFonts.inter(fontSize: 13)),
+                        onSaved: (value) => address = value,
+                      ),
+
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                CircleAvatar(
+                    backgroundColor: theme.textTheme.headlineLarge?.color,
+                    child:
+                        // Consumer<AuthServices>(builder: (context, auth, _) {
+                        //   return
+                        InkWell(
+                            onTap: () async {
+                              log("panUpdateAddressController.text: ${panUpdateAddressController.text}");
+                              log("panUpdateNameController.text: ${panUpdateNameController.text}");
+                              log("panUpdatePanController.text: ${panUpdatePanController.text}");
+                              log("taxUpdateGender: $taxUpdateGender");
+                              if (_updatedPanFile == null || _updatedPanFile!.path.isEmpty) {
+                                showToast(
+                                    message: "Please upload pan file", type: ToastificationType.warning);
+                                return;
+                              }
+                              if (panUpdateAddressController.text.isEmpty &&
+                                  panUpdateNameController.text.isEmpty &&
+                                  panUpdatePanController.text.isEmpty &&
+                                  taxUpdateGender == null) {
+                                showToast(message: "Nothing to update!", type: ToastificationType.error);
+                                return;
+                              }
+                              final result = await auth.updateUserTaxProfile(
+                                  file: _updatedPanFile ?? File(""),
+                                  pan_number: panUpdatePanController.text ?? "",
+                                  name: panUpdateNameController.text ?? "",
+                                  address: panUpdateAddressController.text ?? "",
+                                  gender: taxUpdateGender ?? "");
+                              if (result == true) {
+                                await auth.getUserTaxProfile();
+                                Navigator.pop(context);
+                                setState() {
+                                  _updatedPanFile = null;
+                                  panUpdateAddressController.clear();
+                                  panUpdateNameController.clear();
+                                  panUpdatePanController.clear();
+                                }
+
+                                showToast(
+                                    message: "Your tax profile has updated.",
+                                    type: ToastificationType.success);
+                              }
+                            },
+                            child: auth.isLoading
+                                ? SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CircularProgressIndicator(
+                                      color: theme.textTheme.bodyLarge?.color,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.chevron_right_outlined,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ))
+                    // }),
+                    ),
+              ],
+            );
+          });
         });
       },
     );
@@ -872,7 +870,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                     Text(
                                                       'M',
                                                       style: GoogleFonts.inter(
-                                                        color: Colors.white,
+                                                        color: theme.textTheme.bodyLarge?.color,
                                                       ),
                                                     ),
                                                   ],
@@ -897,7 +895,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                     Text(
                                                       'F',
                                                       style: GoogleFonts.inter(
-                                                        color: Colors.white,
+                                                        color: theme.textTheme.bodyLarge?.color,
                                                       ),
                                                     ),
                                                   ],

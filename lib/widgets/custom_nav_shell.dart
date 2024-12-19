@@ -4,13 +4,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class CustomIcons {
   static const IconData user_home_outline_rounded = Icons.home_outlined;
   static const IconData qr_code_scanner = Icons.qr_code_scanner_outlined;
-  static const IconData user_profile_outlined = Icons.person_pin_outlined;
+  static const IconData user_profile_outlined = Icons.person_outlined;
 }
 
 class CustomOrgIcons {
   static const IconData org_home_outline_rounded = FontAwesomeIcons.globe;
-  static const IconData org_dashboard = FontAwesomeIcons.gaugeHigh;
-  static const IconData org_profile = Icons.person_pin_outlined;
+  static const IconData org_dashboard = Icons.speed_outlined;
+  static const IconData org_profile = Icons.person_outlined;
 }
 
 class CustomNavigationBar extends StatelessWidget {
@@ -32,22 +32,24 @@ class CustomNavigationBar extends StatelessWidget {
       // backgroundColor: Colors.red,
       backgroundColor: theme.secondaryHeaderColor,
       currentIndex: currentIndex,
-      selectedItemColor: theme.textTheme.bodyLarge?.color,
+      // selectedItemColor: theme.textTheme.bodyLarge?.color,
       onTap: onTap,
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
+      showSelectedLabels: true,
+      // showUnselectedLabels: true,
       iconSize: 25,
       items: isOrg
           ? [
               BottomNavigationBarItem(
-                label: 'Org Dashboard',
+                tooltip: "Dashboard",
+                label: 'Dashboard',
                 icon: Icon(
                   CustomOrgIcons.org_dashboard,
                   color: theme.textTheme.headlineLarge?.color,
                 ),
               ),
               BottomNavigationBarItem(
-                label: 'OrgHome',
+                tooltip: "Websites/Apps",
+                label: 'Websites/Apps',
                 icon: Image.asset(
                   "assets/images/websites-apps.webp",
                   height: 25,
@@ -56,7 +58,8 @@ class CustomNavigationBar extends StatelessWidget {
                 ),
               ),
               BottomNavigationBarItem(
-                label: 'Org Profile',
+                tooltip: "Profile",
+                label: 'Profile',
                 icon: Icon(
                   CustomOrgIcons.org_profile,
                   color: theme.textTheme.headlineLarge?.color,
@@ -65,26 +68,26 @@ class CustomNavigationBar extends StatelessWidget {
             ]
           : [
               BottomNavigationBarItem(
-                label: 'Home',
-                icon: Icon(
-                  CustomIcons.user_home_outline_rounded,
-                  color: theme.textTheme.headlineLarge?.color,
-                ),
-              ),
+                  label: 'Home',
+                  icon: Icon(
+                    CustomIcons.user_home_outline_rounded,
+                    color: theme.textTheme.headlineLarge?.color,
+                  ),
+                  tooltip: "Home"),
               BottomNavigationBarItem(
-                label: 'Scan',
-                icon: Icon(
-                  CustomIcons.qr_code_scanner,
-                  color: theme.textTheme.headlineLarge?.color,
-                ),
-              ),
+                  label: 'Scan',
+                  icon: Icon(
+                    CustomIcons.qr_code_scanner,
+                    color: theme.textTheme.headlineLarge?.color,
+                  ),
+                  tooltip: "Scan"),
               BottomNavigationBarItem(
-                label: 'Profile',
-                icon: Icon(
-                  CustomIcons.user_profile_outlined,
-                  color: theme.textTheme.headlineLarge?.color,
-                ),
-              ),
+                  label: 'Profile',
+                  icon: Icon(
+                    CustomIcons.user_profile_outlined,
+                    color: theme.textTheme.headlineLarge?.color,
+                  ),
+                  tooltip: "Profile"),
             ],
     );
   }

@@ -33,8 +33,8 @@ class _OrgHomeViewState extends State<OrgHomeView> {
 
       _allUsersVirtualAccounts = auth.orgAppsAccount;
 
-      _filteredAccounts = _allUsersVirtualAccounts.length > 4
-          ? _allUsersVirtualAccounts.sublist(4)
+      _filteredAccounts = _allUsersVirtualAccounts.length > 3
+          ? _allUsersVirtualAccounts.sublist(3)
           : []; // Empty list if fewer than 5 accounts
       log("_filteredAccounts length: ${_filteredAccounts.length}");
     });
@@ -49,8 +49,8 @@ class _OrgHomeViewState extends State<OrgHomeView> {
       setState(() {
         log("_allUsersVirtualAccounts in search length: ${_allUsersVirtualAccounts.length}");
         // Include accounts starting from index 4
-        _filteredAccounts = _allUsersVirtualAccounts.length > 4
-            ? _allUsersVirtualAccounts.sublist(4) // Accounts after index 4
+        _filteredAccounts = _allUsersVirtualAccounts.length > 3
+            ? _allUsersVirtualAccounts.sublist(3) // Accounts after index 4
             : []; // Empty list if fewer than 5 accounts
       });
     } else {
@@ -133,65 +133,72 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                 ),
               ),
               const SizedBox(height: 25),
-              Container(
-                // color: Colors.red,
-                height: 80, // Adjust height as needed
-                padding: const EdgeInsets.only(left: 34, right: 55),
-                child: auth.orgAppsAccount.isEmpty
-                    ? null
-                    : ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: auth.orgAppsAccount.length.clamp(0, 4), // Limit to 4 items
-                        itemBuilder: (context, index) {
-                          var account = auth.orgAppsAccount[index];
-                          return GestureDetector(
-                            onTap: () {
-                              log("Horizontal index: $index");
-                              context.go('/org-app-account-profile', extra: account);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0), // Control horizontal spacing here
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    margin:
-                                        const EdgeInsets.only(bottom: 5), // Adjust vertical spacing if needed
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: theme.textTheme.headlineLarge?.color,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        account.name[0],
-                                        style: GoogleFonts.inter(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.textTheme.bodyLarge?.color,
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 80, // Adjust height as needed
+                      padding: const EdgeInsets.only(left: 70, right: 55),
+                      child: auth.orgAppsAccount.isEmpty
+                          ? null
+                          : ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: auth.orgAppsAccount.length.clamp(0, 3), // Limit to 4 items
+                              itemBuilder: (context, index) {
+                                var account = auth.orgAppsAccount[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    log("Horizontal index: $index");
+                                    context.go('/org-app-account-profile', extra: account);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0), // Control horizontal spacing here
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                              bottom: 5), // Adjust vertical spacing if needed
+                                          width: 60,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: theme.textTheme.headlineLarge?.color,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              account.name[0],
+                                              style: GoogleFonts.inter(
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        Text(
+                                          account.name,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    account.name,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (auth.orgAppsAccount.length > 4)
-                if (auth.orgAppsAccount.length > 4)
+              if (auth.orgAppsAccount.length > 3)
+                if (auth.orgAppsAccount.length > 3)
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -256,7 +263,7 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                     ? Center(
                         child: Text(
                           "No more accounts!",
-                          style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color, fontSize: 18),
+                          style: GoogleFonts.inter(color: Colors.grey, fontSize: 18),
                         ),
                       )
                     : ListView.builder(

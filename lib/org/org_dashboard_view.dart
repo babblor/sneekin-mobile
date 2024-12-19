@@ -594,19 +594,17 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                           //     ? theme.textTheme.headlineLarge?.color
                           //     : theme.secondaryHeaderColor,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: mobile.mobileNumber == _phone
-                                ? const Color(0xFFFF6500)
-                                : theme.secondaryHeaderColor,
-                          ),
+                          border: Border.all(color: const Color(0xFFFF6500)
+                              //  mobile.mobileNumber == _phone
+                              //     ? const Color(0xFFFF6500)
+                              //     : theme.secondaryHeaderColor,
+                              ),
                         ),
                         child: Text(
                           mobile.mobileNumber,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: mobile.mobileNumber == _phone
-                                ? theme.textTheme.headlineLarge?.color
-                                : theme.textTheme.bodyLarge?.color,
+                            color: Color(0xFFFF6500),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

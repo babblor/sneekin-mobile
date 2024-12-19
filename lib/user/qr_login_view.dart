@@ -23,6 +23,8 @@ class _QrLoginViewState extends State<QrLoginView> {
   bool isScanning = false;
   String? scannedData;
 
+  // bool isLoading = true;
+
   @override
   void reassemble() {
     super.reassemble();
@@ -35,14 +37,49 @@ class _QrLoginViewState extends State<QrLoginView> {
     }
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _showLoader();
+  // }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   _showLoader(); // Reset loader each time user revisits the screen
+  // }
+
+  // void _showLoader() {
+  //   setState(() {
+  //     isLoading = true; // Show loader
+  //   });
+
+  //   Future.delayed(const Duration(seconds: 2), () {
+  //     if (mounted) {
+  //       setState(() {
+  //         isLoading = false; // Hide loader and show QR view
+  //       });
+  //     }
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
+    // log("QR Loading Value: ${isLoading}");
     final theme = Theme.of(context);
     return Scaffold(
       body: Consumer2<AuthServices, AppStore>(builder: (context, auth, app, _) {
+        // if (isLoading) {
+        //   return Center(
+        //     child: CircularProgressIndicator(
+        //       color: theme.textTheme.headlineLarge?.color,
+        //     ),
+        //   );
+        // }
         if (!app.isSignedIn || app.user?.name == null || app.user?.name == "") {
           app.initializeUserData();
         }
+
         return Stack(
           children: [
             QRView(

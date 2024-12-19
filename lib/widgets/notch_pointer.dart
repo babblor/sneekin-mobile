@@ -42,33 +42,37 @@ class Notch extends StatelessWidget {
                 child: SizedBox(
                   height: 50,
                   child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Row(
-                          // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // SizedBox(
-                            //   width: 15,
-                            // ),
-                            Text(
-                              orgAccount.name,
-                              style: GoogleFonts.inter(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textTheme.bodyLarge?.color,
-                                // fontWeight: FontWeight.w600,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 40, right: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // SizedBox(
+                              //   width: 15,
+                              // ),
+                              Text(
+                                orgAccount.name.length > 10
+                                    ? '${orgAccount.name.substring(0, 10)}...'
+                                    : orgAccount.name,
+                                style: GoogleFonts.inter(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const Icon(
-                          Icons.circle,
-                          size: 18,
-                          color: Colors.green,
-                        )
-                      ],
+                            ],
+                          ),
+                          const Icon(
+                            Icons.circle,
+                            size: 18,
+                            color: Colors.green,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ), // Placeholder height
@@ -118,7 +122,7 @@ class Notch extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
-                              color: theme.textTheme.bodyLarge?.color,
+                              color: Colors.white,
                             ),
                           )
                         : ClipRRect(

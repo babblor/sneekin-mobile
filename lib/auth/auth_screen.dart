@@ -1300,6 +1300,72 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 }
 
+// class CustomTopBar extends StatelessWidget {
+//   final String selectedTab;
+//   final Function(String) onTabSelected;
+
+//   const CustomTopBar({
+//     super.key,
+//     required this.selectedTab,
+//     required this.onTabSelected,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: const Color(0xFF1F293F),
+//         borderRadius: BorderRadius.circular(20),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.3),
+//             blurRadius: 10,
+//             offset: const Offset(0, 5),
+//           ),
+//         ],
+//       ),
+//       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceAround,
+//         children: [
+//           _buildTab('User'),
+//           _buildTab('Organization'),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildTab(String tabName) {
+//     bool isSelected = selectedTab == tabName;
+
+//     return GestureDetector(
+//       onTap: () => onTabSelected(tabName),
+//       child: Column(
+//         children: [
+//           Text(
+//             tabName,
+//             style: GoogleFonts.inter(
+//               color: isSelected ? Colors.orange : Colors.white.withOpacity(0.9),
+//               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+//               fontSize: 16,
+//             ),
+//           ),
+//           if (isSelected)
+//             Container(
+//               margin: const EdgeInsets.only(top: 4),
+//               height: 3,
+//               width: 50,
+//               decoration: BoxDecoration(
+//                 color: Colors.orange,
+//                 borderRadius: BorderRadius.circular(1.5),
+//               ),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 class CustomTopBar extends StatelessWidget {
   final String selectedTab;
   final Function(String) onTabSelected;
@@ -1328,40 +1394,65 @@ class CustomTopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildTab('User'),
-          _buildTab('Organization'),
+          Text(
+            'User',
+            style: GoogleFonts.inter(
+              color: selectedTab == 'User' ? Colors.orange : Colors.white.withOpacity(0.9),
+              fontWeight: selectedTab == 'User' ? FontWeight.bold : FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+          _buildToggleSwitch(),
+          Text(
+            'Organization',
+            style: GoogleFonts.inter(
+              color: selectedTab == 'Organization' ? Colors.orange : Colors.white.withOpacity(0.9),
+              fontWeight: selectedTab == 'Organization' ? FontWeight.bold : FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTab(String tabName) {
-    bool isSelected = selectedTab == tabName;
+  Widget _buildToggleSwitch() {
+    bool isUserSelected = selectedTab == 'User';
 
     return GestureDetector(
-      onTap: () => onTabSelected(tabName),
-      child: Column(
-        children: [
-          Text(
-            tabName,
-            style: GoogleFonts.inter(
-              color: isSelected ? Colors.orange : Colors.white.withOpacity(0.9),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 16,
-            ),
-          ),
-          if (isSelected)
-            Container(
-              margin: const EdgeInsets.only(top: 4),
-              height: 3,
-              width: 50,
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(1.5),
+      onTap: () => onTabSelected(isUserSelected ? 'Organization' : 'User'),
+      child: Container(
+        width: 40,
+        height: 20,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Stack(
+          children: [
+            AnimatedAlign(
+              alignment: isUserSelected ? Alignment.centerLeft : Alignment.centerRight,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

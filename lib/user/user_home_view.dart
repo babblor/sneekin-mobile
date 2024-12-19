@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +42,7 @@ class _UserHomeViewState extends State<UserHomeView> {
 
       // Initialize `_filteredAccounts` with accounts starting from index 4
       _filteredAccounts = _allUsersVirtualAccounts.length > 4
-          ? _allUsersVirtualAccounts.sublist(4)
+          ? _allUsersVirtualAccounts.sublist(3)
           : []; // Empty list if fewer than 5 accounts
 
       log("initial _filteredAccounts length: ${_filteredAccounts.length}");
@@ -55,8 +56,8 @@ class _UserHomeViewState extends State<UserHomeView> {
       setState(() {
         log("_allUsersVirtualAccounts in search length: ${_allUsersVirtualAccounts.length}");
         // Include accounts starting from index 4
-        _filteredAccounts = _allUsersVirtualAccounts.length > 4
-            ? _allUsersVirtualAccounts.sublist(4) // Accounts after index 4
+        _filteredAccounts = _allUsersVirtualAccounts.length > 3
+            ? _allUsersVirtualAccounts.sublist(3) // Accounts after index 4
             : []; // Empty list if fewer than 5 accounts
       });
     } else {
@@ -131,7 +132,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                   padding: const EdgeInsets.only(left: 45, right: 55),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: auth.userVirtualAccounts.length.clamp(0, 4), // Limit to 4 items
+                    itemCount: auth.userVirtualAccounts.length.clamp(0, 3), // Limit to 4 items
                     itemBuilder: (context, index) {
                       var account = auth.userVirtualAccounts[index];
                       return GestureDetector(
@@ -163,7 +164,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                     style: GoogleFonts.inter(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
-                                      color: theme.textTheme.bodyLarge?.color,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -190,7 +191,8 @@ class _UserHomeViewState extends State<UserHomeView> {
                   height: 25,
                 ),
               // const SizedBox(height: 5),
-              if (auth.userVirtualAccounts.isNotEmpty)
+              // if (auth.userVirtualAccounts.isNotEmpty)
+              if (auth.userVirtualAccounts.length > 3)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   child: Row(
@@ -314,13 +316,13 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             width: 20,
                                           ),
                                           Text(
-                                            _horizentalAccount?.lastLoginApp ?? "",
-                                            // "A",
+                                            (_horizentalAccount?.lastLoginApp ?? "").length > 10
+                                                ? '${_horizentalAccount?.lastLoginApp?.substring(0, 10)}...'
+                                                : _horizentalAccount?.lastLoginApp ?? "",
                                             style: GoogleFonts.inter(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: theme.textTheme.bodyLarge?.color,
-                                              // fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ],
@@ -450,9 +452,23 @@ class _UserHomeViewState extends State<UserHomeView> {
               Expanded(
                 child: _filteredAccounts.isEmpty
                     ? Center(
-                        child: Text(
-                          "No active accounts!",
-                          style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color, fontSize: 18),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/scanning.gif",
+                              height: 150,
+                              width: 150,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "No more active accounts!",
+                              style: GoogleFonts.inter(color: Colors.grey, fontSize: 18),
+                            ),
+                          ],
                         ),
                       )
                     : ListView.builder(
@@ -648,7 +664,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                           style: GoogleFonts.inter(
                                             fontSize: 17,
                                             fontWeight: FontWeight.bold,
-                                            color: theme.textTheme.bodyLarge?.color,
+                                            color: Colors.white,
                                           ),
                                         )),
                                       ),

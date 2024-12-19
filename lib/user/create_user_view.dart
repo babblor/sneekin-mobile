@@ -33,7 +33,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomTopBar(),
+                // const CustomTopBar(),
                 const SizedBox(
                   height: 20,
                 ),
