@@ -30,7 +30,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
   final TextEditingController orgPANController = TextEditingController();
   final TextEditingController orgGSTINController = TextEditingController();
   // final TextEditingController orgLogoController = TextEditingController();
-  // final TextEditingController orgAddressController = TextEditingController();
+  final TextEditingController orgAddressController = TextEditingController();
   // String? orgLogoUrl;
 
   bool canEdit = false;
@@ -126,6 +126,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
         orgCINController.text = app.org?.cin ?? "N/A";
         orgPANController.text = app.org?.pan ?? "N/A";
         orgGSTINController.text = app.org?.gstin ?? "N/A";
+        orgAddressController.text = app.org?.address ?? "N/A";
         return Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
@@ -141,32 +142,32 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                     Scaffold.of(context).openDrawer();
                   },
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
-                ),
+                // SizedBox(
+                //   height: MediaQuery.of(context).size.height * 0.1,
+                // ),
                 // Expanded(child: SizedBox()),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Positioned(
-                      top: -40, // Adjust the vertical offset as needed
-                      right: 0,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Notch background shape
-                          CustomPaint(
-                            size: const Size(80, 70), // Adjust the size to best match your design
-                            painter: NotchPainter(context: context),
-                          ),
-                          // Icon on top of the notch
-                        ],
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: -40, // Adjust the vertical offset as needed
+                    //   right: 0,
+                    //   child: Stack(
+                    //     alignment: Alignment.center,
+                    //     children: [
+                    //       // Notch background shape
+                    //       CustomPaint(
+                    //         size: const Size(80, 70), // Adjust the size to best match your design
+                    //         painter: NotchPainter(context: context),
+                    //       ),
+                    //       // Icon on top of the notch
+                    //     ],
+                    //   ),
+                    // ),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: theme.secondaryHeaderColor,
+                        color: theme.scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Container(
@@ -178,9 +179,110 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                 // mainAxisAlignment: MainAxisAlignment.center,
                                 // crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const SizedBox(
-                                    height: 20,
+                                  // const SizedBox(
+                                  //   height: 20,
+                                  // ),
+                                  Center(
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 60,
+                                          child: ClipOval(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: app.org?.logo?.isNotEmpty == true
+                                                    ? null
+                                                    : theme.textTheme.headlineLarge?.color,
+                                              ),
+                                              child: Center(
+                                                child: app.org?.logo?.isNotEmpty == true
+                                                    ? CachedNetworkImage(
+                                                        imageUrl: app.org!.logo!,
+
+                                                        fit: BoxFit
+                                                            .cover, // Ensures the image is resized to fit
+                                                        placeholder: (context, url) => const Center(
+                                                          child: SizedBox(
+                                                            height: 15,
+                                                            width: 15,
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.white,
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        errorWidget: (context, url, error) => Center(
+                                                          child: Text(
+                                                            app.org?.name?[0] ?? "N/A",
+                                                            style: GoogleFonts.inter(
+                                                              fontSize: 25,
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Center(
+                                                        child: Text(
+                                                          app.org?.name?[0] ?? "N/A",
+                                                          style: GoogleFonts.inter(
+                                                            fontSize: 25,
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (canEdit)
+                                          Positioned(
+                                            bottom: 2,
+                                            right: -3,
+                                            child: StatefulBuilder(builder: (BuildContext context,
+                                                void Function(void Function()) setState) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  // Handle edit action for organization name
+                                                  log("Organization edit button tapped!");
+                                                  _pickOrgLogoImage(setState);
+                                                },
+                                                child: Container(
+                                                  width: 28,
+                                                  height: 28,
+                                                  decoration: BoxDecoration(
+                                                    color: hasImagePicked
+                                                        ? Colors.green
+                                                        : theme.textTheme.headlineLarge?.color,
+                                                    shape: BoxShape.circle,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black.withOpacity(0.1),
+                                                        blurRadius: 5,
+                                                        offset: const Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: const Center(
+                                                    child: FaIcon(
+                                                      FontAwesomeIcons.penToSquare,
+                                                      color: Colors.white,
+                                                      size: 15,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                      ],
+                                    ),
                                   ),
+                                  if (canEdit)
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     mainAxisAlignment: MainAxisAlignment.end,
@@ -199,9 +301,13 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 25,
-                                  ),
+                                  // const SizedBox(
+                                  //   height: 5,
+                                  // ),
+                                  if (canEdit)
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
                                 ],
                               ),
                               // const SizedBox(height: 15),
@@ -211,13 +317,13 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                               Container(
                                 padding: canEdit ? const EdgeInsets.all(15) : const EdgeInsets.all(0),
                                 decoration: BoxDecoration(
-                                    color:
-                                        canEdit ? theme.scaffoldBackgroundColor : theme.secondaryHeaderColor,
+                                    color: theme.scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(15),
                                     border: Border.all(
                                         width: 1,
-                                        color:
-                                            canEdit ? const Color(0xFFFF6500) : theme.secondaryHeaderColor)),
+                                        color: canEdit
+                                            ? const Color(0xFFFF6500)
+                                            : theme.scaffoldBackgroundColor)),
                                 child: Column(
                                   // crossAxisAlignment: CrossAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,31 +348,10 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                       ),
                                     Row(
                                       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.place_outlined,
-                                              color: theme.textTheme.bodyLarge?.color,
-                                              size: 12,
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              app.org?.address == ""
-                                                  ? "_________"
-                                                  : app.org?.address ?? "_________",
-                                              style: GoogleFonts.inter(
-                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
+                                        // _buildTextField2("Website", orgWebsiteController, theme, app),
+
                                         // Row(
                                         //   crossAxisAlignment: CrossAxisAlignment.start,
                                         //   mainAxisAlignment: MainAxisAlignment.start,
@@ -304,11 +389,72 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                               width: 5,
                                             ),
                                             Text(
-                                              app.org?.email ?? "N/A",
+                                              (app.org?.email != null && app.org!.email!.length > 25)
+                                                  ? "${app.org!.email?.substring(0, 25)}..."
+                                                  : (app.org?.email ?? "N/A"),
                                               style: GoogleFonts.inter(
-                                                  color: theme.textTheme.bodyLarge?.color, fontSize: 11),
-                                            )
+                                                color: theme.textTheme.bodyLarge?.color,
+                                                fontSize: 11,
+                                              ),
+                                            ),
                                           ],
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Expanded(
+                                          child: TextFormField(
+                                            controller:
+                                                orgAddressController, // Replace with your TextEditingController
+                                            style: TextStyle(
+                                              color: theme.textTheme.bodyLarge?.color,
+                                              fontSize: canEdit ? 14 : 11, // Font size based on canEdit
+                                            ),
+                                            enabled: canEdit, // Allow editing based on canEdit
+                                            decoration: InputDecoration(
+                                              prefix: !canEdit
+                                                  ? Padding(
+                                                      padding: const EdgeInsets.only(right: 8.0),
+                                                      child: FaIcon(
+                                                        FontAwesomeIcons.locationDot,
+                                                        color: theme.textTheme.bodyLarge?.color,
+                                                        size: 11,
+                                                      ),
+                                                    )
+                                                  : null,
+                                              filled: true,
+                                              fillColor: theme.scaffoldBackgroundColor, // Background color
+                                              border: canEdit
+                                                  ? OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      borderSide: BorderSide(
+                                                          color: Colors.grey.shade400), // Editable border
+                                                    )
+                                                  : InputBorder.none, // No border when not editable
+                                              enabledBorder: canEdit
+                                                  ? OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      borderSide: BorderSide(
+                                                          color: Colors
+                                                              .grey.shade400), // Enabled editable border
+                                                    )
+                                                  : InputBorder.none,
+                                              focusedBorder: canEdit
+                                                  ? OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(10),
+                                                      borderSide: BorderSide(
+                                                          color: Colors.grey.shade400,
+                                                          width: 2), // Focused editable border
+                                                    )
+                                                  : InputBorder.none, // No focus border when not editable
+                                              disabledBorder: InputBorder.none, // No border when disabled
+                                              hintText: 'Enter text', // Optional hint text
+                                              contentPadding: const EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 12.0,
+                                              ), // Adjust padding
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -320,7 +466,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                     _buildPhoneScrollable("Mobile", theme, app),
                                     if (canEdit)
                                       const SizedBox(
-                                        height: 5,
+                                        height: 15,
                                       ),
                                     StatefulBuilder(builder:
                                         (BuildContext context, void Function(void Function()) setState) {
@@ -369,6 +515,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                 orgPANController.text != app.org?.pan ||
                                                 (orgPANController.text.isNotEmpty && _orgPanImage != null) ||
                                                 orgGSTINController.text != app.org?.gstin ||
+                                                orgAddressController.text != app.org?.address ||
                                                 (orgGSTINController.text.isNotEmpty &&
                                                     _orgGstInImage != null)) {
                                               // Proceed with update logic
@@ -379,7 +526,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                   cin: orgCINController.text,
                                                   pan: orgPANController.text,
                                                   gstIn: orgGSTINController.text,
-                                                  address: "",
+                                                  address: orgAddressController.text,
                                                   logoFile: _orgLogoImage ?? File(""),
                                                   cinFile: _orgCinImage ?? File(""),
                                                   panFile: _orgPanImage ?? File(""),
@@ -445,102 +592,102 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                     // Overflowing Orange Container
 
                     // Right-top notch
-                    Positioned(
-                      top: -30,
-                      left: 35,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 105,
-                            height: 70,
-                            // padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: theme.textTheme.headlineLarge?.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: app.org?.logo?.isNotEmpty == true
-                                  ? CachedNetworkImage(
-                                      imageUrl: app.org!.logo!,
-                                      width: 105,
-                                      height: 70,
-                                      fit: BoxFit.cover, // Ensures the image is resized to fit
-                                      placeholder: (context, url) => const Center(
-                                        child: SizedBox(
-                                          height: 15,
-                                          width: 15,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => Center(
-                                        child: Text(
-                                          app.org?.name?[0] ?? "N/A",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 25,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Text(
-                                        app.org?.name?[0] ?? "N/A",
-                                        style: GoogleFonts.inter(
-                                          fontSize: 25,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          if (canEdit)
-                            Positioned(
-                              bottom: -10,
-                              right: -10,
-                              child: StatefulBuilder(
-                                  builder: (BuildContext context, void Function(void Function()) setState) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    // Handle edit action for organization name
-                                    log("Organization edit button tapped!");
-                                    _pickOrgLogoImage(setState);
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: hasImagePicked
-                                          ? Colors.green
-                                          : theme.textTheme.headlineLarge?.color,
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons.penToSquare,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                        ],
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: -30,
+                    //   left: 35,
+                    //   child: Stack(
+                    //     clipBehavior: Clip.none,
+                    //     children: [
+                    //       Container(
+                    //         width: 105,
+                    //         height: 70,
+                    //         // padding: const EdgeInsets.all(10),
+                    //         decoration: BoxDecoration(
+                    //           color: theme.textTheme.headlineLarge?.color,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Center(
+                    //           child: app.org?.logo?.isNotEmpty == true
+                    //               ? CachedNetworkImage(
+                    //                   imageUrl: app.org!.logo!,
+                    //                   width: 105,
+                    //                   height: 70,
+                    //                   fit: BoxFit.cover, // Ensures the image is resized to fit
+                    //                   placeholder: (context, url) => const Center(
+                    //                     child: SizedBox(
+                    //                       height: 15,
+                    //                       width: 15,
+                    //                       child: CircularProgressIndicator(
+                    //                         color: Colors.white,
+                    //                         strokeWidth: 2,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                   errorWidget: (context, url, error) => Center(
+                    //                     child: Text(
+                    //                       app.org?.name?[0] ?? "N/A",
+                    //                       style: GoogleFonts.inter(
+                    //                         fontSize: 25,
+                    //                         color: Colors.white,
+                    //                         fontWeight: FontWeight.bold,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 )
+                    //               : Center(
+                    //                   child: Text(
+                    //                     app.org?.name?[0] ?? "N/A",
+                    //                     style: GoogleFonts.inter(
+                    //                       fontSize: 25,
+                    //                       color: Colors.white,
+                    //                       fontWeight: FontWeight.bold,
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //         ),
+                    //       ),
+                    //       if (canEdit)
+                    //         Positioned(
+                    //           bottom: -10,
+                    //           right: -10,
+                    //           child: StatefulBuilder(
+                    //               builder: (BuildContext context, void Function(void Function()) setState) {
+                    //             return GestureDetector(
+                    //               onTap: () {
+                    //                 // Handle edit action for organization name
+                    //                 log("Organization edit button tapped!");
+                    //                 _pickOrgLogoImage(setState);
+                    //               },
+                    //               child: Container(
+                    //                 width: 30,
+                    //                 height: 30,
+                    //                 decoration: BoxDecoration(
+                    //                   color: hasImagePicked
+                    //                       ? Colors.green
+                    //                       : theme.textTheme.headlineLarge?.color,
+                    //                   shape: BoxShape.circle,
+                    //                   boxShadow: [
+                    //                     BoxShadow(
+                    //                       color: Colors.black.withOpacity(0.1),
+                    //                       blurRadius: 5,
+                    //                       offset: const Offset(0, 3),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //                 child: const Center(
+                    //                   child: FaIcon(
+                    //                     FontAwesomeIcons.penToSquare,
+                    //                     color: Colors.white,
+                    //                     size: 15,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }),
+                    //         ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -604,7 +751,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                           mobile.mobileNumber,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: Color(0xFFFF6500),
+                            color: const Color(0xFFFF6500),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -630,7 +777,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              label,
+              label.length > 20 ? "${label.substring(0, 20)}..." : label,
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.bold,
                 fontSize: canEdit ? 16 : 14, // Smaller font size when canEdit is false
@@ -656,7 +803,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
             decoration: InputDecoration(
               // contentPadding: canEdit ? EdgeInsets.all(5) : EdgeInsets.zero,
               filled: true,
-              fillColor: canEdit ? theme.scaffoldBackgroundColor : theme.secondaryHeaderColor,
+              fillColor: theme.scaffoldBackgroundColor,
               hintText: null, // Remove hintText since label is outside
               border: canEdit
                   ? OutlineInputBorder(
@@ -905,13 +1052,14 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
             children: [
               // Label on the left
               Text(
-                label,
+                label.length > 15 ? "${label.substring(0, 15)}..." : label,
                 style: GoogleFonts.inter(
                   fontWeight: FontWeight.bold,
                   fontSize: canEdit ? 14 : 12, // Smaller font size when canEdit is false
                   color: theme.textTheme.bodyLarge?.color,
                 ),
               ),
+
               const SizedBox(width: 15), // Space between label and TextFormField
               // Form Field on the right
               Expanded(
@@ -931,14 +1079,10 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                 color: Colors.green,
                                 size: 18,
                               )
-                            : const Icon(
-                                Icons.close_outlined,
-                                color: Colors.red,
-                                size: 18,
-                              ))
+                            : SizedBox.shrink())
                         : null,
                     filled: true,
-                    fillColor: canEdit ? theme.scaffoldBackgroundColor : theme.secondaryHeaderColor,
+                    fillColor: theme.scaffoldBackgroundColor,
                     border: canEdit
                         ? OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),

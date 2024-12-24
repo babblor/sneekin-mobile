@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +10,8 @@ import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 
 class QrLoginView extends StatefulWidget {
-  const QrLoginView({super.key});
+  bool isQrLoading;
+  QrLoginView({super.key, required this.isQrLoading});
 
   @override
   _QrLoginViewState createState() => _QrLoginViewState();
@@ -37,39 +37,22 @@ class _QrLoginViewState extends State<QrLoginView> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _showLoader();
-  // }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   _showLoader(); // Reset loader each time user revisits the screen
-  // }
-
-  // void _showLoader() {
-  //   setState(() {
-  //     isLoading = true; // Show loader
-  //   });
-
-  //   Future.delayed(const Duration(seconds: 2), () {
-  //     if (mounted) {
-  //       setState(() {
-  //         isLoading = false; // Hide loader and show QR view
-  //       });
-  //     }
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    // log("QR Loading Value: ${isLoading}");
+    // if (context.mounted) {
+    //   Future.delayed(const Duration(seconds: 4), () {
+    //     setState(() {
+    //       widget.isQrLoading = false;
+    //     });
+    //   });
+    //   log("QR Loading Value: ${widget.isQrLoading}");
+    // }
+
     final theme = Theme.of(context);
+
     return Scaffold(
       body: Consumer2<AuthServices, AppStore>(builder: (context, auth, app, _) {
-        // if (isLoading) {
+        // if (widget.isQrLoading) {
         //   return Center(
         //     child: CircularProgressIndicator(
         //       color: theme.textTheme.headlineLarge?.color,
@@ -87,12 +70,13 @@ class _QrLoginViewState extends State<QrLoginView> {
               onQRViewCreated: (p0) {
                 controller = p0;
                 p0.scannedDataStream.listen((scanData) async {
-                  log("scanData: ${scanData.code}");
                   if (isScanning) return;
 
                   setState(() {
                     isScanning = true;
                   });
+
+                  log("scanData: ${scanData.code}");
 
                   if (scanData.code != null && scanData.code!.isNotEmpty) {
                     showDialog(
@@ -100,11 +84,11 @@ class _QrLoginViewState extends State<QrLoginView> {
                       barrierDismissible: false,
                       builder: (context) => StatefulBuilder(
                         builder: (context, setState) {
-                          return AlertDialog(
-                            title: const Text("Processing QR Code"),
+                          return const AlertDialog(
+                            title: Text("Processing QR Code"),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 CircularProgressIndicator(),
                                 SizedBox(height: 16),
                                 Text("Verifying QR code, please wait..."),
@@ -239,8 +223,11 @@ class _QrLoginViewState extends State<QrLoginView> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    if (context.mounted) {
+      controller?.dispose();
+    }
     super.dispose();
+    // widget.isQrLoading = false;
   }
 }
 

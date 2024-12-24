@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -107,20 +106,132 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                 ),
               ),
               const SizedBox(height: 40),
+              auth.orgAppsAccount.isEmpty
+                  ? SizedBox.shrink()
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            alignment: Alignment.center,
+                            height: 80, // Adjust height as needed
+                            child: Wrap(
+                              spacing: 20, // Adjust horizontal spacing
+                              alignment: WrapAlignment.center, // Center the children
+                              children: auth.orgAppsAccount
+                                  .take(3) // Limit to 3 items
+                                  .map((account) => GestureDetector(
+                                        onTap: () {
+                                          log("Account tapped: ${account.name}");
+                                          context.go('/org-app-account-profile', extra: account);
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              margin: const EdgeInsets.only(bottom: 5),
+                                              width: 60,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: theme.textTheme.headlineLarge?.color,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  account.name[0],
+                                                  style: GoogleFonts.inter(
+                                                    fontSize: 17,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              account.name.length > 6
+                                                  ? '${account.name.substring(0, 6)}...' // Truncate and add ellipses
+                                                  : account.name,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.ellipsis, // Ensure proper truncation
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              const SizedBox(
+                height: 15,
+              ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FaIcon(
-                      FontAwesomeIcons.globe,
-                      size: 18,
-                      color: theme.textTheme.bodyLarge?.color,
+                    Expanded(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        padding: _isExpanded ? const EdgeInsets.symmetric(horizontal: 10.0) : EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: _isExpanded ? theme.scaffoldBackgroundColor : Colors.transparent,
+                        ),
+                        child: _isExpanded
+                            ? TextFormField(
+                                controller: _controller,
+                                autofocus: true,
+                                onChanged: _filterAccounts,
+                                onTap: _toggleSearchBar,
+                                style: GoogleFonts.inter(color: theme.textTheme.headlineLarge?.color),
+                                decoration: InputDecoration(
+                                  hintText: "Search an account...",
+                                  hintStyle: GoogleFonts.inter(
+                                    color: theme.textTheme.bodyLarge?.color,
+                                    fontSize: 13,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isExpanded = false;
+                                        // _controller.clear();
+                                      });
+                                    },
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                                  ),
+                                  filled: true,
+                                  fillColor: theme.scaffoldBackgroundColor,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                ),
+                              )
+                            : null,
+                      ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                  ],
+                ),
+              ),
+              if (!_isExpanded)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Text(
                       "Websites/Apps",
                       style: GoogleFonts.inter(
@@ -129,135 +240,73 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                         color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 25),
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 80, // Adjust height as needed
-                      padding: const EdgeInsets.only(left: 70, right: 55),
-                      child: auth.orgAppsAccount.isEmpty
-                          ? null
-                          : ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: auth.orgAppsAccount.length.clamp(0, 3), // Limit to 4 items
-                              itemBuilder: (context, index) {
-                                var account = auth.orgAppsAccount[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    log("Horizontal index: $index");
-                                    context.go('/org-app-account-profile', extra: account);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10.0), // Control horizontal spacing here
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              bottom: 5), // Adjust vertical spacing if needed
-                                          width: 60,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            color: theme.textTheme.headlineLarge?.color,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              account.name[0],
-                                              style: GoogleFonts.inter(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          account.name,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                    const SizedBox(width: 5), // Space between text and icon
+                    IconButton(
+                      icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+                      onPressed: () {
+                        setState(() => _isExpanded = true);
+                      },
                     ),
                   ],
                 ),
-              ),
-              if (auth.orgAppsAccount.length > 3)
-                if (auth.orgAppsAccount.length > 3)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: _isExpanded
-                            ? Padding(
-                                padding: _isExpanded ? const EdgeInsets.all(30.0) : const EdgeInsets.all(0.0),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                  child: TextFormField(
-                                    controller: _controller,
-                                    autofocus: true,
-                                    onChanged: _filterAccounts,
-                                    onTap: () {
-                                      _toggleSearchBar();
-                                      // _controller.clear();
-                                    },
-                                    style: GoogleFonts.inter(color: theme.textTheme.headlineLarge?.color),
-                                    decoration: InputDecoration(
-                                      hintText: "Search an account...",
-                                      hintStyle: GoogleFonts.inter(
-                                        color: theme.textTheme.bodyLarge?.color,
-                                        fontSize: 13,
-                                      ),
-                                      suffixIcon: const Icon(Icons.search, color: Color(0xFFFF6500)),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8.0),
-                                        borderSide:
-                                            const BorderSide(color: Color(0xFFFF6500)), // Orange color
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8.0),
-                                        borderSide:
-                                            const BorderSide(color: Color(0xFFFF6500)), // Orange color
-                                      ),
-                                      filled: true,
-                                      fillColor: theme.scaffoldBackgroundColor,
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : const SizedBox(), // When collapsed, no expanded widget
-                      ),
-                      if (!_isExpanded)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: IconButton(
-                            icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
-                            onPressed: () => setState(() => _isExpanded = true),
-                          ),
-                        ),
-                    ],
-                  ),
-              // if (auth.orgAppsAccount.length > 4)
-              // SizedBox(
-              //   height: 15,
-              // ),
+              const SizedBox(height: 25),
+              // if (auth.orgAppsAccount.length > 3)
+              //   if (auth.orgAppsAccount.length > 3)
+              //     Row(
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: [
+              //         Expanded(
+              //           child: _isExpanded
+              //               ? Padding(
+              //                   padding: _isExpanded ? const EdgeInsets.all(30.0) : const EdgeInsets.all(0.0),
+              //                   child: AnimatedContainer(
+              //                     duration: const Duration(milliseconds: 300),
+              //                     curve: Curves.easeInOut,
+              //                     child: TextFormField(
+              //                       controller: _controller,
+              //                       autofocus: true,
+              //                       onChanged: _filterAccounts,
+              //                       onTap: () {
+              //                         _toggleSearchBar();
+              //                         // _controller.clear();
+              //                       },
+              //                       style: GoogleFonts.inter(color: theme.textTheme.headlineLarge?.color),
+              //                       decoration: InputDecoration(
+              //                         hintText: "Search an account...",
+              //                         hintStyle: GoogleFonts.inter(
+              //                           color: theme.textTheme.bodyLarge?.color,
+              //                           fontSize: 13,
+              //                         ),
+              //                         suffixIcon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+              //                         enabledBorder: OutlineInputBorder(
+              //                           borderRadius: BorderRadius.circular(8.0),
+              //                           borderSide:
+              //                               const BorderSide(color: Color(0xFFFF6500)), // Orange color
+              //                         ),
+              //                         focusedBorder: OutlineInputBorder(
+              //                           borderRadius: BorderRadius.circular(8.0),
+              //                           borderSide:
+              //                               const BorderSide(color: Color(0xFFFF6500)), // Orange color
+              //                         ),
+              //                         filled: true,
+              //                         fillColor: theme.scaffoldBackgroundColor,
+              //                         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                 )
+              //               : const SizedBox(), // When collapsed, no expanded widget
+              //         ),
+              //         if (!_isExpanded)
+              //           Padding(
+              //             padding: const EdgeInsets.only(right: 8.0),
+              //             child: IconButton(
+              //               icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+              //               onPressed: () => setState(() => _isExpanded = true),
+              //             ),
+              //           ),
+              //       ],
+              //     ),
               Expanded(
                 child: _filteredAccounts.isEmpty
                     ? Center(

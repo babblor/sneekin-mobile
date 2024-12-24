@@ -27,6 +27,8 @@ class NavigationShell extends StatefulWidget {
 class NavigationShellState extends State<NavigationShell> {
   int _activeIndex = 0;
 
+  bool isQrLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +59,7 @@ class NavigationShellState extends State<NavigationShell> {
         final List<Widget> pages = app.isSignedIn
             ? [
                 const UserHomeView(),
-                const QrLoginView(),
+                QrLoginView(isQrLoading: isQrLoading),
                 const UserProfilePage(),
               ]
             : [
@@ -112,9 +114,13 @@ class NavigationShellState extends State<NavigationShell> {
               currentIndex: _activeIndex,
               isOrg: !app.isSignedIn,
               onTap: (index) {
-                setState(() {
-                  _activeIndex = index;
-                });
+                if (index != _activeIndex) {
+                  setState(() {
+                    _activeIndex = index;
+                  });
+                } else {
+                  log("User tapped the current tab: $index");
+                }
               },
             ),
           ),

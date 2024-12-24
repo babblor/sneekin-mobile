@@ -1,4 +1,4 @@
-package com.sneekin.app
+package com.abblor.sneek
 
 import android.net.Uri
 import android.provider.OpenableColumns

@@ -297,7 +297,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                         );
                         return;
                       }
-                      log("Creating org-app-account with ${_nameController.text}, ${_mobileController.text}, ${_emailController.text}, ${_clientWebsiteController.text}, ${_logoImage}, ${isMobile}");
+                      log("Creating org-app-account with ${_nameController.text}, ${_mobileController.text}, ${_emailController.text}, ${_clientWebsiteController.text}, $_logoImage, $isMobile");
 
                       final result = await auth.createOrgAppsAccount(
                           name: _nameController.text,
@@ -385,28 +385,28 @@ class _OrgDashboardState extends State<OrgDashboard> {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Positioned(
-                    top: -40, // Adjust the vertical offset as needed
-                    right: 0,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.center,
-                      children: [
-                        // Notch background shape
+                  // Positioned(
+                  //   top: -40, // Adjust the vertical offset as needed
+                  //   right: 0,
+                  //   child: Stack(
+                  //     clipBehavior: Clip.none,
+                  //     alignment: Alignment.center,
+                  //     children: [
+                  //       // Notch background shape
 
-                        CustomPaint(
-                          size: const Size(80, 70), // Adjust the size to best match your design
-                          painter: NotchPainter(context: context),
-                        ),
-                        // Icon on top of the notch
-                      ],
-                    ),
-                  ),
+                  //       CustomPaint(
+                  //         size: const Size(80, 70), // Adjust the size to best match your design
+                  //         painter: NotchPainter(context: context),
+                  //       ),
+                  //       // Icon on top of the notch
+                  //     ],
+                  //   ),
+                  // ),
                   Container(
                     // color: theme.scaffoldBackgroundColor,
                     // height: MediaQuery.of(context).size.height,
                     decoration: BoxDecoration(
-                      color: theme.secondaryHeaderColor,
+                      color: theme.scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     padding: const EdgeInsets.all(16),
@@ -633,11 +633,14 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    app.org?.name ?? "N/A",
+                                    (app.org?.name != null && app.org!.name!.length > 25)
+                                        ? "${app.org!.name?.substring(0, 25)}..."
+                                        : (app.org?.name ?? "N/A"),
                                     style: GoogleFonts.inter(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.textTheme.bodyLarge?.color),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.textTheme.bodyLarge?.color,
+                                    ),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -654,9 +657,13 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                         width: 5,
                                       ),
                                       Text(
-                                        app.org?.email ?? "N/A",
+                                        (app.org?.email != null && app.org!.email!.length > 25)
+                                            ? "${app.org!.email?.substring(0, 25)}..."
+                                            : (app.org?.email ?? "N/A"),
                                         style: GoogleFonts.inter(
-                                            fontSize: 13, color: theme.textTheme.bodyLarge?.color),
+                                          fontSize: 13,
+                                          color: theme.textTheme.bodyLarge?.color,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -674,9 +681,9 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                       const SizedBox(
                                         width: 5,
                                       ),
-                                      if (app.org?.mobileNumbers?.isNotEmpty ?? false)
+                                      if (app.org?.mobileNumbers.isNotEmpty ?? false)
                                         Text(
-                                          app.org?.mobileNumbers?[0].mobileNumber ?? "N/A",
+                                          app.org?.mobileNumbers[0].mobileNumber ?? "N/A",
                                           style: GoogleFonts.inter(
                                             fontSize: 13,
                                             color: theme.textTheme.bodyLarge?.color,

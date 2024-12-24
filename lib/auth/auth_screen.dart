@@ -236,17 +236,20 @@ class _AuthScreenState extends State<AuthScreen> {
         // const SizedBox(
         //   height: 15,
         // ),
-        Text(
-          "Create your account",
-          style: GoogleFonts.inter(
-            textStyle: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+        Center(
+          child: Text(
+            "Create your account",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              textStyle: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 30),
         // Name Input Field
         _buildInputField(
           controller: userNameController,
@@ -368,17 +371,20 @@ class _AuthScreenState extends State<AuthScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // const SizedBox(height: 15),
-        Text(
-          "Create your organization",
-          style: GoogleFonts.inter(
-            textStyle: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+        Center(
+          child: Text(
+            "Create your organization",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              textStyle: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 30),
 
         // Name Input Field
         _buildInputField(
@@ -1380,20 +1386,20 @@ class CustomTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1F293F),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+          // color: const Color(0xFF1F293F),
+          // borderRadius: BorderRadius.circular(20),
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(0.3),
+          //     blurRadius: 10,
+          //     offset: const Offset(0, 5),
+          //   ),
+          // ],
           ),
-        ],
-      ),
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 40),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(

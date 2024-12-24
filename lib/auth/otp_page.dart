@@ -247,6 +247,7 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
           ? GestureDetector(
               onTap: () {
                 if (code != null) {
+                  log("Again executing verifyotp through _verifyOtp with ${_phoneController.text} ${code!}");
                   _verifyOtp(code!, context);
                 } else {
                   // ScaffoldMessenger.of(context).showSnackBar(
@@ -339,6 +340,8 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
                 child: OtpTextField(
                   numberOfFields: 4,
                   filled: true,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   fillColor: const Color(0xFF1F2937),
                   cursorColor: Colors.red,
                   borderColor: Colors.red,
@@ -399,46 +402,82 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              TextFormField(
-                key: _phoneNumberKey,
-                controller: _phoneController,
-                enabled: !isSent,
-                keyboardType: TextInputType.phone,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: GoogleFonts.inter(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Enter your phone number...',
-                  hintStyle: GoogleFonts.inter(color: Colors.grey),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      key: _phoneNumberKey,
+                      controller: _phoneController,
+                      enabled: !isSent,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      style: GoogleFonts.inter(color: Colors.grey),
+                      decoration: InputDecoration(
+                        hintText: 'Enter your phone number...',
+                        hintStyle: GoogleFonts.inter(color: Colors.grey),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFFF6500)),
+                        ),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Indian flag
+                              Image.asset(
+                                'assets/images/india_flag.png', // Add your flag image in assets
+                                width: 24,
+                                height: 24,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "+91",
+                                style: GoogleFonts.inter(fontSize: 16, color: Colors.grey),
+                              ),
+                              const SizedBox(width: 8),
+                              // VerticalDivider(
+                              //   color: Colors.red,
+                              //   thickness: 2,
+                              //   width: 2,
+                              // ),
+                              Container(
+                                width: 2,
+                                height: 20,
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
+                        ),
+                        prefixIconConstraints: const BoxConstraints(minWidth: 80),
+                      ),
+                      onChanged: (value) async {
+                        if (value.length == 10) {
+                          setState(() {
+                            isSent = true;
+                          });
+                          final result = await auth.sendOTP(phone: value);
+                          if (result == true) {
+                            startCountdown();
+                            _pageController.animateToPage(
+                              1,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Color(0xFFFF6500)),
-                  ),
-                ),
-                onChanged: (value) async {
-                  if (value.length == 10) {
-                    setState(() {
-                      isSent = true;
-                    });
-                    final result = await auth.sendOTP(phone: value);
-                    if (result == true) {
-                      startCountdown();
-                      _pageController.animateToPage(
-                        1,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  }
-                },
+                ],
               ),
-              const SizedBox(
-                height: 75,
-              )
+              const SizedBox(height: 50),
             ],
           ),
         );

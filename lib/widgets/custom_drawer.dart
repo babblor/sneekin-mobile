@@ -121,8 +121,8 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
             }
 
             if (app.isOrgSignedIn) {
-              _phoneController.text = app.org?.mobileNumbers?.isNotEmpty == true
-                  ? app.org!.mobileNumbers!.first.mobileNumber
+              _phoneController.text = app.org?.mobileNumbers.isNotEmpty == true
+                  ? app.org!.mobileNumbers.first.mobileNumber
                   : "N/A";
             }
 
@@ -158,7 +158,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                     clipBehavior: Clip.none,
                     children: [
                       CircleAvatar(
-                        radius: 60,
+                        radius: 65,
                         backgroundColor: theme.secondaryHeaderColor,
                         child: app.isSignedIn
                             ? (app.user?.profileImageUrl?.isNotEmpty == true
@@ -166,8 +166,8 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     child: CachedNetworkImage(
                                       imageUrl: app.user!.profileImageUrl!,
                                       fit: BoxFit.contain,
-                                      width: 110,
-                                      height: 110,
+                                      // width: 110,
+                                      // height: 110,
                                       placeholder: (context, url) => Center(
                                         child: CircularProgressIndicator(
                                           color: theme.textTheme.headlineLarge?.color,
@@ -198,8 +198,8 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     child: CachedNetworkImage(
                                       imageUrl: app.org!.logo!,
                                       fit: BoxFit.contain,
-                                      width: 110,
-                                      height: 110,
+                                      // width: 110,
+                                      // height: 110,
                                       placeholder: (context, url) => Center(
                                         child: SizedBox(
                                           height: 15,
@@ -234,7 +234,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                       ),
                       if (canEdit)
                         Positioned(
-                          bottom: -2,
+                          bottom: 5,
                           right: -2,
                           child: StatefulBuilder(
                               builder: (BuildContext context, void Function(void Function()) setState) {
@@ -336,7 +336,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                           Text(
                             app.isSignedIn
                                 ? app.user?.mobileNumbers.first.mobileNumber.toString() ?? "N/A"
-                                : app.org?.mobileNumbers?.first.mobileNumber.toString() ?? "N/A",
+                                : app.org?.mobileNumbers.first.mobileNumber.toString() ?? "N/A",
                             style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12),
                           ),
                         ],
@@ -352,9 +352,15 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                           const SizedBox(width: horizontalSpacing),
                           Text(
                             app.isSignedIn
-                                ? app.user?.email.toString() ?? "N/A"
-                                : app.org?.email.toString() ?? "N/A",
-                            style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12),
+                                ? (app.user?.email != null && app.user!.email.length > 20
+                                    ? "${app.user!.email.substring(0, 20)}..."
+                                    : app.user?.email.toString() ?? "N/A")
+                                : (app.org?.email != null && app.org!.email!.length > 20
+                                    ? "${app.org!.email?.substring(0, 20)}..."
+                                    : app.org?.email.toString() ?? "N/A"),
+                            style: GoogleFonts.inter(
+                              fontSize: canEdit ? 14 : 12,
+                            ),
                           ),
                         ],
                       ),
@@ -653,16 +659,20 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
       builder: (BuildContext context, void Function(void Function()) setState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Age", style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.only(top: 15.0),
+              child: Text("Age",
+                  style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12, fontWeight: FontWeight.bold)),
+            ),
             const SizedBox(
               width: 5,
             ),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Range Slider
                   RangeSlider(
@@ -805,11 +815,11 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
           filled: true,
           fillColor: canEdit ? theme.secondaryHeaderColor : theme.scaffoldBackgroundColor,
 
-          hintText: value, // Remove hintText since label is outside
+          hintText: value.length > 15 ? "${value.substring(0, 15)}..." : value, // Truncate if necessary
           hintStyle: GoogleFonts.inter(
             color: theme.textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
-            fontSize: canEdit ? 16 : 16, // Smaller font size when canEdit is false
+            fontSize: canEdit ? 16 : 16, // Consistent font size
           ),
           border: canEdit
               ? OutlineInputBorder(
@@ -894,10 +904,11 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                   : null,
               filled: true,
               fillColor: canEdit ? theme.secondaryHeaderColor : theme.scaffoldBackgroundColor,
-              hintText: value, // Remove hintText since label is outside
+              hintText: value.length > 20 ? "${value.substring(0, 20)}..." : value, // Truncate if necessary
               hintStyle: GoogleFonts.inter(
                 color: theme.textTheme.bodyLarge?.color,
-                fontSize: canEdit ? 15 : 14, // Smaller font size when canEdit is false
+                fontWeight: FontWeight.bold,
+                fontSize: canEdit ? 16 : 16, // Consistent font size
               ),
               border: canEdit
                   ? OutlineInputBorder(

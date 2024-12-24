@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sneekin/auth/auth_screen.dart';
 import 'package:sneekin/models/app.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/models/user.dart';
@@ -23,8 +24,8 @@ import 'services/router_services.dart';
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: const Color(0xFF1F293F), // Primary color
-  secondaryHeaderColor: const Color(0xFF1F2937),
-  scaffoldBackgroundColor: const Color(0xFF1F293F), // Background color
+  secondaryHeaderColor: const Color(0xFF1F293F),
+  scaffoldBackgroundColor: const Color(0xFF1F2937), // Background color
   appBarTheme: const AppBarTheme(
     backgroundColor: Color(0xFF1F2937),
     titleTextStyle:
@@ -166,7 +167,7 @@ class _MyAppState extends State<MyApp> {
           log('checking auth token in every three minutes');
           final app = Provider.of<AppStore>(context, listen: false);
           final isTokenValid = await app.checkAuthToken(context);
-          log("isTokenValid: ${isTokenValid}");
+          log("isTokenValid: $isTokenValid");
           if (isTokenValid) {
             await app.signOut(context);
             showToast(
@@ -176,9 +177,24 @@ class _MyAppState extends State<MyApp> {
             restartApp();
           }
         });
+        // if (theme.isThemeLoading) {
+        //   return MaterialApp(
+        //     home: Scaffold(
+        //       body: Center(
+        //         child: CircularProgressIndicator(
+        //           color: Color(0xFFFF6500),
+        //         ),
+        //       ),
+        //     ),
+        //   );
+        // }
 
         return ToastificationWrapper(
-          child: MaterialApp.router(
+          child:
+              //     MaterialApp(
+              //   home: AuthScreen(),
+              // )
+              MaterialApp.router(
             key: _key,
             debugShowCheckedModeBanner: false,
             theme: lightTheme,

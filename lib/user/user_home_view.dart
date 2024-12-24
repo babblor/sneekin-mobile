@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +64,7 @@ class _UserHomeViewState extends State<UserHomeView> {
       setState(() {
         // Filter accounts based on the query
         _filteredAccounts = _allUsersVirtualAccounts
-            .where((account) => account.orgAppName?.toLowerCase().contains(query.toLowerCase()) ?? false)
+            .where((account) => account.username.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       });
     }
@@ -114,155 +113,148 @@ class _UserHomeViewState extends State<UserHomeView> {
                 ),
               ),
               const SizedBox(height: 30),
-              Center(
-                child: Text(
-                  "Virtual Accounts",
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    // color: Colors.white,
-                    color: theme.textTheme.bodyLarge?.color,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
               // Horizontal scroll view for first 3-4 accounts
               if (auth.userVirtualAccounts.isNotEmpty)
-                Container(
-                  height: 80, // Adjust height as needed
-                  padding: const EdgeInsets.only(left: 45, right: 55),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: auth.userVirtualAccounts.length.clamp(0, 3), // Limit to 4 items
-                    itemBuilder: (context, index) {
-                      var account = auth.userVirtualAccounts[index];
-                      return GestureDetector(
-                        onTap: () {
-                          log("Horizontal index: $index");
-                          setState(() {
-                            _horizentalAccount = account;
-                            _isHorizentalAccountShow = !_isHorizentalAccountShow;
-                          });
-                        },
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10.0), // Control horizontal spacing here
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 5), // Adjust vertical spacing if needed
-                                width: 60,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: theme.textTheme.headlineLarge?.color,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    account.username?[0] ?? "N/A",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                account.lastLoginApp ?? "N/A",
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                Center(
+                  child: Container(
+                    height: 80, // Adjust height as needed
+                    alignment: Alignment.center,
+                    child: auth.userVirtualAccounts.isEmpty
+                        ? null
+                        : Wrap(
+                            spacing: 20, // Adjust horizontal spacing
+                            alignment: WrapAlignment.center, // Center the children
+                            children: auth.userVirtualAccounts
+                                .take(3) // Limit to 3 items
+                                .map((account) => GestureDetector(
+                                      onTap: () {
+                                        log("Account tapped: ${account.username}");
+                                        setState(() {
+                                          _horizentalAccount = account;
+                                          _isHorizentalAccountShow = !_isHorizentalAccountShow;
+                                        });
+                                      },
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 5), // Adjust vertical spacing if needed
+                                            width: 60,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: theme.textTheme.headlineLarge?.color,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                account.username[0] ?? "N/A",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            account.username.length > 6
+                                                ? '${account.username.substring(0, 6)}...' // Truncate and add ellipses
+                                                : account.username ?? "N/A",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis, // Ensure proper truncation
+                                          ),
+                                        ],
+                                      ),
+                                    ))
+                                .toList(),
                           ),
-                        ),
-                      );
-                    },
                   ),
                 ),
-              if (_isExpanded)
+
+              // if (_isExpanded)
+              //   const SizedBox(
+              //     height: 25,
+              //   ),
+              // if (auth.userVirtualAccounts.length > 3)
+              //   Padding(
+              //     padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              //     child: Row(
+              //       crossAxisAlignment: CrossAxisAlignment.end,
+              //       mainAxisAlignment: MainAxisAlignment.end,
+              //       children: [
+              //         if (_isExpanded)
+              //           Expanded(
+              //             child: AnimatedContainer(
+              //               duration: const Duration(milliseconds: 300),
+              //               width: _isExpanded ? double.infinity : 50,
+              //               child: TextFormField(
+              //                 controller: _controller,
+              //                 autofocus: _isExpanded,
+              //                 onChanged: _filterAccounts,
+              //                 // onTap: _toggleSearchBar,
+              //                 style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
+              //                 decoration: InputDecoration(
+              //                   hintText: _isExpanded ? "Search an account..." : null,
+              //                   hintStyle: GoogleFonts.inter(
+              //                     color: theme.textTheme.bodyLarge?.color,
+              //                     fontSize: 13,
+              //                   ),
+              //                   suffixIcon: _isExpanded
+              //                       ? InkWell(
+              //                           onTap: () {
+              //                             // reset();
+              //                             _toggleSearchBar();
+              //                           },
+              //                           child: const Icon(Icons.search, color: Color(0xFFFF6500)))
+              //                       : null,
+              //                   enabledBorder: OutlineInputBorder(
+              //                     borderRadius: BorderRadius.circular(8.0),
+              //                     borderSide: const BorderSide(color: Color(0xFFFF6500)), // Orange color
+              //                   ),
+              //                   focusedBorder: OutlineInputBorder(
+              //                     borderRadius: BorderRadius.circular(8.0),
+              //                     borderSide: const BorderSide(color: Color(0xFFFF6500)), // Green color
+              //                   ),
+              //                   disabledBorder: OutlineInputBorder(
+              //                     borderRadius: BorderRadius.circular(8.0),
+              //                     borderSide:
+              //                         BorderSide(color: theme.disabledColor), // Disabled color from theme
+              //                   ),
+              //                   filled: true,
+              //                   fillColor: theme.scaffoldBackgroundColor,
+              //                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+              //                 ),
+              //               ),
+              //             ),
+              //           ),
+              //       ],
+              //     ),
+              //   ),
+              // if (!_isExpanded && auth.userVirtualAccounts.isNotEmpty)
+              //   Padding(
+              //     padding: const EdgeInsets.only(right: 8.0),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.end,
+              //       children: [
+              //         IconButton(
+              //           icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+              //           onPressed: () => setState(() => _isExpanded = true),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // if (_isExpanded)
+              //   const SizedBox(
+              //     height: 25,
+              //   ),
+              if (_isHorizentalAccountShow)
                 const SizedBox(
-                  height: 25,
-                ),
-              // const SizedBox(height: 5),
-              // if (auth.userVirtualAccounts.isNotEmpty)
-              if (auth.userVirtualAccounts.length > 3)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (_isExpanded)
-                        Expanded(
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: _isExpanded ? double.infinity : 50,
-                            child: TextFormField(
-                              controller: _controller,
-                              autofocus: _isExpanded,
-                              onChanged: _filterAccounts,
-                              // onTap: _toggleSearchBar,
-                              style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
-                              decoration: InputDecoration(
-                                hintText: _isExpanded ? "Search an account..." : null,
-                                hintStyle: GoogleFonts.inter(
-                                  color: theme.textTheme.bodyLarge?.color,
-                                  fontSize: 13,
-                                ),
-                                suffixIcon: _isExpanded
-                                    ? InkWell(
-                                        onTap: () {
-                                          // reset();
-                                          _toggleSearchBar();
-                                        },
-                                        child: const Icon(Icons.search, color: Color(0xFFFF6500)))
-                                    : null,
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(color: Color(0xFFFF6500)), // Orange color
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: const BorderSide(color: Color(0xFFFF6500)), // Green color
-                                ),
-                                disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide:
-                                      BorderSide(color: theme.disabledColor), // Disabled color from theme
-                                ),
-                                filled: true,
-                                fillColor: theme.scaffoldBackgroundColor,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              if (!_isExpanded && auth.userVirtualAccounts.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
-                        onPressed: () => setState(() => _isExpanded = true),
-                      ),
-                    ],
-                  ),
-                ),
-              if (_isExpanded)
-                const SizedBox(
-                  height: 25,
+                  height: 15,
                 ),
               if (_isHorizentalAccountShow)
                 Center(
@@ -432,7 +424,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                             child: Center(
                                 child: Text(
                               // account.usern
-                              "A",
+                              _horizentalAccount?.username[0] ?? "N/A",
                               style: GoogleFonts.inter(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
@@ -449,6 +441,89 @@ class _UserHomeViewState extends State<UserHomeView> {
               // SizedBox(
               //   height: 8,
               // ),
+              const SizedBox(
+                height: 15,
+              ),
+              if (auth.userVirtualAccounts.length > 3)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (_isExpanded)
+                        Expanded(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                              color: theme.scaffoldBackgroundColor,
+                            ),
+                            child: TextFormField(
+                              controller: _controller,
+                              autofocus: true,
+                              onChanged: _filterAccounts,
+                              style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
+                              decoration: InputDecoration(
+                                hintText: "Search a virtual account...",
+                                hintStyle: GoogleFonts.inter(
+                                  color: theme.textTheme.bodyLarge?.color,
+                                  fontSize: 13,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isExpanded = false;
+                                      // _controller.clear();
+                                    });
+                                  },
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(color: Color(0xFFFF6500)), // Orange color
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(color: Color(0xFFFF6500)), // Orange color
+                                ),
+                                filled: true,
+                                fillColor: theme.scaffoldBackgroundColor,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (!_isExpanded)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Center(
+                              child: Text(
+                                "Virtual Accounts",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 24,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 5), // Space between text and icon
+                            IconButton(
+                              icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
+                              onPressed: () => setState(() => _isExpanded = true),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(
+                height: 15,
+              ),
               Expanded(
                 child: _filteredAccounts.isEmpty
                     ? Center(
@@ -461,11 +536,11 @@ class _UserHomeViewState extends State<UserHomeView> {
                               height: 150,
                               width: 150,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
                             Text(
-                              "No more active accounts!",
+                              "No active accounts!",
                               style: GoogleFonts.inter(color: Colors.grey, fontSize: 18),
                             ),
                           ],
@@ -532,9 +607,11 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                     // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      Text("   "),
+                                                      const Text("   "),
                                                       Text(
-                                                        account.lastLoginApp ?? " N/A",
+                                                        (account.username ?? "").length > 10
+                                                            ? '${account.username.substring(0, 10)}...'
+                                                            : account.username ?? "",
                                                         style: GoogleFonts.inter(
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.bold,

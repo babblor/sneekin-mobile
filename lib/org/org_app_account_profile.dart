@@ -186,7 +186,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                             "assets/images/websites-apps.webp",
                             height: 25,
                             width: 25,
-                            color: Color(0xFFFF6500).withOpacity(1),
+                            color: const Color(0xFFFF6500).withOpacity(1),
                           ),
                         )
                       ],
@@ -441,7 +441,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                           _buildTableCell(user.lastLoginApp ?? "___"),
                                           _buildTableCell(user.lastLoginTime?.toIso8601String() ?? "___"),
                                           _buildTableCell((user.ageGroup.toString() ?? 0.toString())),
-                                          _buildTableCell((user.paymentDueStatus ?? false) as String),
+                                          _buildTableCell((user.paymentDueStatus ?? false).toString()),
                                         ],
                                       );
                                     }),

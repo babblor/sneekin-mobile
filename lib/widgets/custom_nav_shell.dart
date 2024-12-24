@@ -29,13 +29,15 @@ class CustomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BottomNavigationBar(
-      // backgroundColor: Colors.red,
-      backgroundColor: theme.secondaryHeaderColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      // fixedColor: theme.textTheme.headlineLarge?.color,
+      enableFeedback: false,
+      // type: BottomNavigationBarType.shifting,
+      selectedFontSize: 12,
+      selectedItemColor: theme.textTheme.bodyLarge?.color,
+      unselectedItemColor: theme.textTheme.bodyLarge?.color,
       currentIndex: currentIndex,
-      // selectedItemColor: theme.textTheme.bodyLarge?.color,
       onTap: onTap,
-      showSelectedLabels: true,
-      // showUnselectedLabels: true,
       iconSize: 25,
       items: isOrg
           ? [
@@ -54,7 +56,7 @@ class CustomNavigationBar extends StatelessWidget {
                   "assets/images/websites-apps.webp",
                   height: 25,
                   width: 25,
-                  color: Color.fromRGBO(255, 94, 0, 1).withOpacity(1),
+                  color: const Color.fromRGBO(255, 94, 0, 1).withOpacity(1),
                 ),
               ),
               BottomNavigationBarItem(

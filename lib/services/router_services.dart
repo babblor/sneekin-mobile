@@ -83,16 +83,18 @@ class RouterServices with ChangeNotifier {
           ),
 
           GoRoute(
-            path: '/create-virtual-account',
-            name: 'create-virtual-account',
-            pageBuilder: (context, state) => MaterialPage(
-              key: state.pageKey,
-              child: const PageWrapper(
-                page: QrLoginView(),
-                isOrg: false,
-              ),
-            ),
-          ),
+              path: '/create-virtual-account',
+              name: 'create-virtual-account',
+              pageBuilder: (context, state) {
+                final isQrLoading = state.extra as bool;
+                return MaterialPage(
+                  key: state.pageKey,
+                  child: PageWrapper(
+                    page: QrLoginView(isQrLoading: isQrLoading),
+                    isOrg: false,
+                  ),
+                );
+              }),
 
           GoRoute(
             path: '/user-profile-page',

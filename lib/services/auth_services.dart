@@ -60,8 +60,8 @@ class AuthServices with ChangeNotifier {
     _dio = Dio(
       BaseOptions(
         baseUrl: dotenv.env["MAIN_API_URL"]!,
-        receiveTimeout: const Duration(seconds: 50),
-        connectTimeout: const Duration(seconds: 50),
+        receiveTimeout: const Duration(seconds: 100),
+        connectTimeout: const Duration(seconds: 100),
       ),
     );
   }
@@ -119,6 +119,7 @@ class AuthServices with ChangeNotifier {
   // Verify OTP Function
 
   verifyOTP({required String phone, required String otp}) async {
+    log("executing verifyOTP function in authServices with _isLoading value: $_isLoading");
     if (_isLoading) {
       return;
     }
@@ -128,12 +129,17 @@ class AuthServices with ChangeNotifier {
 
       FormData data = FormData.fromMap({"phone": phone, "otp": otp, "countryCode": "+91"});
 
+      log("verifyotp phone: $phone");
+      log("verifyotp otp: $otp");
+
+      log("verifyotp body: $data");
+
       final resp = await _dio!.post(
         "/auth/verifyotp",
         data: data,
-        options: Options(
-          contentType: Headers.jsonContentType,
-        ),
+        // options: Options(
+        //   contentType: Headers.jsonContentType,
+        // ),
       );
 
       log("resp.data in verifyOTP: ${resp.data}");
@@ -178,13 +184,13 @@ class AuthServices with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       showToast(message: "Invalid OTP!", type: ToastificationType.error);
-      log("error: ${e.message}");
+      log("error in DioException: ${e.message}");
       return false;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
-      log("error: $e");
+      log("error in catch: $e");
       return false;
     }
   }
@@ -1253,8 +1259,8 @@ class AuthServices with ChangeNotifier {
       notifyListeners();
       Map<String, dynamic> data = {};
 
-      log("qrCode data in authServices: ${qrCode}");
-      log("mobileID data in authServices: ${mobileID}");
+      log("qrCode data in authServices: $qrCode");
+      log("mobileID data in authServices: $mobileID");
       log("appClientID data in authServices: ${dotenv.env["SNEEK_CLIENT_ID"]!}");
 
       // Conditionally add fields if they are not empty

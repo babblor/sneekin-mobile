@@ -416,7 +416,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }
 
                         Navigator.pop(context);
-                        // showTaxProfile = false;
                       },
                       child: const Icon(
                         Icons.close,
@@ -622,8 +621,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     log("user_profile_page.dart rebuilds");
     final theme = Theme.of(context);
-    // final app = Provider.of<AppStore>(context, listen: false);
-    // final auth = Provider.of<AuthServices>(context, listen: false);
 
     return SafeArea(
       child: Container(
@@ -653,32 +650,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Scaffold.of(context).openDrawer();
                   },
                 ),
-                const SizedBox(height: 70),
+                // const SizedBox(height: 20),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Positioned(
-                      top: -40, // Adjust the vertical offset as needed
-                      right: 0,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          // Notch background shape
+                    // Positioned(
+                    //   top: -40, // Adjust the vertical offset as needed
+                    //   right: 0,
+                    //   child: Stack(
+                    //     clipBehavior: Clip.none,
+                    //     alignment: Alignment.center,
+                    //     children: [
+                    //       // Notch background shape
 
-                          CustomPaint(
-                            size: const Size(80, 70), // Adjust the size to best match your design
-                            painter: NotchPainter(context: context),
-                          ),
-                          // Icon on top of the notch
-                        ],
-                      ),
-                    ),
+                    //       CustomPaint(
+                    //         size: const Size(80, 70), // Adjust the size to best match your design
+                    //         painter: NotchPainter(context: context),
+                    //       ),
+                    //       // Icon on top of the notch
+                    //     ],
+                    //   ),
+                    // ),
                     Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.secondaryHeaderColor,
+                          color: theme.scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: SingleChildScrollView(
@@ -686,9 +683,100 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(
-                                  height: 25,
+                                // const SizedBox(
+                                //   height: 25,
+                                // ),
+                                Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 60,
+                                        child: ClipOval(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: app.user?.profileImageUrl?.isEmpty == true
+                                                  ? null
+                                                  : theme.textTheme.headlineLarge?.color,
+                                            ),
+                                            child: Center(
+                                              child: app.user?.profileImageUrl?.isNotEmpty == true
+                                                  ? CachedNetworkImage(
+                                                      imageUrl: app.user!.profileImageUrl!,
+                                                      fit: BoxFit.cover,
+                                                      placeholder: (context, url) => const Center(
+                                                        child: SizedBox(
+                                                          height: 15,
+                                                          width: 15,
+                                                          child: CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                            strokeWidth: 2,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context, url, error) => Text(
+                                                        app.user?.name[0] ?? "N/A",
+                                                        style: GoogleFonts.inter(
+                                                          fontSize: 24,
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      app.user?.name[0] ?? "N/A",
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 24,
+                                                        color: Colors.white,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      if (canEdit)
+                                        Positioned(
+                                          bottom: 2,
+                                          right: -3,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              log("Edit button tapped!");
+                                              _pickImage(setState);
+                                            },
+                                            child: Container(
+                                              width: 28,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: hasImagePicked
+                                                    ? Colors.green
+                                                    : theme.textTheme.headlineLarge?.color,
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.1),
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: const Center(
+                                                child: FaIcon(
+                                                  FontAwesomeIcons.penToSquare,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
+
+                                // SizedBox(
+                                //   height: 15,
+                                // ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -708,8 +796,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   ],
                                 ),
                                 const SizedBox(
-                                  height: 25,
+                                  height: 5,
                                 ),
+                                if (canEdit)
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
                                 // Column(
                                 //   mainAxisAlignment: MainAxisAlignment.start,
                                 //   crossAxisAlignment: CrossAxisAlignment.start,
@@ -758,14 +850,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   padding: canEdit ? const EdgeInsets.all(15) : const EdgeInsets.all(0),
                                   decoration: BoxDecoration(
                                       color: canEdit
-                                          ? theme.scaffoldBackgroundColor
-                                          : theme.secondaryHeaderColor,
+                                          ? theme.secondaryHeaderColor
+                                          : theme.scaffoldBackgroundColor,
                                       borderRadius: BorderRadius.circular(15),
                                       border: Border.all(
                                           width: 1,
                                           color: canEdit
                                               ? const Color(0xFFFF6500)
-                                              : theme.secondaryHeaderColor)),
+                                              : theme.scaffoldBackgroundColor)),
                                   child: Column(
                                     children: [
                                       _buildTextField("Name", nameController, theme, app, false),
@@ -797,7 +889,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(width: 10),
+                                          const SizedBox(width: 15),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
@@ -818,8 +910,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       size: canEdit ? 15 : 13,
                                                       color: Colors.green,
                                                     )
-                                                  : FaIcon(FontAwesomeIcons.close,
-                                                      size: canEdit ? 15 : 13, color: Colors.red),
+                                                  : SizedBox.shrink(),
+
+                                              // app.user!.isEmailVerified
+                                              //     ? FaIcon(
+                                              //         FontAwesomeIcons.circleCheck,
+                                              //         size: canEdit ? 15 : 13,
+                                              //         color: Colors.green,
+                                              //       )
+                                              //     :
+                                              //     FaIcon(FontAwesomeIcons.close,
+                                              //         size: canEdit ? 15 : 13, color: Colors.red
+                                              //         ),
                                             ],
                                           ),
                                         ],
@@ -1051,16 +1153,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       // _buildTextField("PAN", panController, theme, app, showTaxProfile),
-                                      _buildText("PAN", auth.userTaxProfile["panNumber"], context, theme, app,
-                                          showTaxProfile, true, auth.userTaxProfile["isPanVerified"]),
+                                      _buildText(
+                                          FontAwesomeIcons.fileCode,
+                                          auth.userTaxProfile["panNumber"],
+                                          context,
+                                          theme,
+                                          app,
+                                          showTaxProfile,
+                                          true,
+                                          auth.userTaxProfile["isPanVerified"]),
                                       const SizedBox(
                                         height: 7,
                                       ),
-                                      _buildText("NAME", auth.userTaxProfile["name"], context, theme, app,
-                                          showTaxProfile, false, auth.userTaxProfile["isPanVerified"]),
-                                      // _buildTextField("NAME", panNameController, theme, app, showTaxProfile),
-                                      // _buildTextIconField(FontAwesomeIcons.locationDot, panAddressController,
-                                      //     theme, app, showTaxProfile),
+                                      _buildText(
+                                          FontAwesomeIcons.user,
+                                          auth.userTaxProfile["name"],
+                                          context,
+                                          theme,
+                                          app,
+                                          showTaxProfile,
+                                          false,
+                                          auth.userTaxProfile["isPanVerified"]),
                                       const SizedBox(
                                         height: 7,
                                       ),
@@ -1081,97 +1194,97 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                           ),
                         )),
-                    Positioned(
-                      top: -35,
-                      left: 35,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 110,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              color: theme.textTheme.headlineLarge?.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: app.user?.profileImageUrl?.isNotEmpty == true
-                                  ? CachedNetworkImage(
-                                      imageUrl: app.user!.profileImageUrl!,
-                                      width: 110,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => const Center(
-                                        child: SizedBox(
-                                          height: 15,
-                                          width: 15,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => Text(
-                                        app.user?.name[0] ?? "N/A",
-                                        style: GoogleFonts.inter(
-                                          fontSize: 24,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )
-                                  : Text(
-                                      app.user?.name[0] ?? "N/A",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 24,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          if (canEdit)
-                            Positioned(
-                              bottom: -10,
-                              right: -10,
-                              child: StatefulBuilder(
-                                  builder: (BuildContext context, void Function(void Function()) setState) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    // Handle edit button action here
-                                    log("Edit button tapped!");
-                                    _pickImage(setState);
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: hasImagePicked
-                                          ? Colors.green
-                                          : theme.textTheme.headlineLarge?.color,
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: FaIcon(
-                                        FontAwesomeIcons.penToSquare,
-                                        color: Colors.white,
-                                        size: 15,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                        ],
-                      ),
-                    ),
+                    // Positioned(
+                    //   top: -35,
+                    //   left: 35,
+                    //   child: Stack(
+                    //     clipBehavior: Clip.none,
+                    //     children: [
+                    //       Container(
+                    //         width: 110,
+                    //         height: 70,
+                    //         decoration: BoxDecoration(
+                    //           color: theme.textTheme.headlineLarge?.color,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Center(
+                    //           child: app.user?.profileImageUrl?.isNotEmpty == true
+                    //               ? CachedNetworkImage(
+                    //                   imageUrl: app.user!.profileImageUrl!,
+                    //                   width: 110,
+                    //                   height: 70,
+                    //                   fit: BoxFit.cover,
+                    //                   placeholder: (context, url) => const Center(
+                    //                     child: SizedBox(
+                    //                       height: 15,
+                    //                       width: 15,
+                    //                       child: CircularProgressIndicator(
+                    //                         color: Colors.white,
+                    //                         strokeWidth: 2,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                   errorWidget: (context, url, error) => Text(
+                    //                     app.user?.name[0] ?? "N/A",
+                    //                     style: GoogleFonts.inter(
+                    //                       fontSize: 24,
+                    //                       color: Colors.white,
+                    //                       fontWeight: FontWeight.bold,
+                    //                     ),
+                    //                   ),
+                    //                 )
+                    //               : Text(
+                    //                   app.user?.name[0] ?? "N/A",
+                    //                   style: GoogleFonts.inter(
+                    //                     fontSize: 24,
+                    //                     color: Colors.white,
+                    //                     fontWeight: FontWeight.bold,
+                    //                   ),
+                    //                 ),
+                    //         ),
+                    //       ),
+                    //       if (canEdit)
+                    //         Positioned(
+                    //           bottom: -10,
+                    //           right: -10,
+                    //           child: StatefulBuilder(
+                    //               builder: (BuildContext context, void Function(void Function()) setState) {
+                    //             return GestureDetector(
+                    //               onTap: () {
+                    //                 // Handle edit button action here
+                    //                 log("Edit button tapped!");
+                    //                 _pickImage(setState);
+                    //               },
+                    //               child: Container(
+                    //                 width: 30,
+                    //                 height: 30,
+                    //                 decoration: BoxDecoration(
+                    //                   color: hasImagePicked
+                    //                       ? Colors.green
+                    //                       : theme.textTheme.headlineLarge?.color,
+                    //                   shape: BoxShape.circle,
+                    //                   boxShadow: [
+                    //                     BoxShadow(
+                    //                       color: Colors.black.withOpacity(0.1),
+                    //                       blurRadius: 5,
+                    //                       offset: const Offset(0, 3),
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //                 child: const Center(
+                    //                   child: FaIcon(
+                    //                     FontAwesomeIcons.penToSquare,
+                    //                     color: Colors.white,
+                    //                     size: 15,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }),
+                    //         ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -1200,19 +1313,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildText(String label, String value, BuildContext context, ThemeData theme, AppStore app,
+  Widget _buildText(IconData label, String value, BuildContext context, ThemeData theme, AppStore app,
       bool show, bool showVerified, bool isPanVerified) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
+        // Text(
+        //   label,
+        //   style: GoogleFonts.inter(
+        //     fontWeight: FontWeight.bold,
+        //     fontSize: 13, // Smaller font size when canEdit is false
+        //     color: theme.textTheme.bodyLarge?.color,
+        //   ),
+        // ),
+        // const SizedBox(
+        //   width: 15,
+        // ),
+        FaIcon(
           label,
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.bold,
-            fontSize: 13, // Smaller font size when canEdit is false
-            color: theme.textTheme.bodyLarge?.color,
-          ),
+          size: 14,
+          color: theme.textTheme.bodyLarge?.color,
         ),
         const SizedBox(
           width: 15,
@@ -1226,7 +1347,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
         ),
         if (showVerified)
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
         if (showVerified)
@@ -1236,7 +1357,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   size: canEdit ? 15 : 13,
                   color: Colors.green,
                 )
-              : FaIcon(FontAwesomeIcons.close, size: canEdit ? 15 : 13, color: Colors.red)
+              : SizedBox.shrink()
+        // FaIcon(FontAwesomeIcons.close, size: canEdit ? 15 : 13, color: Colors.red)
       ],
     );
   }
@@ -1244,7 +1366,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildIcon(
       IconData label, String value, BuildContext context, ThemeData theme, AppStore app, bool show) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         FaIcon(
@@ -1299,7 +1421,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: canEdit ? theme.scaffoldBackgroundColor : theme.secondaryHeaderColor,
+              fillColor: canEdit ? theme.secondaryHeaderColor : theme.scaffoldBackgroundColor,
               hintText: null, // Remove hintText since label is outside
               border: InputBorder.none, // No border when not editable
               enabledBorder: canEdit
@@ -1858,16 +1980,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
       builder: (BuildContext context, void Function(void Function()) setState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Age", style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12, fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.only(top: 15.0),
+              child: Text("Age",
+                  style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12, fontWeight: FontWeight.bold)),
+            ),
             const SizedBox(
               width: 5,
             ),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Range Slider
                   RangeSlider(

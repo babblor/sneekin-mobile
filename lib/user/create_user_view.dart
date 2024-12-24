@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sneekin/auth/custom_top_bar.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart'; // Import Syncfusion slider package
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +13,6 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController(text: "eg: John Doe");
   final TextEditingController emailController = TextEditingController(text: "eg: johndoe@gmail.com");
   String _gender = 'Male'; // Default value for gender
@@ -22,7 +20,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0xFF1F293F),
