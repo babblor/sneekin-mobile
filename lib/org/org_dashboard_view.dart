@@ -383,7 +383,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                             Icon(
                                               Icons.email_outlined,
                                               color: theme.textTheme.bodyLarge?.color,
-                                              size: 12,
+                                              size: 14,
                                             ),
                                             const SizedBox(
                                               width: 5,
@@ -394,7 +394,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                   : (app.org?.email ?? "N/A"),
                                               style: GoogleFonts.inter(
                                                 color: theme.textTheme.bodyLarge?.color,
-                                                fontSize: 11,
+                                                fontSize: 13,
                                               ),
                                             ),
                                           ],
@@ -408,7 +408,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                 orgAddressController, // Replace with your TextEditingController
                                             style: TextStyle(
                                               color: theme.textTheme.bodyLarge?.color,
-                                              fontSize: canEdit ? 14 : 11, // Font size based on canEdit
+                                              fontSize: canEdit ? 14 : 13, // Font size based on canEdit
                                             ),
                                             enabled: canEdit, // Allow editing based on canEdit
                                             decoration: InputDecoration(
@@ -418,7 +418,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                       child: FaIcon(
                                                         FontAwesomeIcons.locationDot,
                                                         color: theme.textTheme.bodyLarge?.color,
-                                                        size: 11,
+                                                        size: 13,
                                                       ),
                                                     )
                                                   : null,
@@ -459,6 +459,15 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                       ],
                                     ),
                                     // if (!canEdit)
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+
+                                    Text(
+                                      "Inc. Details",
+                                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+
                                     const SizedBox(
                                       height: 15,
                                     ),
@@ -1079,7 +1088,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                 color: Colors.green,
                                 size: 18,
                               )
-                            : SizedBox.shrink())
+                            : const SizedBox.shrink())
                         : null,
                     filled: true,
                     fillColor: theme.scaffoldBackgroundColor,

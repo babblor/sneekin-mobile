@@ -107,7 +107,7 @@ class _OrgHomeViewState extends State<OrgHomeView> {
               ),
               const SizedBox(height: 40),
               auth.orgAppsAccount.isEmpty
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

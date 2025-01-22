@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/widgets/custom_app_bar.dart';
 
-import '../models/virtual_account.dart';
+import '../models/user_virtual_account.dart' as UserVirtualAccount;
+
+// import '../models/virtual_account.dart';
 // import '../../widgets/custom_app_bar.dart';
 
 class UserHomeView extends StatefulWidget {
@@ -23,9 +25,9 @@ class _UserHomeViewState extends State<UserHomeView> {
   final TextEditingController _controller = TextEditingController();
   bool _isExpanded = false;
 
-  List<VirtualAccount> _filteredAccounts = [];
+  List<UserVirtualAccount.VirtualAccount> _filteredAccounts = [];
 
-  List<VirtualAccount> _allUsersVirtualAccounts = [];
+  List<UserVirtualAccount.VirtualAccount> _allUsersVirtualAccounts = [];
 
   @override
   void initState() {
@@ -35,15 +37,14 @@ class _UserHomeViewState extends State<UserHomeView> {
       await auth.getUserVirtualAccounts();
 
       if (auth.userVirtualAccounts.isNotEmpty) {
+        log("all groups length: ${auth.virtualAccountsResp.groups.length}");
+        log("all userVirtualAccounts.length: ${auth.userVirtualAccounts.length}");
         isOpen = List.generate(auth.userVirtualAccounts.length, (index) => false);
       }
       _allUsersVirtualAccounts = auth.userVirtualAccounts;
 
       // Initialize `_filteredAccounts` with accounts starting from index 4
-      _filteredAccounts = _allUsersVirtualAccounts.length > 4
-          ? _allUsersVirtualAccounts.sublist(3)
-          : []; // Empty list if fewer than 5 accounts
-
+      _filteredAccounts = _allUsersVirtualAccounts;
       log("initial _filteredAccounts length: ${_filteredAccounts.length}");
     });
   }
@@ -55,9 +56,7 @@ class _UserHomeViewState extends State<UserHomeView> {
       setState(() {
         log("_allUsersVirtualAccounts in search length: ${_allUsersVirtualAccounts.length}");
         // Include accounts starting from index 4
-        _filteredAccounts = _allUsersVirtualAccounts.length > 3
-            ? _allUsersVirtualAccounts.sublist(3) // Accounts after index 4
-            : []; // Empty list if fewer than 5 accounts
+        _filteredAccounts = _allUsersVirtualAccounts;
       });
     } else {
       log("Executing else block (search query)");
@@ -70,7 +69,7 @@ class _UserHomeViewState extends State<UserHomeView> {
     }
   }
 
-  VirtualAccount? _horizentalAccount;
+  UserVirtualAccount.VirtualAccount? _horizentalAccount;
 
   void _toggleSearchBar() {
     setState(() {
@@ -82,7 +81,7 @@ class _UserHomeViewState extends State<UserHomeView> {
     });
   }
 
-  bool _isHorizentalAccountShow = false;
+  final bool _isHorizentalAccountShow = false;
 
   @override
   Widget build(BuildContext context) {
@@ -114,24 +113,25 @@ class _UserHomeViewState extends State<UserHomeView> {
               ),
               const SizedBox(height: 30),
               // Horizontal scroll view for first 3-4 accounts
-              if (auth.userVirtualAccounts.isNotEmpty)
+              if (auth.virtualAccountsResp.groups.isNotEmpty && !auth.isLoading)
                 Center(
                   child: Container(
                     height: 80, // Adjust height as needed
                     alignment: Alignment.center,
-                    child: auth.userVirtualAccounts.isEmpty
+                    child: auth.virtualAccountsResp.groups.isEmpty
                         ? null
                         : Wrap(
                             spacing: 20, // Adjust horizontal spacing
                             alignment: WrapAlignment.center, // Center the children
-                            children: auth.userVirtualAccounts
-                                .take(3) // Limit to 3 items
+                            children: auth.virtualAccountsResp.groups
+                                // .take(3) // Limit to 3 items
                                 .map((account) => GestureDetector(
                                       onTap: () {
-                                        log("Account tapped: ${account.username}");
+                                        log("Account tapped: ${account.mobileId}");
                                         setState(() {
-                                          _horizentalAccount = account;
-                                          _isHorizentalAccountShow = !_isHorizentalAccountShow;
+                                          // _horizentalAccount = account;
+                                          // _isHorizentalAccountShow = !_isHorizentalAccountShow;
+                                          _filteredAccounts = account.userVirtualAccounts;
                                         });
                                       },
                                       child: Column(
@@ -149,7 +149,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             ),
                                             child: Center(
                                               child: Text(
-                                                account.username[0] ?? "N/A",
+                                                account.mobileId.toString()[0],
                                                 style: GoogleFonts.inter(
                                                   fontSize: 17,
                                                   fontWeight: FontWeight.bold,
@@ -159,9 +159,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                             ),
                                           ),
                                           Text(
-                                            account.username.length > 6
-                                                ? '${account.username.substring(0, 6)}...' // Truncate and add ellipses
-                                                : account.username ?? "N/A",
+                                            account.mobileId.toString(),
                                             style: GoogleFonts.inter(
                                               fontSize: 13,
                                               fontWeight: FontWeight.bold,
@@ -235,216 +233,11 @@ class _UserHomeViewState extends State<UserHomeView> {
               //       ],
               //     ),
               //   ),
-              // if (!_isExpanded && auth.userVirtualAccounts.isNotEmpty)
-              //   Padding(
-              //     padding: const EdgeInsets.only(right: 8.0),
-              //     child: Row(
-              //       mainAxisAlignment: MainAxisAlignment.end,
-              //       children: [
-              //         IconButton(
-              //           icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
-              //           onPressed: () => setState(() => _isExpanded = true),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // if (_isExpanded)
-              //   const SizedBox(
-              //     height: 25,
-              //   ),
-              if (_isHorizentalAccountShow)
-                const SizedBox(
-                  height: 15,
-                ),
-              if (_isHorizentalAccountShow)
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Main White Container
-                        Container(
-                          width: 230,
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: theme.secondaryHeaderColor,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            // height: 50,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Row(
-                                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          Text(
-                                            (_horizentalAccount?.lastLoginApp ?? "").length > 10
-                                                ? '${_horizentalAccount?.lastLoginApp?.substring(0, 10)}...'
-                                                : _horizentalAccount?.lastLoginApp ?? "",
-                                            style: GoogleFonts.inter(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: theme.textTheme.bodyLarge?.color,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Icon(
-                                        Icons.circle,
-                                        size: 18,
-                                        color: Colors.green,
-                                      )
-                                    ],
-                                  ),
-                                  // Expandable Section
 
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-                                        Text(
-                                          "Virtual ID: ${_horizentalAccount!.id}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Mobile No: ${_horizentalAccount!.mobileNumber}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "App Name: ${_horizentalAccount!.orgAppName}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Username: ${_horizentalAccount!.username}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Created App: ${_horizentalAccount!.createdApp}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Last Login App: ${_horizentalAccount!.lastLoginApp}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Payment Status: ${_horizentalAccount!.paymentDueStatus}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          "Last Login Time: ${_horizentalAccount!.lastLoginTime}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          ),
-                                        ),
-                                        // const SizedBox(
-                                        //   height: 10,
-                                        // )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ), // Placeholder height
-                        ),
-
-                        Positioned(
-                          top: 12.5,
-                          left: -30,
-                          child: Container(
-                            width: 60,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: theme.textTheme.headlineLarge?.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                                child: Text(
-                              // account.usern
-                              _horizentalAccount?.username[0] ?? "N/A",
-                              style: GoogleFonts.inter(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textTheme.bodyLarge?.color,
-                              ),
-                            )),
-                          ),
-                        ),
-                        // Right-top notch
-                      ],
-                    ),
-                  ),
-                ),
-              // SizedBox(
-              //   height: 8,
-              // ),
               const SizedBox(
                 height: 15,
               ),
-              if (auth.userVirtualAccounts.length > 3)
+              if (auth.userVirtualAccounts.isNotEmpty && !auth.isLoading)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   child: Row(
@@ -533,8 +326,8 @@ class _UserHomeViewState extends State<UserHomeView> {
                           children: [
                             Image.asset(
                               "assets/scanning.gif",
-                              height: 150,
-                              width: 150,
+                              height: 125,
+                              width: 125,
                             ),
                             const SizedBox(
                               height: 5,
@@ -642,77 +435,295 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                         const SizedBox(
                                                           height: 15,
                                                         ),
-                                                        Text(
-                                                          "Virtual ID: ${account.id}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Align to the start vertically
+                                                          children: [
+                                                            Text(
+                                                              "ID: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.id}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Ensure text wraps
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Mobile No: ${account.mobileNumber}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Align vertically to the start
+                                                          children: [
+                                                            Text(
+                                                              "Mobile No: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.mobileNumber}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Enable wrapping
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "App Name: ${account.orgAppName}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Aligns content to the start vertically
+                                                          children: [
+                                                            Text(
+                                                              "App Name: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.orgAppName}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Enable line breaks
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Username: ${account.username}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              "Username: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                account.username,
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Ensure text wraps
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Created App: ${account.createdApp}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Aligns content to the top
+                                                          children: [
+                                                            Text(
+                                                              "Created App: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.createdApp}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Enable line breaks
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Last Login App: ${account.lastLoginApp}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Aligns content to the top
+                                                          children: [
+                                                            Text(
+                                                              "Last Login App: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.lastLoginApp}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Enable line breaks
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Payment Status: ${account.paymentDueStatus}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Aligns content to the top
+                                                          children: [
+                                                            Text(
+                                                              "Payment Status: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.paymentDueStatus}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow: TextOverflow
+                                                                    .visible, // Allows text to break into lines
+                                                                softWrap: true, // Enables wrapping
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(height: 5),
-                                                        Text(
-                                                          "Last Login Time: ${account.lastLoginTime}",
-                                                          style: GoogleFonts.inter(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Theme.of(context).textTheme.bodyLarge?.color,
-                                                          ),
-                                                        ),
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .start, // Aligns content to the top
+                                                          children: [
+                                                            Text(
+                                                              "Last Login Time: ",
+                                                              style: GoogleFonts.inter(
+                                                                fontSize: 14,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyLarge
+                                                                    ?.color,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                "${account.lastLoginTime}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow: TextOverflow
+                                                                    .visible, // Allows text to break into lines
+                                                                softWrap: true, // Enables wrapping
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+
                                                         // const SizedBox(
                                                         //   height: 5,
                                                         // )

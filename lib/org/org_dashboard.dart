@@ -594,11 +594,14 @@ class _OrgDashboardState extends State<OrgDashboard> {
                                         'Nov',
                                         'Dec'
                                       ];
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 8),
-                                        child: Text(
-                                          months[value.toInt()],
-                                          style: theme.textTheme.bodySmall,
+                                      return Transform.rotate(
+                                        angle: -0.785398, // 45 degrees in radians
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            months[value.toInt()],
+                                            style: theme.textTheme.bodySmall,
+                                          ),
                                         ),
                                       );
                                     },
@@ -621,6 +624,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 30),
 
                         Consumer<AppStore>(builder: (context, app, _) {

@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +23,7 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
   String selectedTab = 'User';
 
   final TextEditingController userNameController = TextEditingController();
@@ -39,6 +42,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _gender = 'M'; // Default value for gender
   // double _age = 18.0; // Single age value
+
+  bool hasEmailSent = false;
+  bool hasEmailSent2 = false;
 
   static const platform = MethodChannel('com.example.sneekin/path');
 
@@ -62,14 +68,28 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool hasGenderSelected = false;
 
-  final ImagePicker _picker = ImagePicker();
+  bool isEmailVerified = false;
 
+  bool isEmailVerified2 = false;
+
+  final ImagePicker _picker = ImagePicker();
+  bool isError = false;
+  String? code;
+  bool clearOTPFieldText = false;
   final List<FocusNode> _focusNodes = List.generate(10, (_) => FocusNode());
+
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
-    // Add listeners to all focus nodes
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _shakeAnimation =
+        Tween<double>(begin: 0, end: 10).chain(CurveTween(curve: Curves.elasticIn)).animate(_shakeController);
     for (var focusNode in _focusNodes) {
       focusNode.addListener(() {
         setState(() {}); // Update UI when focus changes
@@ -79,6 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
+    _shakeController.dispose();
     // nameController.dispose();
     // emailController.dispose();
     userEmailController.dispose();
@@ -151,6 +172,29 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  bool isCountdownActive = false;
+  int countdownSeconds = 60;
+  Timer? _countdownTimer;
+
+  void startCountdown() {
+    setState(() {
+      isCountdownActive = true;
+      countdownSeconds = 60;
+    });
+
+    _countdownTimer?.cancel(); // Cancel any existing timer
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (countdownSeconds > 0) {
+          countdownSeconds--;
+        } else {
+          timer.cancel();
+          isCountdownActive = false;
+        }
+      });
+    });
+  }
+
   Future<void> _pickOrgPanFileImage(setState) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -172,6 +216,39 @@ class _AuthScreenState extends State<AuthScreen> {
         _gstInFile = File(image.path);
         hasGstInFilePicked = true;
       });
+    }
+  }
+
+  _verifyOtp(String verificationCode, String email, BuildContext context) async {
+    try {
+      final auth = Provider.of<AuthServices>(context, listen: false);
+      if (verificationCode.isEmpty || email.isEmpty) {
+        showToast(message: "Code is empty! Request again!", type: ToastificationType.success);
+        _shakeController.forward(from: 0);
+        setState(() {
+          // hasEmailSent = false;
+          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+        });
+      }
+      final resp = await auth.verifyEmailOTP(email: email, otp: verificationCode);
+      if (resp == true) {
+        setState(() {
+          isError = false;
+          selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
+          // hasEmailSent = false;
+          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+        });
+        showToast(message: "Email verified successfully!", type: ToastificationType.success);
+      } else {
+        _shakeController.forward(from: 0);
+        setState(() {
+          isError = true;
+          isEmailVerified = false;
+        });
+      }
+    } catch (e) {
+      _shakeController.forward(from: 0);
+      showToast(message: e.toString(), type: ToastificationType.error);
     }
   }
 
@@ -255,6 +332,7 @@ class _AuthScreenState extends State<AuthScreen> {
           controller: userNameController,
           labelText: 'Name',
           mandatory: true,
+          hasEmail: false,
           isPicked: hasImagePicked,
           hintText: 'Enter your name',
           img: _userProfileImage,
@@ -276,6 +354,7 @@ class _AuthScreenState extends State<AuthScreen> {
           hintText: 'Enter your email',
           mandatory: true,
           isPicked: hasImagePicked,
+          hasEmail: true,
           profileIcon: false,
           keyboardType: TextInputType.emailAddress,
           onTap: () {},
@@ -284,14 +363,95 @@ class _AuthScreenState extends State<AuthScreen> {
           focusNode: _focusNodes[1],
           isEditable: isEditable,
         ),
+
+        if (hasEmailSent)
+          AnimatedBuilder(
+            animation: _shakeAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(_shakeAnimation.value, 0),
+                child: child,
+              );
+            },
+            child: OtpTextField(
+              numberOfFields: 4,
+              filled: true,
+              keyboardType: TextInputType.phone,
+              clearText: true,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              fillColor: const Color(0xFF1F2937),
+              cursorColor: Colors.red,
+              borderColor: Colors.red,
+              enabledBorderColor: isError ? Colors.red : Colors.white,
+              textStyle: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              onSubmit: (verificationCode) {
+                // if (isError) {
+                //   setState(() {
+                //     code = verificationCode;
+                //   });
+                //   return;
+                // }
+                final email = selectedTab == "User" ? userEmailController.text : orgEmailController.text;
+                _verifyOtp(verificationCode, email, context);
+              },
+            ),
+          ),
         // const SizedBox(height: 15),
+
+        if (hasEmailSent) const SizedBox(height: 10),
+        if (hasEmailSent)
+          if (isCountdownActive)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Center(
+                child: Text(
+                  "Resend OTP in $countdownSeconds seconds",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            )
+          else
+            TextButton(
+              onPressed: () async {
+                if (orgEmailController.text.isEmpty && userEmailController.text.isEmpty) {
+                  showToast(message: "Please enter email.", type: ToastificationType.error);
+                  return;
+                }
+                final resp = await Provider.of<AuthServices>(context, listen: false)
+                    .sendEmailOTP(email: userEmailController.text);
+
+                if (resp == true) {
+                  setState(() {
+                    hasEmailSent = true;
+                  });
+                  startCountdown();
+                  showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
+                } else {
+                  setState(() {
+                    hasEmailSent = false;
+                  });
+                }
+              },
+              child: Center(
+                child: Text(
+                  "Resend OTP",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            ),
 
         // Gender Dropdown
         // _buildGenderDropdown(),
 
-        // const SizedBox(
-        //   height: 15,
-        // ),
+        if (hasEmailSent)
+          const SizedBox(
+            height: 5,
+          ),
         _buildRadio(focusNode: _focusNodes[2]),
         // Row(
         //   children: [
@@ -393,6 +553,7 @@ class _AuthScreenState extends State<AuthScreen> {
           mandatory: true,
           hintText: 'Enter organization name',
           profileIcon: true,
+          hasEmail: false,
           img: _orgProfileImage,
           onTap: () {
             _pickOrgLogoImage(setState);
@@ -412,6 +573,7 @@ class _AuthScreenState extends State<AuthScreen> {
           isPicked: hasImagePicked,
           onTap: () {},
           profileIcon: false,
+          hasEmail: true,
           hintText: 'Enter organization email',
           imageField: false,
           hasPicked: false,
@@ -419,7 +581,89 @@ class _AuthScreenState extends State<AuthScreen> {
           isEditable: isEditable,
         ),
         const SizedBox(height: 10),
+        if (hasEmailSent2)
+          AnimatedBuilder(
+            animation: _shakeAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(_shakeAnimation.value, 0),
+                child: child,
+              );
+            },
+            child: OtpTextField(
+              numberOfFields: 4,
+              filled: true,
+              keyboardType: TextInputType.phone,
+              clearText: true,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              fillColor: const Color(0xFF1F2937),
+              cursorColor: Colors.red,
+              borderColor: Colors.red,
+              enabledBorderColor: isError ? Colors.red : Colors.white,
+              textStyle: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              onSubmit: (verificationCode) {
+                // if (isError) {
+                //   setState(() {
+                //     code = verificationCode;
+                //   });
+                //   return;
+                // }
+                final email = orgEmailController.text;
+                _verifyOtp(verificationCode, email, context);
+              },
+            ),
+          ),
+        // const SizedBox(height: 15),
 
+        if (hasEmailSent2) const SizedBox(height: 10),
+        if (hasEmailSent2)
+          if (isCountdownActive)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Center(
+                child: Text(
+                  "Resend OTP in $countdownSeconds seconds",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            )
+          else
+            TextButton(
+              onPressed: () async {
+                if (orgEmailController.text.isEmpty && userEmailController.text.isEmpty) {
+                  showToast(message: "Please enter email.", type: ToastificationType.error);
+                  return;
+                }
+                final resp = await Provider.of<AuthServices>(context, listen: false).sendEmailOTP(
+                    email: selectedTab == "User" ? userEmailController.text : orgEmailController.text);
+                if (resp == true) {
+                  setState(() {
+                    hasEmailSent = true;
+                  });
+                  startCountdown();
+                  showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
+                } else {
+                  setState(() {
+                    hasEmailSent = false;
+                  });
+                }
+              },
+              child: Center(
+                child: Text(
+                  "Resend OTP",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            ),
+        if (hasEmailSent2)
+          const SizedBox(
+            height: 20,
+          ),
         _buildInputField(
           controller: addressController,
           labelText: 'Organization Address',
@@ -427,6 +671,7 @@ class _AuthScreenState extends State<AuthScreen> {
           isPicked: hasImagePicked,
           profileIcon: false,
           hintText: 'Enter organization address',
+          hasEmail: false,
           onTap: () {},
           imageField: false,
           hasPicked: false,
@@ -441,6 +686,7 @@ class _AuthScreenState extends State<AuthScreen> {
           mandatory: true,
           isPicked: hasImagePicked,
           profileIcon: false,
+          hasEmail: false,
           onTap: () {
             _pickOrgGstInFileImage(setState);
           },
@@ -457,6 +703,7 @@ class _AuthScreenState extends State<AuthScreen> {
           controller: cinController,
           labelText: 'Organization CIN',
           mandatory: true,
+          hasEmail: false,
           onTap: () {
             _pickOrgCinFileImage(setState);
           },
@@ -479,6 +726,7 @@ class _AuthScreenState extends State<AuthScreen> {
           },
           profileIcon: false,
           isPicked: hasImagePicked,
+          hasEmail: false,
           mandatory: true,
           hintText: 'Enter PAN',
           imageField: true,
@@ -776,6 +1024,7 @@ class _AuthScreenState extends State<AuthScreen> {
     required String hintText,
     required bool profileIcon,
     required bool mandatory,
+    required bool hasEmail,
     required bool imageField,
     TextInputType keyboardType = TextInputType.text,
     required VoidCallback onTap,
@@ -830,6 +1079,64 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
             ),
+            if (hasEmail)
+              Consumer<AuthServices>(builder: (context, auth, _) {
+                return InkWell(
+                  onTap: () async {
+                    if (auth.isLoading || isError) return;
+                    if (orgEmailController.text.isEmpty && userEmailController.text.isEmpty) {
+                      showToast(message: "Please enter email.", type: ToastificationType.error);
+                      return;
+                    }
+
+                    log("orgEmailController.text: ${orgEmailController.text}");
+                    log("userEmailController.text: ${userEmailController.text}");
+                    final emailData =
+                        selectedTab == "User" ? userEmailController.text : orgEmailController.text;
+                    log("emailData: $emailData");
+                    if (emailData.isEmpty) {
+                      return showToast(message: "Please enter email.", type: ToastificationType.error);
+                    }
+                    final resp = await auth.sendEmailOTP(email: emailData);
+                    if (resp == true) {
+                      setState(() {
+                        // hasEmailSent = true;
+                        selectedTab == "User" ? hasEmailSent = true : hasEmailSent2 = true;
+                      });
+                      startCountdown();
+                      showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
+                    } else {
+                      setState(() {
+                        selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: selectedTab == "User"
+                        ? (isEmailVerified
+                            ? const Icon(
+                                Icons.verified_outlined,
+                                color: Color(0xFFFF6500),
+                                size: 16,
+                              )
+                            : Text(
+                                "Verify",
+                                style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                              ))
+                        : (isEmailVerified2
+                            ? const Icon(
+                                Icons.verified_outlined,
+                                color: Color(0xFFFF6500),
+                                size: 16,
+                              )
+                            : Text(
+                                "Verify",
+                                style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                              )),
+                  ),
+                );
+              }),
             if (imageField) const SizedBox(width: 15),
             if (imageField)
               InkWell(
@@ -1385,7 +1692,7 @@ class CustomTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           // color: const Color(0xFF1F293F),
           // borderRadius: BorderRadius.circular(20),
           // boxShadow: [

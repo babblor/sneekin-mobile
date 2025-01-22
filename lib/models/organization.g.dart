@@ -92,5 +92,7 @@ class OrganizationAdapter extends TypeAdapter<Organization> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is OrganizationAdapter && runtimeType == other.runtimeType && typeId == other.typeId;
+      other is OrganizationAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

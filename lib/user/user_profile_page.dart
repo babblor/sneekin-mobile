@@ -910,7 +910,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       size: canEdit ? 15 : 13,
                                                       color: Colors.green,
                                                     )
-                                                  : SizedBox.shrink(),
+                                                  : const SizedBox.shrink(),
 
                                               // app.user!.isEmailVerified
                                               //     ? FaIcon(
@@ -1357,7 +1357,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   size: canEdit ? 15 : 13,
                   color: Colors.green,
                 )
-              : SizedBox.shrink()
+              : const SizedBox.shrink()
         // FaIcon(FontAwesomeIcons.close, size: canEdit ? 15 : 13, color: Colors.red)
       ],
     );

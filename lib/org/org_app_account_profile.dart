@@ -510,14 +510,14 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                     ),
                   ),
                   Positioned(
-                    top: -30,
+                    top: -35,
                     left: 35,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Container(
                           width: 105,
-                          height: 60,
+                          height: 70,
                           decoration: BoxDecoration(
                             color: theme.textTheme.headlineLarge?.color,
                             borderRadius: BorderRadius.circular(12),

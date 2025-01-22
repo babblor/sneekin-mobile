@@ -9,6 +9,7 @@ import 'package:sneekin/models/org_app_account.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:path/path.dart';
 import 'package:sneekin/models/user.dart';
+import 'package:sneekin/models/user_virtual_account.dart' as UserVirtualAccount;
 import 'package:sneekin/models/virtual_account.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/utils/toast.dart';
@@ -39,8 +40,13 @@ class AuthServices with ChangeNotifier {
 
   String? passKey;
 
-  List<VirtualAccount> _userVirtualAccounts = [];
-  List<VirtualAccount> get userVirtualAccounts => _userVirtualAccounts;
+  List<UserVirtualAccount.VirtualAccount> _userVirtualAccounts = [];
+  List<UserVirtualAccount.VirtualAccount> get userVirtualAccounts => _userVirtualAccounts;
+
+  UserVirtualAccount.VirtualAccountResponse _virtualAccountsResp =
+      UserVirtualAccount.VirtualAccountResponse(totalPages: 0, groups: []);
+
+  UserVirtualAccount.VirtualAccountResponse get virtualAccountsResp => _virtualAccountsResp;
 
   List<VirtualAccount> _websiteVirtualAccounts = [];
   List<VirtualAccount> get websiteVirtualAccounts => _websiteVirtualAccounts;
@@ -60,8 +66,8 @@ class AuthServices with ChangeNotifier {
     _dio = Dio(
       BaseOptions(
         baseUrl: dotenv.env["MAIN_API_URL"]!,
-        receiveTimeout: const Duration(seconds: 100),
-        connectTimeout: const Duration(seconds: 100),
+        receiveTimeout: const Duration(seconds: 200),
+        connectTimeout: const Duration(seconds: 200),
       ),
     );
   }
@@ -96,6 +102,8 @@ class AuthServices with ChangeNotifier {
         return true;
       } else {
         _isLoading = false;
+        _dio!.options.headers['Authorization'] = null;
+        passKey = null;
         notifyListeners();
         showToast(message: "Some error occurred", type: ToastificationType.error);
         log("could not received OTP");
@@ -103,12 +111,130 @@ class AuthServices with ChangeNotifier {
       }
     } on DioException catch (e) {
       _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
       return false;
     } catch (e) {
       _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
+      notifyListeners();
+      showToast(message: "Some error occurred", type: ToastificationType.error);
+      log("error: $e");
+      return false;
+    }
+  }
+
+  // Send Email OTP Function
+
+  sendEmailOTP({required String email}) async {
+    if (_isLoading) {
+      return;
+    }
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      if (appStore.app?.accessToken == null) {
+        await appStore.initializeAppData();
+      }
+
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      final resp = await _dio!.post(
+        "/send-email-otp?email=$email",
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
+      );
+
+      log("resp.data in sendEmailOTP: ${resp.data}");
+
+      if (resp.statusCode == 200) {
+        log("sendEmailOTP resp: ${resp.data}");
+        _isLoading = false;
+        notifyListeners();
+        // showToast(message: "${resp.data["message"]}", type: ToastificationType.success);
+        return true;
+      } else {
+        _isLoading = false;
+        _dio!.options.headers['Authorization'] = null;
+        passKey = null;
+        notifyListeners();
+        showToast(message: "Some error occurred", type: ToastificationType.error);
+        log("could not received OTP");
+        return false;
+      }
+    } on DioException catch (e) {
+      _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
+      notifyListeners();
+      showToast(message: "Some error occurred", type: ToastificationType.error);
+      log("error: $e");
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
+      notifyListeners();
+      showToast(message: "Some error occurred", type: ToastificationType.error);
+      log("error: $e");
+      return false;
+    }
+  }
+
+  // Verify Email OTP
+
+  verifyEmailOTP({required String email, required String otp}) async {
+    if (_isLoading) {
+      return;
+    }
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      final resp = await _dio!.post(
+        "/verify-email-otp?email=$email&otp=$otp",
+        options: Options(
+          contentType: Headers.jsonContentType,
+        ),
+      );
+
+      log("resp.data in verifyEmailOTP: ${resp.data}");
+
+      if (resp.statusCode == 200) {
+        log("verifyEmailOTP resp: ${resp.data}");
+        _isLoading = false;
+        notifyListeners();
+        // showToast(message: "${resp.data["message"]}", type: ToastificationType.success);
+        return true;
+      } else {
+        _isLoading = false;
+        _dio!.options.headers['Authorization'] = null;
+        passKey = null;
+        notifyListeners();
+        showToast(message: "Invalid OTP!", type: ToastificationType.error);
+        log("could not received OTP");
+        return false;
+      }
+    } on DioException catch (e) {
+      _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
+      notifyListeners();
+      showToast(message: "Invalid OTP!", type: ToastificationType.error);
+      log("error: $e");
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      _dio!.options.headers['Authorization'] = null;
+      passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
@@ -119,13 +245,19 @@ class AuthServices with ChangeNotifier {
   // Verify OTP Function
 
   verifyOTP({required String phone, required String otp}) async {
-    log("executing verifyOTP function in authServices with _isLoading value: $_isLoading");
+    log("executing verifyOTP function in authServices with _isLoading value: $_isLoading phone: ${phone} otp: ${otp}");
     if (_isLoading) {
       return;
     }
     try {
       _isLoading = true;
       notifyListeners();
+
+      if (appStore.app?.accessToken == null) {
+        await appStore.initializeAppData();
+      }
+
+      // _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       FormData data = FormData.fromMap({"phone": phone, "otp": otp, "countryCode": "+91"});
 
@@ -594,48 +726,90 @@ class AuthServices with ChangeNotifier {
 
   // get user virtual accounts
 
-  getUserVirtualAccounts() async {
+  Future<bool> getUserVirtualAccounts() async {
     try {
       _isLoading = true;
       notifyListeners();
+
       if (appStore.app?.accessToken == null) {
         await appStore.initializeAppData();
       }
+
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
-      final resp = await _dio!.get(
-        "/virtual-accounts/new",
-        options: Options(
-          contentType: Headers.jsonContentType,
-        ),
+
+      Map<int, List<UserVirtualAccount.VirtualAccount>> groupedVirtualAccounts =
+          {}; // Map to group by mobileId
+      int currentPage = 1;
+      int totalPages = 1;
+
+      do {
+        final response = await _dio!.get(
+          "/virtual-accounts",
+          queryParameters: {"page": currentPage},
+          options: Options(
+            contentType: Headers.jsonContentType,
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          // Parse response using the VirtualAccountResponse model
+          final data = UserVirtualAccount.VirtualAccountResponse.fromJson(response.data);
+
+          if (currentPage == 1) {
+            totalPages = data.totalPages;
+          }
+
+          // Group virtual accounts by mobileId
+          for (var group in data.groups) {
+            if (!groupedVirtualAccounts.containsKey(group.mobileId)) {
+              groupedVirtualAccounts[group.mobileId] = [];
+            }
+            groupedVirtualAccounts[group.mobileId]!.addAll(group.userVirtualAccounts);
+          }
+
+          currentPage++;
+        } else {
+          log("Error fetching virtual accounts: ${response.statusCode}");
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+      } while (currentPage <= totalPages);
+
+      // Convert the grouped map into a list of groups for mergedResponse
+      List<UserVirtualAccount.Group> mergedGroups = []; // Using Group class
+      groupedVirtualAccounts.forEach((mobileId, virtualAccounts) {
+        mergedGroups.add(UserVirtualAccount.Group(
+          mobileId: mobileId,
+          countryCode: '', // You can set this to an appropriate value if needed
+          userVirtualAccounts: virtualAccounts,
+        ));
+      });
+
+      // Update state with the merged results
+      _virtualAccountsResp = UserVirtualAccount.VirtualAccountResponse(
+        totalPages: totalPages,
+        groups: mergedGroups,
       );
-      if (resp.statusCode == 200) {
-        // log("getUserVirtualAccounts resp: ${resp.data}");
-        // log("virtual account data: ${resp.data["userVirtualAccounts"]}");
-        _userVirtualAccounts = (resp.data["userVirtualAccounts"] as List)
-            .map((account) => VirtualAccount.fromJson(account))
-            .toList();
-        _isLoading = false;
-        notifyListeners();
-        log("virtual account length: ${userVirtualAccounts.length}");
-        return true;
-      } else {
-        _userVirtualAccounts = [];
-        _isLoading = false;
-        notifyListeners();
-        log("could not received OTP");
-        return false;
-      }
-    } on DioException catch (e) {
-      _userVirtualAccounts = [];
+
+      // Flatten all virtual accounts into a single list
+      _userVirtualAccounts = groupedVirtualAccounts.values.expand((x) => x).toList();
+
       _isLoading = false;
       notifyListeners();
-      log("error getUserVirtualAccounts: $e");
+      log("Total virtual accounts fetched: ${_userVirtualAccounts.length}");
+      return true;
+    } on DioException catch (e) {
+      log("DioException in getUserVirtualAccounts: $e");
+      _isLoading = false;
+      _userVirtualAccounts = [];
+      notifyListeners();
       return false;
     } catch (e) {
-      _userVirtualAccounts = [];
+      log("Exception in getUserVirtualAccounts: $e");
       _isLoading = false;
+      _userVirtualAccounts = [];
       notifyListeners();
-      log("error getUserVirtualAccounts: $e");
       return false;
     }
   }
