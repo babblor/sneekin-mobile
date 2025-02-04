@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/services/auth_services.dart';
+import 'package:sneekin/user/user_home_view.dart';
 import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 
@@ -107,17 +108,16 @@ class _QrLoginViewState extends State<QrLoginView> {
                       );
 
                       if (resp == true) {
+                        // Reset the scanning state after success
+                        setState(() {
+                          isScanning = false;
+                        });
                         showToast(
                           message: "Account created successfully",
                           type: ToastificationType.success,
                         );
                         Navigator.of(context).pop();
-                        context.go("/root");
-
-                        // Reset the scanning state after success
-                        setState(() {
-                          isScanning = false;
-                        });
+                        context.goNamed('user-home-page');
                       } else {
                         Navigator.of(context).pop();
                         showDialog(

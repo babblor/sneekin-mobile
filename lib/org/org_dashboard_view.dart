@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,12 +63,15 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
 
   bool hasCinPicked = false;
   File? _orgCinImage;
-
   Future<void> _pickOrgCinImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _orgCinImage = File(image.path);
+        _orgCinImage = File(result.files.single.path!);
         hasCinPicked = true;
       });
     }
@@ -77,10 +81,14 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
   File? _orgPanImage;
 
   Future<void> _pickOrgPanImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _orgPanImage = File(image.path);
+        _orgPanImage = File(result.files.single.path!);
         hasPanPicked = true;
       });
     }
@@ -90,10 +98,14 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
   File? _orgGstInImage;
 
   Future<void> _pickOrgGstInImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _orgGstInImage = File(image.path);
+        _orgGstInImage = File(result.files.single.path!);
         hasGstInPicked = true;
       });
     }
@@ -463,16 +475,17 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                       height: 15,
                                     ),
 
+                                    _buildPhoneScrollable("Mobile", theme, app),
+                                    const SizedBox(
+                                      height: 25,
+                                    ),
                                     Text(
                                       "Inc. Details",
                                       style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
                                     ),
-
                                     const SizedBox(
-                                      height: 15,
+                                      height: 10,
                                     ),
-
-                                    _buildPhoneScrollable("Mobile", theme, app),
                                     if (canEdit)
                                       const SizedBox(
                                         height: 15,

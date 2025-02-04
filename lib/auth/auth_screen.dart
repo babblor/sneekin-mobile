@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -65,6 +66,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   File? _orgProfileImage;
 
   bool hasImagePicked = false;
+
+  bool isEmailVerifiedUser = false;
+  bool isEmailVerifiedOrg = false;
 
   bool hasGenderSelected = false;
 
@@ -162,11 +166,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   File? _gstInFile;
 
   Future<void> _pickOrgCinFileImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      // _uploadProfileImage = await _getFileName(image.path);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _cinFile = File(image.path);
+        _cinFile = File(result.files.single.path!);
         hasCinFilePicked = true;
       });
     }
@@ -196,11 +203,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _pickOrgPanFileImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      // _uploadProfileImage = await _getFileName(image.path);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _panFile = File(image.path);
+        _panFile = File(result.files.single.path!);
         hasPanFilePicked = true;
       });
     }
@@ -209,11 +219,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   bool isEditable = true;
 
   Future<void> _pickOrgGstInFileImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      // _uploadProfileImage = await _getFileName(image.path);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _gstInFile = File(image.path);
+        _gstInFile = File(result.files.single.path!);
         hasGstInFilePicked = true;
       });
     }
@@ -243,6 +256,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
         _shakeController.forward(from: 0);
         setState(() {
           isError = true;
+          isEmailVerified2 = false;
           isEmailVerified = false;
         });
       }
@@ -1181,11 +1195,15 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             showToast(message: "Fill all the entries.", type: ToastificationType.error);
             return; // Stop execution if validation fails
           }
+          if (!isEmailVerified) {
+            return showToast(message: "Please verify the email!", type: ToastificationType.error);
+          }
           final resp = await auth.createUser(
               email: userEmailController.text,
               name: userNameController.text,
               age: _selectedRange.start.toInt(),
               gender: _gender,
+              isemailverified: isEmailVerified,
               image: _userProfileImage ?? File(""));
 
           if (resp == true) {
@@ -1523,6 +1541,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             showToast(message: "Fill all the entries.", type: ToastificationType.error);
             return; // Stop execution if validation fails
           }
+          if (!isEmailVerified2) {
+            return showToast(message: "Please verify the email!", type: ToastificationType.error);
+          }
           final resp = await value.createOrg(
               email: orgEmailController.text,
               name: orgNameController.text,
@@ -1533,6 +1554,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               logo: _orgProfileImage ?? File(""),
               gstnInFile: _gstInFile ?? File(""),
               panFile: _panFile ?? File(""),
+              isemailverified: isEmailVerified2,
               cinFile: _cinFile ?? File(""));
 
           if (resp == true) {

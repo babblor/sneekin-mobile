@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -76,12 +77,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   /// Image Picker
   Future<void> _pickUpdatedPanImage(setState) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      // _imageFile = File(image.path);
-      // _uploadProfileImage = await _getFileName(image.path);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'], // Adjust as needed
+    );
+
+    if (result != null && result.files.single.path != null) {
       setState(() {
-        _updatedPanFile = File(image.path);
+        _updatedPanFile = File(result.files.single.path!);
         hasUpdatedPanFilePicked = true;
       });
     }
@@ -1044,6 +1047,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   email: "",
                                                   age: _selectedRange!.start.toInt(),
                                                   gender: _gender!);
+
+                                              log("result of updateUser in user_profile_page.dart: ${result}");
 
                                               if (result == true) {
                                                 await app.initializeUserData();

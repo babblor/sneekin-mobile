@@ -4,11 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/widgets/custom_app_bar.dart';
-
 import '../models/user_virtual_account.dart' as UserVirtualAccount;
-
-// import '../models/virtual_account.dart';
-// import '../../widgets/custom_app_bar.dart';
 
 class UserHomeView extends StatefulWidget {
   const UserHomeView({super.key});
@@ -40,6 +36,7 @@ class _UserHomeViewState extends State<UserHomeView> {
         log("all groups length: ${auth.virtualAccountsResp.groups.length}");
         log("all userVirtualAccounts.length: ${auth.userVirtualAccounts.length}");
         isOpen = List.generate(auth.userVirtualAccounts.length, (index) => false);
+        log("isOpen length: ${isOpen}");
       }
       _allUsersVirtualAccounts = auth.userVirtualAccounts;
 
@@ -85,6 +82,7 @@ class _UserHomeViewState extends State<UserHomeView> {
 
   @override
   Widget build(BuildContext context) {
+    log("user_home_view built");
     final theme = Theme.of(context);
     return SafeArea(
       child: Container(
@@ -737,7 +735,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                                     ),
 
                                     Positioned(
-                                      top: 12.5,
+                                      top: 9,
                                       left: -30,
                                       child: Container(
                                         width: 60,

@@ -86,7 +86,8 @@ class RouterServices with ChangeNotifier {
               path: '/create-virtual-account',
               name: 'create-virtual-account',
               pageBuilder: (context, state) {
-                final isQrLoading = state.extra as bool;
+                final isQrLoading = (state.extra as bool?) ?? false;
+
                 return MaterialPage(
                   key: state.pageKey,
                   child: PageWrapper(

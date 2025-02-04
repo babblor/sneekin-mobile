@@ -10,3 +10,11 @@ e.g: 50000000002
 
 3. Email verification is not implemented so while creating an user must verify their email through OTP.
 
+
+Upload Images Endpoints for Sneek In
+
+1. https://sneek.in/api/upload/profile -> User Profile
+2. https://sneek.in/api/upload/pan -> For user they need to create first tax profile then can upload image/pdf for pan docuemtn for verificatom.
+3. https://sneek.in/api/upload/logo -> For Organization
+4. https://sneek.in/api/upload/gstin 
+5. https://sneek.in/api/upload/cin

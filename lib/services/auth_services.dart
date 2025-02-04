@@ -65,7 +65,7 @@ class AuthServices with ChangeNotifier {
   initialize() async {
     _dio = Dio(
       BaseOptions(
-        baseUrl: dotenv.env["MAIN_API_URL"]!,
+        baseUrl: dotenv.env["BASE_API_URL"]!,
         receiveTimeout: const Duration(seconds: 200),
         connectTimeout: const Duration(seconds: 200),
       ),
@@ -208,7 +208,7 @@ class AuthServices with ChangeNotifier {
 
       log("resp.data in verifyEmailOTP: ${resp.data}");
 
-      if (resp.statusCode == 200) {
+      if (resp.statusCode == 200 && resp.data["status"] == "true") {
         log("verifyEmailOTP resp: ${resp.data}");
         _isLoading = false;
         notifyListeners();
@@ -219,7 +219,7 @@ class AuthServices with ChangeNotifier {
         _dio!.options.headers['Authorization'] = null;
         passKey = null;
         notifyListeners();
-        showToast(message: "Invalid OTP!", type: ToastificationType.error);
+        showToast(message: resp.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
         log("could not received OTP");
         return false;
       }
@@ -228,7 +228,7 @@ class AuthServices with ChangeNotifier {
       _dio!.options.headers['Authorization'] = null;
       passKey = null;
       notifyListeners();
-      showToast(message: "Invalid OTP!", type: ToastificationType.error);
+      showToast(message: e.response?.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
       log("error: $e");
       return false;
     } catch (e) {
@@ -505,32 +505,35 @@ class AuthServices with ChangeNotifier {
 
   // Send OTP Function
 
-  Future<bool> createUser({
-    required String email,
-    required String name,
-    required int age,
-    required String gender,
-    required File image,
-  }) async {
+  Future<bool> createUser(
+      {required String email,
+      required String name,
+      required int age,
+      required String gender,
+      required File image,
+      required bool isemailverified}) async {
     if (_isLoading) {
       return false;
     }
 
     try {
-      log("Calling createUser with email: $email, name: $name, gender: $gender, age: $age ,image: $image");
+      log("Calling createUser with email: $email, name: $name, gender: $gender, age: $age ,image: $image, isemailverified: $isemailverified");
       log("passkey: $passKey");
 
       _isLoading = true;
       notifyListeners();
 
-      await removeAuthToken();
+      // await removeAuthToken();
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
-      // Initialize imageURL as null
-      String? imageURL;
-
-      // Upload the image if the file path is valid
+// Upload the image if the file path is valid
       if (image.path.isNotEmpty) {
-        imageURL = await uploadImage(image: image);
+        bool imageURL = await uploadFile(file: image, uploadFileType: "profile");
+        log("imageURL bool value in createUser(): $imageURL");
+        if (!imageURL) {
+          return false; // Return early if upload fails
+        }
       }
 
       // Prepare the request payload
@@ -539,21 +542,17 @@ class AuthServices with ChangeNotifier {
         "name": name,
         "age": age,
         "gender": gender,
+        "isemailverified": isemailverified
       };
 
-      log("imageURL after uploading to GCP Bucket: $imageURL");
-
       // Add the image URL to the payload if available
-      if (imageURL != null && imageURL.isNotEmpty) {
-        userData["profileImageUrl"] = imageURL;
-      }
+      // if (imageURL != null && imageURL.isNotEmpty) {
+      //   userData["profileImageUrl"] = imageURL;
+      // }
 
       log("userData after uploading to GCP Bucket: $userData");
 
       log("endpoint URL: ${dotenv.env["BASE_API_URL"]!}/users");
-
-      // Set the Authorization header
-      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       log(" _dio!.options.headers['Authorization']: ${_dio!.options.headers['Authorization']}");
 
@@ -621,66 +620,83 @@ class AuthServices with ChangeNotifier {
       required File panFile,
       required File cinFile,
       required String address,
-      required File gstnInFile}) async {
+      required File gstnInFile,
+      required bool isemailverified}) async {
     if (_isLoading) {
       return;
     }
     try {
-      log("Calling createOrg with $email, $name, $cin, $pan, $gstin, $logo, $address");
+      log("Calling createOrg with $email, $name, $cin, $pan, $gstin, $logo, $address, $isemailverified");
       log("passkey: $passKey");
       _isLoading = true;
       notifyListeners();
 
-      await removeAuthToken();
+      // await removeAuthToken();
+
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       // Initialize imageURL as null
-      String? imageURL;
-      String? panUrl;
-      String? gstInUrl;
-      String? cinUrl;
-
-      // Upload the image if the file path is valid
+// Upload files and generate URLs
       if (logo.path.isNotEmpty) {
-        imageURL = await uploadImage(image: logo);
+        bool imageURL = await uploadFile(file: logo, uploadFileType: "logo");
+        if (!imageURL) {
+          return false; // Return early if upload fails
+        }
       }
+
       if (panFile.path.isNotEmpty) {
-        panUrl = await uploadImage(image: panFile);
+        bool panUrl = await uploadFile(file: panFile, uploadFileType: "pan");
+        if (!panUrl) {
+          return false; // Return early if upload fails
+        }
       }
+
       if (gstnInFile.path.isNotEmpty) {
-        gstInUrl = await uploadImage(image: gstnInFile);
+        bool gstInUrl = await uploadFile(file: gstnInFile, uploadFileType: "gstin");
+        if (!gstInUrl) {
+          return false; // Return early if upload fails
+        }
       }
+
       if (cinFile.path.isNotEmpty) {
-        cinUrl = await uploadImage(image: cinFile);
+        bool cinUrl = await uploadFile(file: cinFile, uploadFileType: "cin");
+        if (!cinUrl) {
+          return false; // Return early if upload fails
+        }
       }
 
       // Prepare the request payload
-      Map<String, dynamic> orgData = {"email": email, "name": name, "gstIn": gstin, "pan": pan, "cin": cin};
+      Map<String, dynamic> orgData = {
+        "email": email,
+        "name": name,
+        "gstIn": gstin,
+        "pan": pan,
+        "cin": cin,
+        "isemailverified": isemailverified
+      };
 
       if (address.isNotEmpty) orgData["address"] = address;
 
-      log("imageURL after uploading to GCP Bucket: $imageURL");
-
       // Add the image URL to the payload if available
-      if (imageURL != null && imageURL.isNotEmpty) {
-        orgData["logo"] = imageURL;
-      }
+      // if (imageURL != null && imageURL.isNotEmpty) {
+      //   orgData["logo"] = imageURL;
+      // }
 
-      if (panUrl != null && panUrl.isNotEmpty) {
-        orgData["panUrl"] = panUrl;
-      }
+      // if (panUrl != null && panUrl.isNotEmpty) {
+      //   orgData["panUrl"] = panUrl;
+      // }
 
-      if (gstInUrl != null && gstInUrl.isNotEmpty) {
-        orgData["cinUrl"] = cinUrl;
-      }
+      // if (gstInUrl != null && gstInUrl.isNotEmpty) {
+      //   orgData["cinUrl"] = cinUrl;
+      // }
 
-      if (gstInUrl != null && gstInUrl.isNotEmpty) {
-        orgData["gstInUrl"] = gstInUrl;
-      }
+      // if (gstInUrl != null && gstInUrl.isNotEmpty) {
+      //   orgData["gstInUrl"] = gstInUrl;
+      // }
 
       log("orgData after uploading to GCP Bucket: $orgData");
 
       // FormData _data = FormData.fromMap({"email": email, "name": name, "age": age, "gender": gender});
-      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
       final resp = await _dio!.post(
         "/organizations",
         data: orgData,
@@ -739,7 +755,7 @@ class AuthServices with ChangeNotifier {
 
       Map<int, List<UserVirtualAccount.VirtualAccount>> groupedVirtualAccounts =
           {}; // Map to group by mobileId
-      int currentPage = 1;
+      int currentPage = 0;
       int totalPages = 1;
 
       do {
@@ -753,6 +769,7 @@ class AuthServices with ChangeNotifier {
 
         if (response.statusCode == 200) {
           // Parse response using the VirtualAccountResponse model
+          log("response.data in userVirtualAccounts Resp: ${response.data}");
           final data = UserVirtualAccount.VirtualAccountResponse.fromJson(response.data);
 
           if (currentPage == 1) {
@@ -778,6 +795,7 @@ class AuthServices with ChangeNotifier {
 
       // Convert the grouped map into a list of groups for mergedResponse
       List<UserVirtualAccount.Group> mergedGroups = []; // Using Group class
+      log("mergedGroups after calling getUserVirtualAccounts: " + mergedGroups.toString());
       groupedVirtualAccounts.forEach((mobileId, virtualAccounts) {
         mergedGroups.add(UserVirtualAccount.Group(
           mobileId: mobileId,
@@ -963,7 +981,7 @@ class AuthServices with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      String? newPanUrl;
+      bool? newPanUrl;
 
       // Prepare the request payload
       Map<String, dynamic> data = {
@@ -974,10 +992,12 @@ class AuthServices with ChangeNotifier {
       };
 
       if (file.path != "") {
-        newPanUrl = await uploadImage(image: file);
+        newPanUrl = await uploadFile(file: file, uploadFileType: "pan");
       }
 
-      if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
+      log("pan URL of user: ${newPanUrl}");
+
+      // if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
 
       // Set the Authorization header
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
@@ -1046,7 +1066,7 @@ class AuthServices with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      String? newPanUrl;
+      bool? newPanUrl;
 
       // Prepare the request payload
       Map<String, dynamic> data = {};
@@ -1057,7 +1077,7 @@ class AuthServices with ChangeNotifier {
       if (gender != "") data["gender"] = gender;
 
       if (file.path != "") {
-        newPanUrl = await uploadImage(image: file);
+        newPanUrl = await uploadFile(file: file, uploadFileType: "pan");
       }
 
       if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
@@ -1148,23 +1168,40 @@ class AuthServices with ChangeNotifier {
       if (pan.isNotEmpty || pan != "") data['pan'] = pan;
       if (gstIn.isNotEmpty || gstIn != "") data['gstIn'] = gstIn;
       if (address.isNotEmpty || address != "") data['address'] = address;
+// Upload files and generate URLs
+      if (logoFile.path.isNotEmpty) {
+        bool logoUrl = await uploadFile(file: logoFile, uploadFileType: "logo");
+        if (!logoUrl || logoUrl == "") {
+          return false; // Return early if upload fails
+        }
+      }
 
-      String? logoUrl;
-      String? cinUrl;
-      String? panUrl;
-      String? gstInUrl;
+      if (cinFile.path.isNotEmpty) {
+        bool cinUrl = await uploadFile(file: cinFile, uploadFileType: "cin");
+        if (!cinUrl || cinUrl == "") {
+          return false; // Return early if upload fails
+        }
+      }
 
-      // Upload files and generate URLs
-      if (logoFile.path.isNotEmpty) logoUrl = await uploadImage(image: logoFile);
-      if (cinFile.path.isNotEmpty) cinUrl = await uploadImage(image: cinFile);
-      if (panFile.path.isNotEmpty) panUrl = await uploadImage(image: panFile);
-      if (gstInFile.path.isNotEmpty) gstInUrl = await uploadImage(image: gstInFile);
+      if (panFile.path.isNotEmpty) {
+        bool panUrl = await uploadFile(file: panFile, uploadFileType: "pan");
+        if (!panUrl || panUrl == "") {
+          return false; // Return early if upload fails
+        }
+      }
+
+      if (gstInFile.path.isNotEmpty) {
+        bool gstInUrl = await uploadFile(file: gstInFile, uploadFileType: "gstin");
+        if (!gstInUrl || gstInUrl == "") {
+          return false; // Return early if upload fails
+        }
+      }
 
       // Attach file URLs to the data body if they are not null
-      if (logoUrl != null) data['logo'] = logoUrl;
-      if (cinUrl != null) data['cinUrl'] = cinUrl;
-      if (panUrl != null) data['panUrl'] = panUrl;
-      if (gstInUrl != null) data['gstInUrl'] = gstInUrl;
+      // if (logoUrl != null) data['logo'] = logoUrl;
+      // if (cinUrl != null) data['cinUrl'] = cinUrl;
+      // if (panUrl != null) data['panUrl'] = panUrl;
+      // if (gstInUrl != null) data['gstInUrl'] = gstInUrl;
 
       // Set the Authorization header
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
@@ -1221,9 +1258,26 @@ class AuthServices with ChangeNotifier {
     if (_isLoading) return false;
 
     try {
-      removeAuthToken();
+      // removeAuthToken();
       _isLoading = true;
       notifyListeners();
+
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      // Upload profile image and generate URL
+      if (profileImage.path.isNotEmpty) {
+        bool isProfileImageUploaded = await uploadFile(file: profileImage, uploadFileType: "profile");
+        log("Profile image upload success: $isProfileImageUploaded");
+
+        if (!isProfileImageUploaded) {
+          _isLoading = false;
+          notifyListeners();
+          return false; // Return early without showing another toast
+        }
+      }
+
+      log("Still executing after failing of uploadFile :(");
 
       // Initialize an empty data map
       Map<String, dynamic> data = {};
@@ -1233,17 +1287,6 @@ class AuthServices with ChangeNotifier {
       if (email.isNotEmpty) data['email'] = email;
       data['age'] = age;
       if (gender.isNotEmpty) data['gender'] = gender;
-
-      String? profileImageUrl;
-
-      // Upload profile image and generate URL
-      if (profileImage.path.isNotEmpty) profileImageUrl = await uploadImage(image: profileImage);
-
-      // Attach the profile image URL to the data body if it's not null
-      if (profileImageUrl != null) data['profileImageUrl'] = profileImageUrl;
-
-      // Set the Authorization header
-      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       // Make the POST request
       final resp = await _dio!.put(
@@ -1257,6 +1300,8 @@ class AuthServices with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
+      log("resp.statusCode in updateUser: ${resp.statusCode}");
+
       if (resp.statusCode == 200 || resp.statusCode == 201) {
         await getProfile(accessToken: appStore.app?.accessToken ?? "");
         return true;
@@ -1268,7 +1313,7 @@ class AuthServices with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       showToast(
-        message: e.message ?? "Network Error! Please try again later.",
+        message: e.response?.data["message"] ?? "Network Error! Please try again later.",
         type: ToastificationType.error,
       );
       log("DioException: ${e.response?.data ?? e.toString()}");
@@ -1302,13 +1347,17 @@ class AuthServices with ChangeNotifier {
       if (clientWebsite.isNotEmpty) data['clientWebsite'] = clientWebsite;
       data['isMobileApp'] = isMobile;
 
-      String? logoUrl;
+// Upload profile image and generate URL
+      if (logo.path.isNotEmpty) {
+        bool logoUrl = await uploadFile(file: logo, uploadFileType: "orgapplogo");
 
-      // Upload profile image and generate URL
-      if (logo.path.isNotEmpty) logoUrl = await uploadImage(image: logo);
+        if (!logoUrl || logoUrl == "") {
+          return false; // Return early without showing another toast
+        }
+      }
 
       // Attach the profile image URL to the data body if it's not null
-      if (logoUrl != null) data['logo'] = logoUrl;
+      // if (logoUrl != null) data['logo'] = logoUrl;
 
       // Set the Authorization header
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
@@ -1374,13 +1423,17 @@ class AuthServices with ChangeNotifier {
       if (email.isNotEmpty) data['email'] = email;
       if (clientWebsite.isNotEmpty) data['clientWebsite'] = clientWebsite;
 
-      String? logoUrl;
+// Upload profile image and generate URL
+      if (logo.path.isNotEmpty) {
+        bool logoUrl = await uploadFile(file: logo, uploadFileType: "logo");
 
-      // Upload profile image and generate URL
-      if (logo.path.isNotEmpty) logoUrl = await uploadImage(image: logo);
+        if (!logoUrl || logoUrl == "") {
+          return false; // Return early without showing another toast
+        }
+      }
 
       // Attach the profile image URL to the data body if it's not null
-      if (logoUrl != null) data['logo'] = logoUrl;
+      // if (logoUrl != null) data['logo'] = logoUrl;
 
       log("body in /org-apps-account: $data");
 
@@ -1454,14 +1507,15 @@ class AuthServices with ChangeNotifier {
         ),
       );
 
-      _isLoading = false;
-      notifyListeners();
-
       if (resp.statusCode == 200 || resp.statusCode == 201) {
         await getUserVirtualAccounts();
+        _isLoading = false;
+        notifyListeners();
         return true;
       } else {
         showToast(message: resp.data["message"] ?? "Failed to login", type: ToastificationType.error);
+        _isLoading = false;
+        notifyListeners();
         return false;
       }
     } on DioException catch (e) {
@@ -1506,6 +1560,66 @@ class AuthServices with ChangeNotifier {
       }
     } catch (e) {
       log("e: $e");
+    }
+  }
+
+  Future<bool> uploadFile({required String uploadFileType, required File file}) async {
+    try {
+      // Ensure dio is initialized
+      if (dio == null) {
+        log("Dio instance is null");
+        showToast(message: "Network Error! Please try again later.", type: ToastificationType.error);
+        return false;
+      }
+
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      log("Uploading $uploadFileType with file ${file.path}");
+
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+      });
+
+      final String endpoint = "/upload/$uploadFileType";
+
+      final response = await dio!.post(
+        endpoint,
+        data: formData,
+        options: Options(
+          headers: {"Content-Type": "multipart/form-data"},
+        ),
+      );
+
+      log("Response of file uploading: ${response.toString()}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("File uploaded successfully!");
+        return true;
+      } else {
+        showToast(
+          message: response.data?["error"] ?? "Couldn't upload image. Try again later.",
+          type: ToastificationType.error,
+        );
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } on DioException catch (e) {
+      log("DioError: ${e.toString()}");
+      showToast(
+        message: e.response?.data?["message"] ?? "Network Error! Please try again later.",
+        type: ToastificationType.error,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      log("Error uploading file: $e");
+      showToast(message: "Something went wrong. Please try again later.", type: ToastificationType.error);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 }
