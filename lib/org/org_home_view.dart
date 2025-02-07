@@ -105,7 +105,7 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                   },
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 5),
               auth.orgAppsAccount.isEmpty
                   ? const SizedBox.shrink()
                   : Center(

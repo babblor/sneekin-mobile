@@ -351,6 +351,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         if (_formKey.currentState?.validate() == true) {
                           _formKey.currentState?.save();
                           log('Name: $name, PAN Number: $pan_number, Address: $address, Gender: $taxGender');
+                          if (_updatedPanFile == null) {
+                            return showToast(
+                                message: "Please upload pan document!", type: ToastificationType.error);
+                          }
                           final result = await auth.createUserTaxProfile(
                             file: _updatedPanFile ?? File(""),
                             pan_number: pan_number!,

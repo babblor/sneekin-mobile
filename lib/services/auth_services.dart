@@ -103,7 +103,7 @@ class AuthServices with ChangeNotifier {
       } else {
         _isLoading = false;
         _dio!.options.headers['Authorization'] = null;
-        passKey = null;
+        // passKey = null;
         notifyListeners();
         showToast(message: "Some error occurred", type: ToastificationType.error);
         log("could not received OTP");
@@ -112,7 +112,7 @@ class AuthServices with ChangeNotifier {
     } on DioException catch (e) {
       _isLoading = false;
       _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
@@ -120,7 +120,7 @@ class AuthServices with ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
@@ -161,8 +161,8 @@ class AuthServices with ChangeNotifier {
         return true;
       } else {
         _isLoading = false;
-        _dio!.options.headers['Authorization'] = null;
-        passKey = null;
+        // _dio!.options.headers['Authorization'] = null;
+        // passKey = null;
         notifyListeners();
         showToast(message: "Some error occurred", type: ToastificationType.error);
         log("could not received OTP");
@@ -170,16 +170,16 @@ class AuthServices with ChangeNotifier {
       }
     } on DioException catch (e) {
       _isLoading = false;
-      _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // _dio!.options.headers['Authorization'] = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
       return false;
     } catch (e) {
       _isLoading = false;
-      _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // _dio!.options.headers['Authorization'] = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
@@ -216,8 +216,8 @@ class AuthServices with ChangeNotifier {
         return true;
       } else {
         _isLoading = false;
-        _dio!.options.headers['Authorization'] = null;
-        passKey = null;
+        // _dio!.options.headers['Authorization'] = null;
+        // passKey = null;
         notifyListeners();
         showToast(message: resp.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
         log("could not received OTP");
@@ -225,16 +225,16 @@ class AuthServices with ChangeNotifier {
       }
     } on DioException catch (e) {
       _isLoading = false;
-      _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // _dio!.options.headers['Authorization'] = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: e.response?.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
       log("error: $e");
       return false;
     } catch (e) {
       _isLoading = false;
-      _dio!.options.headers['Authorization'] = null;
-      passKey = null;
+      // _dio!.options.headers['Authorization'] = null;
+      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");
@@ -510,14 +510,14 @@ class AuthServices with ChangeNotifier {
       required String name,
       required int age,
       required String gender,
-      required File image,
+      // required File image,
       required bool isemailverified}) async {
     if (_isLoading) {
       return false;
     }
 
     try {
-      log("Calling createUser with email: $email, name: $name, gender: $gender, age: $age ,image: $image, isemailverified: $isemailverified");
+      log("Calling createUser with email: $email, name: $name, gender: $gender, age: $age , isEmailVerified: $isemailverified");
       log("passkey: $passKey");
 
       _isLoading = true;
@@ -528,13 +528,13 @@ class AuthServices with ChangeNotifier {
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
 // Upload the image if the file path is valid
-      if (image.path.isNotEmpty) {
-        bool imageURL = await uploadFile(file: image, uploadFileType: "profile");
-        log("imageURL bool value in createUser(): $imageURL");
-        if (!imageURL) {
-          return false; // Return early if upload fails
-        }
-      }
+      // if (image.path.isNotEmpty) {
+      //   bool imageURL = await uploadFile(file: image, uploadFileType: "profile");
+      //   log("imageURL bool value in createUser(): $imageURL");
+      //   if (!imageURL) {
+      //     return false; // Return early if upload fails
+      //   }
+      // }
 
       // Prepare the request payload
       Map<String, dynamic> userData = {
@@ -542,7 +542,7 @@ class AuthServices with ChangeNotifier {
         "name": name,
         "age": age,
         "gender": gender,
-        "isemailverified": isemailverified
+        "isEmailVerified": isemailverified
       };
 
       // Add the image URL to the payload if available
@@ -616,17 +616,17 @@ class AuthServices with ChangeNotifier {
       required String cin,
       required String pan,
       required String gstin,
-      required File logo,
-      required File panFile,
-      required File cinFile,
+      // required File logo,
+      // required File panFile,
+      // required File cinFile,
       required String address,
-      required File gstnInFile,
+      // required File gstnInFile,
       required bool isemailverified}) async {
     if (_isLoading) {
       return;
     }
     try {
-      log("Calling createOrg with $email, $name, $cin, $pan, $gstin, $logo, $address, $isemailverified");
+      log("Calling createOrg with $email, $name, $cin, $pan, $gstin, $address, $isemailverified");
       log("passkey: $passKey");
       _isLoading = true;
       notifyListeners();
@@ -637,33 +637,33 @@ class AuthServices with ChangeNotifier {
 
       // Initialize imageURL as null
 // Upload files and generate URLs
-      if (logo.path.isNotEmpty) {
-        bool imageURL = await uploadFile(file: logo, uploadFileType: "logo");
-        if (!imageURL) {
-          return false; // Return early if upload fails
-        }
-      }
+      // if (logo.path.isNotEmpty) {
+      //   bool imageURL = await uploadFile(file: logo, uploadFileType: "logo");
+      //   if (!imageURL) {
+      //     return false; // Return early if upload fails
+      //   }
+      // }
 
-      if (panFile.path.isNotEmpty) {
-        bool panUrl = await uploadFile(file: panFile, uploadFileType: "pan");
-        if (!panUrl) {
-          return false; // Return early if upload fails
-        }
-      }
+      // if (panFile.path.isNotEmpty) {
+      //   bool panUrl = await uploadFile(file: panFile, uploadFileType: "pan");
+      //   if (!panUrl) {
+      //     return false; // Return early if upload fails
+      //   }
+      // }
 
-      if (gstnInFile.path.isNotEmpty) {
-        bool gstInUrl = await uploadFile(file: gstnInFile, uploadFileType: "gstin");
-        if (!gstInUrl) {
-          return false; // Return early if upload fails
-        }
-      }
+      // if (gstnInFile.path.isNotEmpty) {
+      //   bool gstInUrl = await uploadFile(file: gstnInFile, uploadFileType: "gstin");
+      //   if (!gstInUrl) {
+      //     return false; // Return early if upload fails
+      //   }
+      // }
 
-      if (cinFile.path.isNotEmpty) {
-        bool cinUrl = await uploadFile(file: cinFile, uploadFileType: "cin");
-        if (!cinUrl) {
-          return false; // Return early if upload fails
-        }
-      }
+      // if (cinFile.path.isNotEmpty) {
+      //   bool cinUrl = await uploadFile(file: cinFile, uploadFileType: "cin");
+      //   if (!cinUrl) {
+      //     return false; // Return early if upload fails
+      //   }
+      // }
 
       // Prepare the request payload
       Map<String, dynamic> orgData = {
@@ -672,7 +672,7 @@ class AuthServices with ChangeNotifier {
         "gstIn": gstin,
         "pan": pan,
         "cin": cin,
-        "isemailverified": isemailverified
+        "isEmailVerified": isemailverified
       };
 
       if (address.isNotEmpty) orgData["address"] = address;
@@ -964,50 +964,50 @@ class AuthServices with ChangeNotifier {
     }
   }
 
-  createUserTaxProfile(
-      {required String pan_number,
-      required String name,
-      required String address,
-      required String gender,
-      required File file}) async {
+  Future<bool> createUserTaxProfile({
+    required String pan_number,
+    required String name,
+    required String address,
+    required String gender,
+    required File file,
+  }) async {
     if (_isLoading) {
-      return;
+      return false;
     }
 
     try {
-      log("Calling createUserTaxProfile with pan_number: $pan_number, name: $name, gender: $gender, address: $address");
-      // log("passkey: $passKey");
+      log("Calling createUserTaxProfile with pan_number: $pan_number, name: $name, gender: $gender, address: $address, file: ${file.path}");
 
       _isLoading = true;
       notifyListeners();
 
-      bool? newPanUrl;
+      // Convert file to MultipartFile
+      String fileName = file.path.split('/').last;
+      MultipartFile multipartFile = await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
+      );
 
       // Prepare the request payload
-      Map<String, dynamic> data = {
-        "panNumber": pan_number,
-        "name": name,
-        "address": address,
-        "gender": gender,
-      };
-
-      if (file.path != "") {
-        newPanUrl = await uploadFile(file: file, uploadFileType: "pan");
-      }
-
-      log("pan URL of user: ${newPanUrl}");
-
-      // if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
+      FormData formData = FormData.fromMap({
+        "file": multipartFile,
+        "taxProfileUser": {
+          "panNumber": pan_number,
+          "name": name,
+          "address": address,
+          "gender": gender,
+        },
+      });
 
       // Set the Authorization header
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       // Make the POST request
-      final resp = await _dio!.post(
+      final Response resp = await _dio!.post(
         "/users/tax-profile",
-        data: data,
+        data: formData,
         options: Options(
-          contentType: Headers.jsonContentType,
+          contentType: Headers.multipartFormDataContentType,
         ),
       );
 
@@ -1347,15 +1347,6 @@ class AuthServices with ChangeNotifier {
       if (clientWebsite.isNotEmpty) data['clientWebsite'] = clientWebsite;
       data['isMobileApp'] = isMobile;
 
-// Upload profile image and generate URL
-      if (logo.path.isNotEmpty) {
-        bool logoUrl = await uploadFile(file: logo, uploadFileType: "orgapplogo");
-
-        if (!logoUrl || logoUrl == "") {
-          return false; // Return early without showing another toast
-        }
-      }
-
       // Attach the profile image URL to the data body if it's not null
       // if (logoUrl != null) data['logo'] = logoUrl;
 
@@ -1377,6 +1368,14 @@ class AuthServices with ChangeNotifier {
       log("resp.data in createOrgAppsAccount: ${resp.data}");
 
       if (resp.statusCode == 200 || resp.statusCode == 201) {
+// Upload profile image and generate URL
+        if (logo.path.isNotEmpty) {
+          bool logoUrl = await uploadOrgAppAccountLogo(file: logo, orgappid: resp.data["id"]);
+
+          if (!logoUrl || logoUrl == "") {
+            showToast(message: "Failed to upload Org-App-Account logo", type: ToastificationType.warning);
+          }
+        }
         await getOrgAppsAccounts();
         await getOrgProfile(accessToken: appStore.app?.accessToken ?? "");
         // await appStore.initializeOrgData();
@@ -1425,7 +1424,7 @@ class AuthServices with ChangeNotifier {
 
 // Upload profile image and generate URL
       if (logo.path.isNotEmpty) {
-        bool logoUrl = await uploadFile(file: logo, uploadFileType: "logo");
+        bool logoUrl = await uploadOrgAppAccountLogo(file: logo, orgappid: id);
 
         if (!logoUrl || logoUrl == "") {
           return false; // Return early without showing another toast
@@ -1582,6 +1581,65 @@ class AuthServices with ChangeNotifier {
       });
 
       final String endpoint = "/upload/$uploadFileType";
+
+      final response = await dio!.post(
+        endpoint,
+        data: formData,
+        options: Options(
+          headers: {"Content-Type": "multipart/form-data"},
+        ),
+      );
+
+      log("Response of file uploading: ${response.toString()}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("File uploaded successfully!");
+        return true;
+      } else {
+        showToast(
+          message: response.data?["error"] ?? "Couldn't upload image. Try again later.",
+          type: ToastificationType.error,
+        );
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } on DioException catch (e) {
+      log("DioError: ${e.toString()}");
+      showToast(
+        message: e.response?.data?["message"] ?? "Network Error! Please try again later.",
+        type: ToastificationType.error,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      log("Error uploading file: $e");
+      showToast(message: "Something went wrong. Please try again later.", type: ToastificationType.error);
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> uploadOrgAppAccountLogo({required File file, required int orgappid}) async {
+    try {
+      log("Getting orgappid: ${orgappid} for uploading org-app-logo");
+      // Ensure dio is initialized
+      if (dio == null) {
+        log("Dio instance is null");
+        showToast(message: "Network Error! Please try again later.", type: ToastificationType.error);
+        return false;
+      }
+
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+      });
+
+      final String endpoint = "/org-app-accounts/upload/${orgappid}";
 
       final response = await dio!.post(
         endpoint,

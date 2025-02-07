@@ -109,7 +109,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                   },
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 5),
               // Horizontal scroll view for first 3-4 accounts
               if (auth.virtualAccountsResp.groups.isNotEmpty && !auth.isLoading)
                 Center(

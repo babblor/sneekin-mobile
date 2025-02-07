@@ -34,7 +34,7 @@ class CustomNavigationBar extends StatelessWidget {
       enableFeedback: false,
       // type: BottomNavigationBarType.shifting,
       selectedFontSize: 12,
-      selectedItemColor: theme.textTheme.bodyLarge?.color,
+      selectedItemColor: theme.textTheme.headlineLarge?.color,
       unselectedItemColor: theme.textTheme.bodyLarge?.color,
       currentIndex: currentIndex,
       onTap: onTap,

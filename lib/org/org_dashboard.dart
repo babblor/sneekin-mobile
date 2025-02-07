@@ -143,7 +143,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                               controller: _nameController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                hintText: 'Enter your name',
+                                hintText: 'Enter app name',
                                 hintStyle: GoogleFonts.inter(fontSize: 13),
                               ),
                               validator: (value) {
@@ -178,7 +178,7 @@ class _OrgDashboardState extends State<OrgDashboard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Is Mobile?',
+                            'Is Mobile App?',
                             style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Checkbox(

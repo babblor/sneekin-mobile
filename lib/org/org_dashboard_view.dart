@@ -388,41 +388,31 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                         // const SizedBox(
                                         //   width: 2,
                                         // ),
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Icon(
-                                              Icons.email_outlined,
+                                        Flexible(
+                                          child: Text(
+                                            app.org?.email ?? "N/A",
+                                            style: GoogleFonts.inter(
                                               color: theme.textTheme.bodyLarge?.color,
-                                              size: 14,
+                                              fontSize: 13,
                                             ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              (app.org?.email != null && app.org!.email!.length > 25)
-                                                  ? "${app.org!.email?.substring(0, 25)}..."
-                                                  : (app.org?.email ?? "N/A"),
-                                              style: GoogleFonts.inter(
-                                                color: theme.textTheme.bodyLarge?.color,
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                          ),
                                         ),
+
                                         const SizedBox(
                                           width: 5,
                                         ),
                                         Expanded(
                                           child: TextFormField(
-                                            controller:
-                                                orgAddressController, // Replace with your TextEditingController
+                                            controller: orgAddressController,
+                                            maxLines: null, // Allows multiple lines
+                                            keyboardType: TextInputType.multiline, // Enables multi-line input
                                             style: TextStyle(
                                               color: theme.textTheme.bodyLarge?.color,
-                                              fontSize: canEdit ? 14 : 13, // Font size based on canEdit
+                                              fontSize: canEdit ? 14 : 13,
                                             ),
-                                            enabled: canEdit, // Allow editing based on canEdit
+                                            enabled: canEdit,
                                             decoration: InputDecoration(
                                               prefix: !canEdit
                                                   ? Padding(
@@ -435,36 +425,30 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                     )
                                                   : null,
                                               filled: true,
-                                              fillColor: theme.scaffoldBackgroundColor, // Background color
+                                              fillColor: theme.scaffoldBackgroundColor,
                                               border: canEdit
                                                   ? OutlineInputBorder(
                                                       borderRadius: BorderRadius.circular(10),
-                                                      borderSide: BorderSide(
-                                                          color: Colors.grey.shade400), // Editable border
+                                                      borderSide: BorderSide(color: Colors.grey.shade400),
                                                     )
-                                                  : InputBorder.none, // No border when not editable
+                                                  : InputBorder.none,
                                               enabledBorder: canEdit
                                                   ? OutlineInputBorder(
                                                       borderRadius: BorderRadius.circular(10),
-                                                      borderSide: BorderSide(
-                                                          color: Colors
-                                                              .grey.shade400), // Enabled editable border
+                                                      borderSide: BorderSide(color: Colors.grey.shade400),
                                                     )
                                                   : InputBorder.none,
                                               focusedBorder: canEdit
                                                   ? OutlineInputBorder(
                                                       borderRadius: BorderRadius.circular(10),
-                                                      borderSide: BorderSide(
-                                                          color: Colors.grey.shade400,
-                                                          width: 2), // Focused editable border
+                                                      borderSide:
+                                                          BorderSide(color: Colors.grey.shade400, width: 2),
                                                     )
-                                                  : InputBorder.none, // No focus border when not editable
-                                              disabledBorder: InputBorder.none, // No border when disabled
-                                              hintText: 'Enter text', // Optional hint text
+                                                  : InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              hintText: 'Enter text',
                                               contentPadding: const EdgeInsets.symmetric(
-                                                horizontal: 16.0,
-                                                vertical: 12.0,
-                                              ), // Adjust padding
+                                                  horizontal: 16.0, vertical: 12.0),
                                             ),
                                           ),
                                         ),
@@ -541,6 +525,34 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                 (orgGSTINController.text.isNotEmpty &&
                                                     _orgGstInImage != null)) {
                                               // Proceed with update logic
+
+                                              if (orgGSTINController.text != app.org?.gstin) {
+                                                if (orgGSTINController.text.length != 15 &&
+                                                    orgGSTINController.text.isNotEmpty) {
+                                                  return showToast(
+                                                      message: "GSTIN needs 15 digits",
+                                                      type: ToastificationType.error);
+                                                }
+                                              }
+
+                                              if (orgCINController.text != app.org?.cin) {
+                                                if (orgCINController.text.length != 21 &&
+                                                    orgCINController.text.isNotEmpty) {
+                                                  return showToast(
+                                                      message: "CIN needs 21 digits",
+                                                      type: ToastificationType.error);
+                                                }
+                                              }
+
+                                              if (orgPANController.text != app.org?.pan) {
+                                                if (orgPANController.text.length != 10 &&
+                                                    orgPANController.text.isNotEmpty) {
+                                                  return showToast(
+                                                      message: "PAN needs 10 digits",
+                                                      type: ToastificationType.error);
+                                                }
+                                              }
+
                                               final result = await auth.updateOrganization(
                                                   name: orgNameController.text,
                                                   websiteName: orgWebsiteController.text,
@@ -1093,6 +1105,14 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                     fontSize: canEdit ? 14 : 12, // Smaller font size when canEdit is false
                     color: theme.textTheme.bodyLarge?.color,
                   ),
+                  maxLength: label == "CIN"
+                      ? 21
+                      : label == "PAN"
+                          ? 10
+                          : label == "GSTIN"
+                              ? 15
+                              : null,
+                  buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                   decoration: InputDecoration(
                     suffix: !canEdit
                         ? (isVerified

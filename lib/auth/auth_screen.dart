@@ -347,15 +347,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           labelText: 'Name',
           mandatory: true,
           hasEmail: false,
+          inputType: "Name",
           isPicked: hasImagePicked,
           hintText: 'Enter your name',
           img: _userProfileImage,
           onTap: () {
-            _pickImage(setState);
+            // _pickImage(setState);
           },
-          profileIcon: true,
-          imageField: true,
-          hasPicked: hasImagePicked,
+          profileIcon: false,
+          imageField: false,
+          hasPicked: false,
           focusNode: _focusNodes[0],
           isEditable: isEditable,
         ),
@@ -367,6 +368,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           labelText: 'Email',
           hintText: 'Enter your email',
           mandatory: true,
+          inputType: "Email",
           isPicked: hasImagePicked,
           hasEmail: true,
           profileIcon: false,
@@ -566,15 +568,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           labelText: 'Organization Name',
           mandatory: true,
           hintText: 'Enter organization name',
-          profileIcon: true,
+          profileIcon: false,
           hasEmail: false,
           img: _orgProfileImage,
           onTap: () {
-            _pickOrgLogoImage(setState);
+            // _pickOrgLogoImage(setState);
           },
-          isPicked: hasImagePicked,
-          imageField: true,
-          hasPicked: hasImagePicked,
+          inputType: "Name",
+          isPicked: false,
+          imageField: false,
+          hasPicked: false,
           focusNode: _focusNodes[4],
           isEditable: isEditable,
         ),
@@ -588,6 +591,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           onTap: () {},
           profileIcon: false,
           hasEmail: true,
+          inputType: "Email",
           hintText: 'Enter organization email',
           imageField: false,
           hasPicked: false,
@@ -684,6 +688,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           mandatory: false,
           isPicked: hasImagePicked,
           profileIcon: false,
+          inputType: "Address",
           hintText: 'Enter organization address',
           hasEmail: false,
           onTap: () {},
@@ -698,15 +703,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           controller: gstinController,
           labelText: 'Organization GSTIN',
           mandatory: true,
-          isPicked: hasImagePicked,
+          isPicked: false,
           profileIcon: false,
           hasEmail: false,
+          inputType: "GSTIN",
           onTap: () {
-            _pickOrgGstInFileImage(setState);
+            // _pickOrgGstInFileImage(setState);
           },
           hintText: 'Enter organization gstin',
-          imageField: true,
-          hasPicked: hasGstInFilePicked,
+          imageField: false,
+          hasPicked: false,
           focusNode: _focusNodes[7],
           isEditable: isEditable,
         ),
@@ -717,15 +723,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           controller: cinController,
           labelText: 'Organization CIN',
           mandatory: true,
+          inputType: "CIN",
           hasEmail: false,
           onTap: () {
-            _pickOrgCinFileImage(setState);
+            // _pickOrgCinFileImage(setState);
           },
           profileIcon: false,
-          isPicked: hasImagePicked,
+          isPicked: false,
           hintText: 'Enter CIN',
-          imageField: true,
-          hasPicked: hasCinFilePicked,
+          imageField: false,
+          hasPicked: false,
           focusNode: _focusNodes[8],
           isEditable: isEditable,
         ),
@@ -736,15 +743,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           controller: panController,
           labelText: 'Organization PAN',
           onTap: () {
-            _pickOrgPanFileImage(setState);
+            // _pickOrgPanFileImage(setState);
           },
           profileIcon: false,
-          isPicked: hasImagePicked,
+          isPicked: false,
           hasEmail: false,
           mandatory: true,
           hintText: 'Enter PAN',
-          imageField: true,
-          hasPicked: hasPanFilePicked,
+          inputType: "PAN",
+          imageField: false,
+          hasPicked: false,
           focusNode: _focusNodes[9],
           isEditable: isEditable,
         ),
@@ -1040,6 +1048,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     required bool mandatory,
     required bool hasEmail,
     required bool imageField,
+    required String inputType,
     TextInputType keyboardType = TextInputType.text,
     required VoidCallback onTap,
     File? img,
@@ -1074,6 +1083,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                 enabled: isEditable,
                 controller: controller,
                 keyboardType: keyboardType,
+                maxLength: inputType == "PAN"
+                    ? 10
+                    : inputType == "GSTIN"
+                        ? 15
+                        : inputType == "CIN"
+                            ? 21
+                            : null,
+                buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                 focusNode: focusNode,
                 style: GoogleFonts.inter(color: Colors.white),
                 decoration: InputDecoration(
@@ -1199,12 +1216,13 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             return showToast(message: "Please verify the email!", type: ToastificationType.error);
           }
           final resp = await auth.createUser(
-              email: userEmailController.text,
-              name: userNameController.text,
-              age: _selectedRange.start.toInt(),
-              gender: _gender,
-              isemailverified: isEmailVerified,
-              image: _userProfileImage ?? File(""));
+            email: userEmailController.text,
+            name: userNameController.text,
+            age: _selectedRange.start.toInt(),
+            gender: _gender,
+            isemailverified: isEmailVerified,
+            // image: _userProfileImage ?? File("")
+          );
 
           if (resp == true) {
             // context.go("root");
@@ -1541,21 +1559,33 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             showToast(message: "Fill all the entries.", type: ToastificationType.error);
             return; // Stop execution if validation fails
           }
+
+          if (gstinController.text.length != 15) {
+            return showToast(message: "GSTIN needs 15 digits", type: ToastificationType.error);
+          }
+          if (cinController.text.length != 21) {
+            return showToast(message: "CIN needs 21 digits", type: ToastificationType.error);
+          }
+          if (panController.text.length != 10) {
+            return showToast(message: "PAN needs 10 digits", type: ToastificationType.error);
+          }
+
           if (!isEmailVerified2) {
             return showToast(message: "Please verify the email!", type: ToastificationType.error);
           }
           final resp = await value.createOrg(
-              email: orgEmailController.text,
-              name: orgNameController.text,
-              cin: cinController.text,
-              pan: panController.text,
-              gstin: gstinController.text,
-              address: addressController.text,
-              logo: _orgProfileImage ?? File(""),
-              gstnInFile: _gstInFile ?? File(""),
-              panFile: _panFile ?? File(""),
-              isemailverified: isEmailVerified2,
-              cinFile: _cinFile ?? File(""));
+            email: orgEmailController.text,
+            name: orgNameController.text,
+            cin: cinController.text,
+            pan: panController.text,
+            gstin: gstinController.text,
+            address: addressController.text,
+            // logo: _orgProfileImage ?? File(""),
+            // gstnInFile: _gstInFile ?? File(""),
+            // panFile: _panFile ?? File(""),
+            isemailverified: isEmailVerified2,
+            // cinFile: _cinFile ?? File("")
+          );
 
           if (resp == true) {
             // context.go("root");
