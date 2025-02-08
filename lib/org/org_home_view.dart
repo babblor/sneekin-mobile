@@ -124,7 +124,7 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                                   .map((account) => GestureDetector(
                                         onTap: () {
                                           log("Account tapped: ${account.name}");
-                                          context.go('/org-app-account-profile', extra: account);
+                                          context.goNamed('org-app-account-profile', extra: account);
                                         },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,

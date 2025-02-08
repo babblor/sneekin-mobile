@@ -18,9 +18,24 @@ class PageWrapper extends StatefulWidget {
 class _PageWrapperState extends State<PageWrapper> {
   int _activeIndex = 0;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateActiveIndex();
+  }
+
+  void _updateActiveIndex() {
+    final String currentRoute = GoRouter.of(context).routeInformationProvider.value.uri.toString();
+
+    log("Current Route: $currentRoute");
+
+    setState(() {
+      _activeIndex = _getIndexFromRoute(currentRoute);
+    });
+  }
+
   bool _handlePop() {
     if (_activeIndex != 0) {
-      // Reset to the default tab (index 0) instead of exiting the app
       setState(() {
         _activeIndex = 0;
       });
@@ -41,20 +56,47 @@ class _PageWrapperState extends State<PageWrapper> {
           currentIndex: _activeIndex,
           isOrg: widget.isOrg,
           onTap: (index) {
-            setState(() {
-              _activeIndex = index;
-            });
-            _navigateToPage(index);
+            if (index != _activeIndex) {
+              setState(() {
+                _activeIndex = index;
+              });
+              _navigateToPage(index);
+            }
           },
         ),
       ),
     );
   }
 
-  void _navigateToPage(int index) {
-    log("index:$index");
+  int _getIndexFromRoute(String route) {
     if (widget.isOrg) {
-      // Organization navigation
+      switch (route) {
+        case '/org-dashboard':
+          return 0;
+        case '/org-home-view':
+          return 1;
+        case '/org-dashboard-view':
+          return 2;
+        default:
+          return 0;
+      }
+    } else {
+      switch (route) {
+        case '/user-home-page':
+          return 0;
+        case '/create-virtual-account':
+          return 1;
+        case '/user-profile-page':
+          return 2;
+        default:
+          return 0;
+      }
+    }
+  }
+
+  void _navigateToPage(int index) {
+    log("Navigating to index: $index");
+    if (widget.isOrg) {
       switch (index) {
         case 0:
           context.goNamed('org-dashboard');
@@ -70,7 +112,6 @@ class _PageWrapperState extends State<PageWrapper> {
           break;
       }
     } else {
-      // User navigation
       switch (index) {
         case 0:
           context.goNamed('user-home-page');
