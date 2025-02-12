@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/services/auth_services.dart';
-import 'package:sneekin/user/user_home_view.dart';
 import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 

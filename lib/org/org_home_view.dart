@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/models/org_app_account.dart';
 import 'package:sneekin/services/auth_services.dart';
+import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/widgets/notch_pointer.dart';
 import '../widgets/custom_app_bar.dart';
 
@@ -124,7 +125,19 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                                   .map((account) => GestureDetector(
                                         onTap: () {
                                           log("Account tapped: ${account.name}");
-                                          context.goNamed('org-app-account-profile', extra: account);
+                                          context
+                                              .pushNamed(
+                                            'org-app-account-profile',
+                                            extra: account,
+                                          )
+                                              .then((_) {
+                                            // Reset icon state when user navigates back
+                                            Provider.of<HelperServices>(context, listen: false)
+                                                .resetHasReachedOrgAppAccountPage();
+                                          });
+
+                                          Provider.of<HelperServices>(context, listen: false)
+                                              .changeHasReachedOrgAppAccountPage(true);
                                         },
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,

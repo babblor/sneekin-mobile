@@ -13,5 +13,27 @@ class HelperServices with ChangeNotifier {
   //   notifyListeners();
   // }
 
+  int _activeIndex = 0;
+  int get activeIndex => _activeIndex;
+
+  bool _hasReachedOrgAppAccountPage = false;
+
+  bool get hasReachedOrgAppAccountPage => _hasReachedOrgAppAccountPage;
+
+  changeScreen(int index) {
+    _activeIndex = index;
+    notifyListeners();
+  }
+
+  changeHasReachedOrgAppAccountPage(bool value) {
+    _hasReachedOrgAppAccountPage = value;
+    notifyListeners();
+  }
+
+  void resetHasReachedOrgAppAccountPage() {
+    _hasReachedOrgAppAccountPage = false;
+    notifyListeners();
+  }
+
   final ImagePicker _picker = ImagePicker();
 }

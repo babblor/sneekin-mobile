@@ -26,8 +26,11 @@ class _PageWrapperState extends State<PageWrapper> {
 
   void _updateActiveIndex() {
     final String currentRoute = GoRouter.of(context).routeInformationProvider.value.uri.toString();
-
     log("Current Route: $currentRoute");
+
+    if (currentRoute.contains("org-app-account-profile")) {
+      return; // Do not reset activeIndex when navigating away
+    }
 
     setState(() {
       _activeIndex = _getIndexFromRoute(currentRoute);

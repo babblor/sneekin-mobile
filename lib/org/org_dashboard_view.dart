@@ -213,7 +213,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                                         imageUrl: app.org!.logo!,
 
                                                         fit: BoxFit
-                                                            .cover, // Ensures the image is resized to fit
+                                                            .fill, // Ensures the image is resized to fit
                                                         placeholder: (context, url) => const Center(
                                                           child: SizedBox(
                                                             height: 15,
@@ -359,7 +359,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                         height: 15,
                                       ),
                                     Row(
-                                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      // mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         // _buildTextField2("Website", orgWebsiteController, theme, app),
@@ -389,66 +389,82 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                                         //   width: 2,
                                         // ),
                                         Flexible(
-                                          child: Text(
-                                            app.org?.email ?? "N/A",
-                                            style: GoogleFonts.inter(
-                                              color: theme.textTheme.bodyLarge?.color,
-                                              fontSize: 13,
-                                            ),
-                                            softWrap: true,
-                                            overflow: TextOverflow.visible,
+                                          child: Row(
+                                            children: [
+                                              if (!canEdit)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(right: 8.0),
+                                                  child: FaIcon(
+                                                    Icons.mail_lock_outlined,
+                                                    color: theme.textTheme.bodyLarge?.color,
+                                                    size: 13,
+                                                  ),
+                                                ),
+                                              Text(
+                                                app.org?.email ?? "N/A",
+                                                style: GoogleFonts.inter(
+                                                  color: theme.textTheme.bodyLarge?.color,
+                                                  fontSize: 13,
+                                                ),
+                                                softWrap: true,
+                                                overflow: TextOverflow.visible,
+                                              ),
+                                            ],
                                           ),
                                         ),
 
                                         const SizedBox(
                                           width: 5,
                                         ),
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: orgAddressController,
-                                            maxLines: null, // Allows multiple lines
-                                            keyboardType: TextInputType.multiline, // Enables multi-line input
-                                            style: TextStyle(
-                                              color: theme.textTheme.bodyLarge?.color,
-                                              fontSize: canEdit ? 14 : 13,
-                                            ),
-                                            enabled: canEdit,
-                                            decoration: InputDecoration(
-                                              prefix: !canEdit
-                                                  ? Padding(
-                                                      padding: const EdgeInsets.only(right: 8.0),
-                                                      child: FaIcon(
-                                                        FontAwesomeIcons.locationDot,
-                                                        color: theme.textTheme.bodyLarge?.color,
-                                                        size: 13,
-                                                      ),
-                                                    )
-                                                  : null,
-                                              filled: true,
-                                              fillColor: theme.scaffoldBackgroundColor,
-                                              border: canEdit
-                                                  ? OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      borderSide: BorderSide(color: Colors.grey.shade400),
-                                                    )
-                                                  : InputBorder.none,
-                                              enabledBorder: canEdit
-                                                  ? OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      borderSide: BorderSide(color: Colors.grey.shade400),
-                                                    )
-                                                  : InputBorder.none,
-                                              focusedBorder: canEdit
-                                                  ? OutlineInputBorder(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      borderSide:
-                                                          BorderSide(color: Colors.grey.shade400, width: 2),
-                                                    )
-                                                  : InputBorder.none,
-                                              disabledBorder: InputBorder.none,
-                                              hintText: 'Enter text',
-                                              contentPadding: const EdgeInsets.symmetric(
-                                                  horizontal: 16.0, vertical: 12.0),
+                                        Flexible(
+                                          child: Expanded(
+                                            child: TextFormField(
+                                              controller: orgAddressController,
+                                              maxLines: null, // Allows multiple lines
+                                              keyboardType:
+                                                  TextInputType.multiline, // Enables multi-line input
+                                              style: TextStyle(
+                                                color: theme.textTheme.bodyLarge?.color,
+                                                fontSize: canEdit ? 14 : 13,
+                                              ),
+                                              enabled: canEdit,
+                                              decoration: InputDecoration(
+                                                prefix: !canEdit
+                                                    ? Padding(
+                                                        padding: const EdgeInsets.only(right: 8.0),
+                                                        child: FaIcon(
+                                                          FontAwesomeIcons.locationDot,
+                                                          color: theme.textTheme.bodyLarge?.color,
+                                                          size: 13,
+                                                        ),
+                                                      )
+                                                    : null,
+                                                filled: true,
+                                                fillColor: theme.scaffoldBackgroundColor,
+                                                border: canEdit
+                                                    ? OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(color: Colors.grey.shade400),
+                                                      )
+                                                    : InputBorder.none,
+                                                enabledBorder: canEdit
+                                                    ? OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(color: Colors.grey.shade400),
+                                                      )
+                                                    : InputBorder.none,
+                                                focusedBorder: canEdit
+                                                    ? OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide:
+                                                            BorderSide(color: Colors.grey.shade400, width: 2),
+                                                      )
+                                                    : InputBorder.none,
+                                                disabledBorder: InputBorder.none,
+                                                hintText: 'Enter address',
+                                                contentPadding: const EdgeInsets.symmetric(
+                                                    horizontal: 16.0, vertical: 12.0),
+                                              ),
                                             ),
                                           ),
                                         ),

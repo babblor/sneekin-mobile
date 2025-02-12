@@ -1052,7 +1052,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   age: _selectedRange!.start.toInt(),
                                                   gender: _gender!);
 
-                                              log("result of updateUser in user_profile_page.dart: ${result}");
+                                              log("result of updateUser in user_profile_page.dart: $result");
 
                                               if (result == true) {
                                                 await app.initializeUserData();

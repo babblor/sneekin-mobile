@@ -253,7 +253,7 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //   const SnackBar(content: Text('Invalid OTP!')),
                   // );
-                  log("code: ${code}");
+                  log("code: $code");
                   showToast(message: "Invalid OTP!", type: ToastificationType.info);
                 }
               },

@@ -18,7 +18,6 @@ import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/services/theme_services.dart';
 import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
-import 'auth/auth_screen.dart';
 import 'services/router_services.dart';
 
 final ThemeData darkTheme = ThemeData(

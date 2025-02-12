@@ -525,7 +525,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                           child: Center(
                             child: widget.orgAccount.logo == null || widget.orgAccount.logo!.isEmpty
                                 ? Text(
-                                    widget.orgAccount.name[0],
+                                    widget.orgAccount.name[0] ?? "N/A",
                                     style: GoogleFonts.inter(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

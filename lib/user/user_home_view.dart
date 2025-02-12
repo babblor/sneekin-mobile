@@ -36,7 +36,7 @@ class _UserHomeViewState extends State<UserHomeView> {
         log("all groups length: ${auth.virtualAccountsResp.groups.length}");
         log("all userVirtualAccounts.length: ${auth.userVirtualAccounts.length}");
         isOpen = List.generate(auth.userVirtualAccounts.length, (index) => false);
-        log("isOpen length: ${isOpen}");
+        log("isOpen length: $isOpen");
       }
       _allUsersVirtualAccounts = auth.userVirtualAccounts;
 

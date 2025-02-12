@@ -1,14 +1,9 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sneekin/org/add_org_app_account.dart';
-import 'package:sneekin/org/create_org_view.dart';
 import 'package:sneekin/org/org_dashboard.dart';
 import 'package:sneekin/org/org_dashboard_view.dart';
 import 'package:sneekin/org/org_home_view.dart';
-import 'package:sneekin/org/show_org_app_account.dart';
-import 'package:sneekin/org/virtual_accounts_of_org_apps_accounts.dart';
 import 'package:sneekin/services/app_store.dart';
 import 'package:sneekin/services/helper_services.dart';
 import 'package:sneekin/user/qr_login_view.dart';
@@ -26,8 +21,8 @@ class NavigationShell extends StatefulWidget {
 
 class NavigationShellState extends State<NavigationShell> {
   int _activeIndex = 0;
-
   bool isQrLoading = true;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -42,10 +37,11 @@ class NavigationShellState extends State<NavigationShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppStore>(
-      builder: (context, app, child) {
+    return Consumer2<AppStore, HelperServices>(
+      builder: (context, app, helper, child) {
         log("initially isSigned in status: ${app.isSignedIn}");
         log("initially isOrgSigned in status: ${app.isOrgSignedIn}");
+
         if (app.isLoading) {
           return Scaffold(
             body: Center(
@@ -55,22 +51,6 @@ class NavigationShellState extends State<NavigationShell> {
             ),
           );
         }
-
-        final List<Widget> pages = app.isSignedIn
-            ? [
-                const UserHomeView(),
-                QrLoginView(isQrLoading: isQrLoading),
-                const UserProfilePage(),
-              ]
-            : [
-                const OrgDashboard(),
-                const OrgHomeView(),
-                const OrgDashboardView(),
-                const AddOrgAppAccountPage(),
-                const CreateOrgView(),
-                const VirtualAccountsOfOrgAppAccount(),
-                ShowOrgAppAccountsPage(),
-              ];
 
         return PopScope(
           canPop: false,
@@ -82,7 +62,6 @@ class NavigationShellState extends State<NavigationShell> {
 
             log("Result: $result");
 
-            // Show a confirmation dialog
             final shouldExit = await showDialog<bool>(
               context: context,
               builder: (BuildContext context) {
@@ -91,11 +70,11 @@ class NavigationShellState extends State<NavigationShell> {
                   content: const Text("Are you sure you want to quit the app?"),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(false), // Do not exit
+                      onPressed: () => Navigator.of(context).pop(false),
                       child: const Text("Cancel"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(true), // Exit the app
+                      onPressed: () => Navigator.of(context).pop(true),
                       child: const Text("Yes"),
                     ),
                   ],
@@ -106,9 +85,17 @@ class NavigationShellState extends State<NavigationShell> {
           child: Scaffold(
             key: context.read<HelperServices>().globalScaffoldKey,
             drawer: const CustomDrawerWidget(),
-            body: IndexedStack(
-              index: _activeIndex,
-              children: pages,
+            body: Navigator(
+              key: _navigatorKey,
+              pages: [
+                MaterialPage(child: _getPage(_activeIndex, app.isSignedIn)),
+              ],
+              onPopPage: (route, result) {
+                if (!route.didPop(result)) {
+                  return false;
+                }
+                return true;
+              },
             ),
             bottomNavigationBar: CustomNavigationBar(
               currentIndex: _activeIndex,
@@ -116,7 +103,9 @@ class NavigationShellState extends State<NavigationShell> {
               onTap: (index) {
                 if (index != _activeIndex) {
                   setState(() {
+                    // helper.changeScreen(index);
                     _activeIndex = index;
+                    log("User tapped tab: $index");
                   });
                 } else {
                   log("User tapped the current tab: $index");
@@ -127,5 +116,41 @@ class NavigationShellState extends State<NavigationShell> {
         );
       },
     );
+  }
+
+  Widget _getPage(int index, bool isUser) {
+    if (isUser) {
+      switch (index) {
+        case 0:
+          return const UserHomeView();
+        case 1:
+          return QrLoginView(isQrLoading: isQrLoading);
+        case 2:
+          return const UserProfilePage();
+        default:
+          return const UserHomeView();
+      }
+    } else {
+      switch (index) {
+        case 0:
+          return const OrgDashboard();
+        case 1:
+          return const OrgHomeView();
+        case 2:
+          return const OrgDashboardView();
+        // case 3:
+        //   return const AddOrgAppAccountPage();
+        // case 4:
+        //   return OrgAppAccountProfile(
+        //     orgAccount: OrgAppAccount(clientId: "", id: 0, name: ""),
+        //   );
+        // case 5:
+        //   return const VirtualAccountsOfOrgAppAccount();
+        // case 6:
+        //   return ShowOrgAppAccountsPage();
+        default:
+          return const OrgDashboard();
+      }
+    }
   }
 }

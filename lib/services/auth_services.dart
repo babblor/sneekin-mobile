@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
@@ -70,6 +71,24 @@ class AuthServices with ChangeNotifier {
         connectTimeout: const Duration(seconds: 200),
       ),
     );
+  }
+
+  void logFormData(FormData formData) async {
+    StringBuffer postmanFormat = StringBuffer();
+
+    postmanFormat.writeln('FormData: {');
+
+    for (var field in formData.fields) {
+      postmanFormat.writeln('  "${field.key}": ${field.value},');
+    }
+
+    for (var file in formData.files) {
+      postmanFormat.writeln('  "${file.key}": File("${file.value.filename}"),');
+    }
+
+    postmanFormat.writeln('}');
+
+    log(postmanFormat.toString());
   }
 
   // Send OTP Function
@@ -245,7 +264,7 @@ class AuthServices with ChangeNotifier {
   // Verify OTP Function
 
   verifyOTP({required String phone, required String otp}) async {
-    log("executing verifyOTP function in authServices with _isLoading value: $_isLoading phone: ${phone} otp: ${otp}");
+    log("executing verifyOTP function in authServices with _isLoading value: $_isLoading phone: $phone otp: $otp");
     if (_isLoading) {
       return;
     }
@@ -795,7 +814,7 @@ class AuthServices with ChangeNotifier {
 
       // Convert the grouped map into a list of groups for mergedResponse
       List<UserVirtualAccount.Group> mergedGroups = []; // Using Group class
-      log("mergedGroups after calling getUserVirtualAccounts: " + mergedGroups.toString());
+      log("mergedGroups after calling getUserVirtualAccounts: $mergedGroups");
       groupedVirtualAccounts.forEach((mobileId, virtualAccounts) {
         mergedGroups.add(UserVirtualAccount.Group(
           mobileId: mobileId,
@@ -981,6 +1000,9 @@ class AuthServices with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
+      // Set the Authorization header
+      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
       // Convert file to MultipartFile
       String fileName = file.path.split('/').last;
       MultipartFile multipartFile = await MultipartFile.fromFile(
@@ -988,19 +1010,19 @@ class AuthServices with ChangeNotifier {
         filename: fileName,
       );
 
-      // Prepare the request payload
+// Prepare the request payload
       FormData formData = FormData.fromMap({
         "file": multipartFile,
-        "taxProfileUser": {
+        "taxProfileUser": jsonEncode({
           "panNumber": pan_number,
           "name": name,
           "address": address,
           "gender": gender,
-        },
+        }),
       });
 
-      // Set the Authorization header
-      _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+      // Log the formData for debugging
+      log("Request Payload: ${formData.fields}");
 
       // Make the POST request
       final Response resp = await _dio!.post(
@@ -1050,90 +1072,188 @@ class AuthServices with ChangeNotifier {
     }
   }
 
-  updateUserTaxProfile(
-      {required String pan_number,
-      required String name,
-      required String address,
-      required String gender,
-      required File file}) async {
-    if (_isLoading) {
-      return;
+  Future<bool> updateUserTaxProfile({
+    required String pan_number,
+    required String name,
+    required String address,
+    required String gender,
+    required File file,
+  }) async {
+    if (_isLoading) return false;
+
+    // Check if the file exists and is valid
+    if (!file.existsSync()) {
+      log("Error: File does not exist - ${file.path}");
+      showToast(
+        message: "Invalid file. Please upload a valid file.",
+        type: ToastificationType.error,
+      );
+      return false;
     }
 
     try {
-      log("Calling updateUserTaxProfile with pan_number: $pan_number, name: $name, gender: $gender, address: $address");
+      log("Calling updateUserTaxProfile with file: ${file.path}");
 
       _isLoading = true;
       notifyListeners();
 
-      bool? newPanUrl;
-
-      // Prepare the request payload
-      Map<String, dynamic> data = {};
-
-      if (name != "") data["name"] = name;
-      if (pan_number != "") data["panNumber"] = pan_number;
-      if (address != "") data["address"] = address;
-      if (gender != "") data["gender"] = gender;
-
-      if (file.path != "") {
-        newPanUrl = await uploadFile(file: file, uploadFileType: "pan");
-      }
-
-      if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
-
-      log("final body for tax-profile PUT: $data");
-
-      // Set the Authorization header
+      // Set Authorization header
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+      log("Authorization Header: Bearer ${appStore.app?.accessToken}");
 
-      // Make the POST request
-      final resp = await _dio!.put(
-        "/users/tax-profile",
-        data: data,
-        options: Options(
-          contentType: Headers.jsonContentType,
-        ),
+      // Convert file to MultipartFile
+      String fileName = file.path.split('/').last;
+      MultipartFile multipartFile = await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
       );
 
-      log("Response data in updateUserTaxProfile: ${resp.data}");
+// Prepare tax profile data, only adding non-empty fields
+      Map<String, dynamic> taxProfileUser = {};
 
-      // Handle the response
-      if (resp.statusCode == 200 && resp.data != null) {
-        log("User created successfully: ${resp.data}");
+      if (pan_number.isNotEmpty) taxProfileUser["panNumber"] = pan_number;
+      if (name.isNotEmpty) taxProfileUser["name"] = name;
+      if (address.isNotEmpty) taxProfileUser["address"] = address;
+      if (gender.isNotEmpty) taxProfileUser["gender"] = gender;
+
+      FormData formData = FormData.fromMap({
+        "file": multipartFile,
+        "taxProfileUser": jsonEncode(taxProfileUser),
+      });
+
+      log("Request Payload: ${formData.fields}");
+      log("taxProfileUser: ${jsonEncode(taxProfileUser)}");
+      log("Headers: ${_dio!.options.headers}");
+
+      // Send the PUT request
+      final Response resp = await _dio!.put(
+        "/users/tax-profile",
+        data: formData,
+        options: Options(contentType: Headers.multipartFormDataContentType),
+      );
+
+      log("Response data: ${resp.data}");
+
+      // Handle response
+      if (resp.statusCode == 200) {
+        log("User tax profile updated successfully: ${resp.data}");
 
         _isLoading = false;
         notifyListeners();
+
         // showToast(
         //   message: "Tax profile has been updated successfully.",
         //   type: ToastificationType.success,
         // );
+
         return true;
       } else {
-        _isLoading = false;
-        notifyListeners();
-        String errorMessage = resp.data["message"] ?? "Something went wrong. Please try again.";
-        showToast(message: errorMessage, type: ToastificationType.error);
-        log("Failed to updateUserTaxProfile: $errorMessage");
+        log("Failed to update tax profile: ${resp.data}");
+        showToast(
+          message: resp.data["message"] ?? "Something went wrong. Please try again.",
+          type: ToastificationType.error,
+        );
+
         return false;
       }
     } on DioException catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      showToast(
-        message: e.response?.data["message"] ?? "Network Error! Please try again later.",
-        type: ToastificationType.error,
-      );
-      log("DioException updateUserTaxProfile: ${e.response?.data ?? e.toString()}");
+      log("DioException: ${e.message}");
+      showToast(message: "Network Error! Please try again later.", type: ToastificationType.error);
       return false;
     } catch (e) {
+      log("Unexpected Error: $e");
+      showToast(message: "An unexpected error occurred.", type: ToastificationType.error);
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      showToast(message: "An unexpected error occurred.", type: ToastificationType.error);
-      log("Error updateUserTaxProfile: $e");
-      return false;
     }
   }
+
+  // updateUserTaxProfile(
+  //     {required String pan_number,
+  //     required String name,
+  //     required String address,
+  //     required String gender,
+  //     required File file}) async {
+  //   if (_isLoading) {
+  //     return;
+  //   }
+
+  //   try {
+  //     log("Calling updateUserTaxProfile with pan_number: $pan_number, name: $name, gender: $gender, address: $address");
+
+  //     _isLoading = true;
+  //     notifyListeners();
+
+  //     bool? newPanUrl;
+
+  //     // Prepare the request payload
+  //     Map<String, dynamic> data = {};
+
+  //     if (name != "") data["name"] = name;
+  //     if (pan_number != "") data["panNumber"] = pan_number;
+  //     if (address != "") data["address"] = address;
+  //     if (gender != "") data["gender"] = gender;
+
+  //     if (file.path != "") {
+  //       newPanUrl = await uploadFile(file: file, uploadFileType: "pan");
+  //     }
+
+  //     if (newPanUrl != null && newPanUrl != "") data["panUrl"] = newPanUrl;
+
+  //     log("final body for tax-profile PUT: $data");
+
+  //     // Set the Authorization header
+  //     _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
+
+  //     // Make the POST request
+  //     final resp = await _dio!.put(
+  //       "/users/tax-profile",
+  //       data: data,
+  //       options: Options(
+  //         contentType: Headers.jsonContentType,
+  //       ),
+  //     );
+
+  //     log("Response data in updateUserTaxProfile: ${resp.data}");
+
+  //     // Handle the response
+  //     if (resp.statusCode == 200 && resp.data != null) {
+  //       log("User created successfully: ${resp.data}");
+
+  //       _isLoading = false;
+  //       notifyListeners();
+  //       // showToast(
+  //       //   message: "Tax profile has been updated successfully.",
+  //       //   type: ToastificationType.success,
+  //       // );
+  //       return true;
+  //     } else {
+  //       _isLoading = false;
+  //       notifyListeners();
+  //       String errorMessage = resp.data["message"] ?? "Something went wrong. Please try again.";
+  //       showToast(message: errorMessage, type: ToastificationType.error);
+  //       log("Failed to updateUserTaxProfile: $errorMessage");
+  //       return false;
+  //     }
+  //   } on DioException catch (e) {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //     showToast(
+  //       message: e.response?.data["message"] ?? "Network Error! Please try again later.",
+  //       type: ToastificationType.error,
+  //     );
+  //     log("DioException updateUserTaxProfile: ${e.response?.data ?? e.toString()}");
+  //     return false;
+  //   } catch (e) {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //     showToast(message: "An unexpected error occurred.", type: ToastificationType.error);
+  //     log("Error updateUserTaxProfile: $e");
+  //     return false;
+  //   }
+  // }
 
   // update organization api
 
@@ -1624,7 +1744,7 @@ class AuthServices with ChangeNotifier {
 
   Future<bool> uploadOrgAppAccountLogo({required File file, required int orgappid}) async {
     try {
-      log("Getting orgappid: ${orgappid} for uploading org-app-logo");
+      log("Getting orgappid: $orgappid for uploading org-app-logo");
       // Ensure dio is initialized
       if (dio == null) {
         log("Dio instance is null");
@@ -1639,7 +1759,7 @@ class AuthServices with ChangeNotifier {
         "file": await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
       });
 
-      final String endpoint = "/org-app-accounts/upload/${orgappid}";
+      final String endpoint = "/org-app-accounts/upload/$orgappid";
 
       final response = await dio!.post(
         endpoint,
