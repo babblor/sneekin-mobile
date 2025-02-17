@@ -118,56 +118,58 @@ class _UserHomeViewState extends State<UserHomeView> {
                     alignment: Alignment.center,
                     child: auth.virtualAccountsResp.groups.isEmpty
                         ? null
-                        : Wrap(
-                            spacing: 20, // Adjust horizontal spacing
-                            alignment: WrapAlignment.center, // Center the children
-                            children: auth.virtualAccountsResp.groups
-                                // .take(3) // Limit to 3 items
-                                .map((account) => GestureDetector(
-                                      onTap: () {
-                                        log("Account tapped: ${account.mobileId}");
-                                        setState(() {
-                                          // _horizentalAccount = account;
-                                          // _isHorizentalAccountShow = !_isHorizentalAccountShow;
-                                          _filteredAccounts = account.userVirtualAccounts;
-                                        });
-                                      },
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                bottom: 5), // Adjust vertical spacing if needed
-                                            width: 60,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: theme.textTheme.headlineLarge?.color,
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                account.mobileId.toString()[0],
-                                                style: GoogleFonts.inter(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: auth.virtualAccountsResp.groups
+                                  .map((account) => Padding(
+                                        padding: const EdgeInsets.only(right: 20), // Add horizontal spacing
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            log("Account tapped: ${account.mobileId}");
+                                            setState(() {
+                                              _filteredAccounts = account.userVirtualAccounts;
+                                            });
+                                          },
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 5), // Adjust vertical spacing if needed
+                                                width: 60,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: theme.textTheme.headlineLarge?.color,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    account.mobileId.toString()[0],
+                                                    style: GoogleFonts.inter(
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                              Text(
+                                                "+91${account.mobileId.toString()}",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis, // Ensure proper truncation
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            account.mobileId.toString(),
-                                            style: GoogleFonts.inter(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            overflow: TextOverflow.ellipsis, // Ensure proper truncation
-                                          ),
-                                        ],
-                                      ),
-                                    ))
-                                .toList(),
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
                           ),
                   ),
                 ),
@@ -670,7 +672,9 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                             ),
                                                             Flexible(
                                                               child: Text(
-                                                                "${account.paymentDueStatus}",
+                                                                account.paymentDueStatus == true
+                                                                    ? "Done"
+                                                                    : "Pending",
                                                                 style: GoogleFonts.inter(
                                                                   fontSize: 14,
                                                                   color: Theme.of(context)

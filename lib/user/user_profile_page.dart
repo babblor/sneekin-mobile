@@ -268,6 +268,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             color: Colors.white,
                           ),
                         ),
+                        Radio<String>(
+                          value: 'O',
+                          groupValue: taxGender,
+                          activeColor: const Color(0xFFFF6500),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              log("new gender value: $newValue");
+                              taxGender = newValue!;
+                            });
+                          },
+                        ),
+                        Text(
+                          'O',
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(
@@ -487,7 +504,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             onChanged: (String? newValue) {
                               setState(() {
                                 log("new gender value: $newValue");
-                                taxUpdateGender = newValue!;
+                                taxGender = newValue!;
                               });
                             },
                           ),
@@ -510,6 +527,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                           Text(
                             'F',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                            ),
+                          ),
+                          Radio<String>(
+                            value: 'O',
+                            groupValue: taxGender,
+                            activeColor: const Color(0xFFFF6500),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                log("new gender value: $newValue");
+                                taxGender = newValue!;
+                              });
+                            },
+                          ),
+                          Text(
+                            'O',
                             style: GoogleFonts.inter(
                               color: Colors.white,
                             ),
@@ -567,7 +601,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               log("panUpdateAddressController.text: ${panUpdateAddressController.text}");
                               log("panUpdateNameController.text: ${panUpdateNameController.text}");
                               log("panUpdatePanController.text: ${panUpdatePanController.text}");
-                              log("taxUpdateGender: $taxUpdateGender");
+                              log("taxUpdateGender: $taxGender");
                               if (_updatedPanFile == null || _updatedPanFile!.path.isEmpty) {
                                 showToast(
                                     message: "Please upload pan file", type: ToastificationType.warning);
@@ -576,7 +610,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               if (panUpdateAddressController.text.isEmpty &&
                                   panUpdateNameController.text.isEmpty &&
                                   panUpdatePanController.text.isEmpty &&
-                                  taxUpdateGender == null) {
+                                  taxGender == null) {
                                 showToast(message: "Nothing to update!", type: ToastificationType.error);
                                 return;
                               }
@@ -585,7 +619,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   pan_number: panUpdatePanController.text ?? "",
                                   name: panUpdateNameController.text ?? "",
                                   address: panUpdateAddressController.text ?? "",
-                                  gender: taxUpdateGender ?? "");
+                                  gender: taxGender ?? "");
                               if (result == true) {
                                 await auth.getUserTaxProfile();
                                 Navigator.pop(context);
@@ -694,34 +728,47 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 //   height: 25,
                                 // ),
                                 Center(
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 60,
-                                        child: ClipOval(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: app.user?.profileImageUrl?.isEmpty == true
-                                                  ? null
-                                                  : theme.textTheme.headlineLarge?.color,
-                                            ),
-                                            child: Center(
-                                              child: app.user?.profileImageUrl?.isNotEmpty == true
-                                                  ? CachedNetworkImage(
-                                                      imageUrl: app.user!.profileImageUrl!,
-                                                      fit: BoxFit.cover,
-                                                      placeholder: (context, url) => const Center(
-                                                        child: SizedBox(
-                                                          height: 15,
-                                                          width: 15,
-                                                          child: CircularProgressIndicator(
-                                                            color: Colors.white,
-                                                            strokeWidth: 2,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Color(0xFFFF6500), width: 3),
+                                        shape: BoxShape.circle),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 60,
+                                          child: ClipOval(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: app.user?.profileImageUrl?.isEmpty == true
+                                                    ? null
+                                                    : theme.textTheme.headlineLarge?.color,
+                                              ),
+                                              child: Center(
+                                                child: app.user?.profileImageUrl?.isNotEmpty == true
+                                                    ? CachedNetworkImage(
+                                                        imageUrl: app.user!.profileImageUrl!,
+                                                        fit: BoxFit.cover,
+                                                        placeholder: (context, url) => const Center(
+                                                          child: SizedBox(
+                                                            height: 15,
+                                                            width: 15,
+                                                            child: CircularProgressIndicator(
+                                                              color: Colors.white,
+                                                              strokeWidth: 2,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      errorWidget: (context, url, error) => Text(
+                                                        errorWidget: (context, url, error) => Text(
+                                                          app.user?.name[0] ?? "N/A",
+                                                          style: GoogleFonts.inter(
+                                                            fontSize: 24,
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Text(
                                                         app.user?.name[0] ?? "N/A",
                                                         style: GoogleFonts.inter(
                                                           fontSize: 24,
@@ -729,65 +776,61 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                           fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
-                                                    )
-                                                  : Text(
-                                                      app.user?.name[0] ?? "N/A",
-                                                      style: GoogleFonts.inter(
-                                                        fontSize: 24,
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      if (canEdit)
-                                        Positioned(
-                                          bottom: 2,
-                                          right: -3,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              log("Edit button tapped!");
-                                              _pickImage(setState);
-                                            },
-                                            child: Container(
-                                              width: 28,
-                                              height: 28,
-                                              decoration: BoxDecoration(
-                                                color: hasImagePicked
-                                                    ? Colors.green
-                                                    : theme.textTheme.headlineLarge?.color,
-                                                shape: BoxShape.circle,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 5,
-                                                    offset: const Offset(0, 3),
+                                        if (canEdit)
+                                          Positioned(
+                                            bottom: 2,
+                                            right: -3,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                log("Edit button tapped!");
+                                                _pickImage(setState);
+                                              },
+                                              child: Container(
+                                                width: 28,
+                                                height: 28,
+                                                decoration: BoxDecoration(
+                                                  color: hasImagePicked
+                                                      ? Colors.green
+                                                      : theme.textTheme.headlineLarge?.color,
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(0.1),
+                                                      blurRadius: 5,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: const Center(
+                                                  child: FaIcon(
+                                                    FontAwesomeIcons.penToSquare,
+                                                    color: Colors.white,
+                                                    size: 15,
                                                   ),
-                                                ],
-                                              ),
-                                              child: const Center(
-                                                child: FaIcon(
-                                                  FontAwesomeIcons.penToSquare,
-                                                  color: Colors.white,
-                                                  size: 15,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
 
-                                // SizedBox(
-                                //   height: 15,
-                                // ),
+                                SizedBox(
+                                  height: 25,
+                                ),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  // crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
+                                    Text(
+                                      "Personal Information",
+                                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
                                     GestureDetector(
                                       onTap: () {
                                         setState(() {
@@ -797,7 +840,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                       child: FaIcon(
                                         canEdit ? FontAwesomeIcons.xmark : FontAwesomeIcons.penToSquare,
                                         color: theme.textTheme.headlineLarge?.color,
-                                        size: 25,
+                                        size: 20,
                                       ),
                                     ),
                                   ],
@@ -908,15 +951,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                         : 12, // Smaller font size when canEdit is false
                                                     color: theme.textTheme.bodyLarge?.color,
                                                   )),
-                                              const SizedBox(
-                                                width: 15,
-                                              ),
-                                              app.user!.isEmailVerified
-                                                  ? FaIcon(
-                                                      FontAwesomeIcons.circleCheck,
-                                                      size: canEdit ? 15 : 13,
-                                                      color: Colors.green,
-                                                    )
+                                              if (!canEdit)
+                                                const SizedBox(
+                                                  width: 15,
+                                                ),
+                                              !canEdit
+                                                  ? app.user!.isEmailVerified
+                                                      ? FaIcon(
+                                                          FontAwesomeIcons.circleCheck,
+                                                          size: canEdit ? 15 : 13,
+                                                          color: Colors.green,
+                                                        )
+                                                      : const SizedBox.shrink()
                                                   : const SizedBox.shrink(),
 
                                               // app.user!.isEmailVerified
@@ -1006,6 +1052,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       style: GoogleFonts.inter(
                                                         color: theme.textTheme.bodyLarge?.color,
                                                       ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Radio<String>(
+                                                      value: 'O',
+                                                      groupValue: _gender,
+                                                      activeColor: const Color(0xFFFF6500),
+                                                      onChanged: (String? newValue) {
+                                                        setState(() {
+                                                          log("new gender value: $newValue");
+                                                          _gender = newValue!;
+                                                        });
+                                                      },
+                                                    ),
+                                                    Text(
+                                                      'O',
+                                                      style: GoogleFonts.inter(
+                                                          color: theme.textTheme.bodyLarge?.color),
                                                     ),
                                                   ],
                                                 ),
@@ -1701,10 +1766,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             color: theme.textTheme.bodyLarge?.color,
           ),
         ),
-        if (!canEdit)
-          const SizedBox(
-            width: 15,
-          ),
+        if (!canEdit) const SizedBox(width: 15),
         if (canEdit) const SizedBox(width: 20), // Space between label and numbers
         // Right-aligned horizontal scrollable numbers
         Expanded(
@@ -1712,42 +1774,38 @@ class _UserProfilePageState extends State<UserProfilePage> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: app.user?.mobileNumbers.map((mobile) {
-                    return GestureDetector(
-                      onTap: canEdit
-                          ? () {
-                              setState(() {
-                                _phone = mobile.mobileNumber;
-                              });
-                            }
-                          : null, // Disable tap when canEdit is false
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        margin: const EdgeInsets.only(right: 8), // Space between chips
-                        decoration: BoxDecoration(
-                          // color: mobile.mobileNumber == _phone
-                          //     ? theme.textTheme.headlineLarge?.color
-                          //     : theme.secondaryHeaderColor,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: mobile.mobileNumber == _phone
-                                ? const Color(0xFFFF6500)
-                                : theme.secondaryHeaderColor,
+                    return Row(
+                      children: [
+                        GestureDetector(
+                          onTap: canEdit
+                              ? () {
+                                  setState(() {
+                                    _phone = mobile.mobileNumber;
+                                  });
+                                }
+                              : null, // Disable tap when canEdit is false
+                          child: Text(
+                            mobile.mobileNumber,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: theme.textTheme.bodyLarge?.color,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          mobile.mobileNumber,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: mobile.mobileNumber == _phone
-                                ? theme.textTheme.headlineLarge?.color
-                                : theme.textTheme.bodyLarge?.color,
-                            fontWeight: FontWeight.w500,
+                        if (app.user!.mobileNumbers.last != mobile)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              "|",
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: theme.textTheme.bodyLarge?.color,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                      ],
                     );
                   }).toList() ??
                   [],

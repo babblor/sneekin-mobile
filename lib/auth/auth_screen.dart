@@ -801,6 +801,8 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             _buildRadioButton('M', 'M'),
             const SizedBox(width: 10),
             _buildRadioButton('F', 'F'),
+            const SizedBox(width: 10),
+            _buildRadioButton('O', 'O'),
           ],
         ),
       ],

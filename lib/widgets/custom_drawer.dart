@@ -32,10 +32,17 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
 
   String address = "N/A";
 
+  String pan = "N/A";
+  String cin = "N/A";
+  String gstin = "N/A";
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _orgPanController = TextEditingController();
+  final TextEditingController _orgCinController = TextEditingController();
+  final TextEditingController _orgGstInController = TextEditingController();
 
   RangeValues? _selectedRange; // Initial range with 5-diff
   final double _fixedDifference = 5;
@@ -107,6 +114,9 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
 
             if (app.isOrgSignedIn) {
               address = (app.org?.address?.isNotEmpty == true ? app.org!.address! : "______");
+              pan = (app.org?.pan?.isNotEmpty == true ? app.org!.pan! : "______");
+              cin = (app.org?.cin?.isNotEmpty == true ? app.org!.cin! : "______");
+              gstin = (app.org?.gstin?.isNotEmpty == true ? app.org!.gstin! : "______");
             }
 
             if (app.isSignedIn) {
@@ -153,155 +163,163 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Center(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        radius: 65,
-                        backgroundColor: theme.secondaryHeaderColor,
-                        child: app.isSignedIn
-                            ? (app.user?.profileImageUrl?.isNotEmpty == true
-                                ? ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: app.user!.profileImageUrl!,
-                                      fit: BoxFit.contain,
-                                      // width: 110,
-                                      // height: 110,
-                                      placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator(
-                                          color: theme.textTheme.headlineLarge?.color,
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => Center(
-                                        child: Text(
-                                          app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 35,
-                                            color: theme.textTheme.headlineLarge?.color,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: Text(
-                                      app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 35,
-                                        color: theme.textTheme.headlineLarge?.color,
-                                      ),
-                                    ),
-                                  ))
-                            : (app.org?.logo?.isNotEmpty == true
-                                ? ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: app.org!.logo!,
-                                      fit: BoxFit.contain,
-                                      // width: 110,
-                                      // height: 110,
-                                      placeholder: (context, url) => Center(
-                                        child: SizedBox(
-                                          height: 15,
-                                          width: 15,
-                                          child: Center(
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xFFFF6500), width: 3), shape: BoxShape.circle),
+                  child: Center(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+                          radius: 65,
+                          backgroundColor: theme.textTheme.headlineLarge?.color,
+                          child: app.isSignedIn
+                              ? (app.user?.profileImageUrl?.isNotEmpty == true
+                                  ? ClipOval(
+                                      child: SizedBox(
+                                        width: 130, // 2 * radius
+                                        height: 130,
+                                        child: CachedNetworkImage(
+                                          imageUrl: app.user!.profileImageUrl!,
+                                          fit: BoxFit.cover, // Ensures full stretch inside the circle
+                                          placeholder: (context, url) => Center(
                                             child: CircularProgressIndicator(
                                               color: theme.textTheme.headlineLarge?.color,
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => Center(
-                                        child: Text(
-                                          app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 35,
-                                            color: theme.textTheme.headlineLarge?.color,
+                                          errorWidget: (context, url, error) => Center(
+                                            child: Text(
+                                              app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
+                                              style: GoogleFonts.inter(
+                                                fontSize: 35,
+                                                color: theme.textTheme.bodyLarge?.color,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: Text(
-                                      app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
-                                      style: GoogleFonts.inter(
-                                        fontSize: 35,
-                                        color: theme.textTheme.headlineLarge?.color,
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 35,
+                                          color: Colors.white,
+                                        ),
                                       ),
+                                    ))
+                              : (app.org?.logo?.isNotEmpty == true
+                                  ? ClipOval(
+                                      child: SizedBox(
+                                        width: 130,
+                                        height: 130,
+                                        child: CachedNetworkImage(
+                                          imageUrl: app.org!.logo!,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) => Center(
+                                            child: SizedBox(
+                                              height: 15,
+                                              width: 15,
+                                              child: Center(
+                                                child: CircularProgressIndicator(
+                                                  color: theme.textTheme.headlineLarge?.color,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) => Center(
+                                            child: Text(
+                                              app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
+                                              style: GoogleFonts.inter(
+                                                fontSize: 35,
+                                                color: theme.textTheme.headlineLarge?.color,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 35,
+                                          color: theme.textTheme.headlineLarge?.color,
+                                        ),
+                                      ),
+                                    )),
+                        ),
+                        if (canEdit)
+                          Positioned(
+                            bottom: 5,
+                            right: -2,
+                            child: StatefulBuilder(
+                                builder: (BuildContext context, void Function(void Function()) setState) {
+                              return GestureDetector(
+                                onTap: () {
+                                  // Handle edit action here
+                                  log("Edit button tapped!");
+                                  if (app.isSignedIn) _pickUserImage(setState);
+                                  if (app.isOrgSignedIn) _pickOrgImage(setState);
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: theme.textTheme.headlineLarge?.color,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: FaIcon(
+                                      FontAwesomeIcons.penToSquare,
+                                      color: userImagePicked || orgImagePicked ? Colors.green : Colors.white,
+                                      size: 20,
                                     ),
-                                  )),
-                      ),
-                      if (canEdit)
-                        Positioned(
-                          bottom: 5,
-                          right: -2,
-                          child: StatefulBuilder(
-                              builder: (BuildContext context, void Function(void Function()) setState) {
-                            return GestureDetector(
-                              onTap: () {
-                                // Handle edit action here
-                                log("Edit button tapped!");
-                                if (app.isSignedIn) _pickUserImage(setState);
-                                if (app.isOrgSignedIn) _pickOrgImage(setState);
-                              },
-                              child: Container(
-                                width: 30,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  color: theme.textTheme.headlineLarge?.color,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: FaIcon(
-                                    FontAwesomeIcons.penToSquare,
-                                    color: userImagePicked || orgImagePicked ? Colors.green : Colors.white,
-                                    size: 20,
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
-                        ),
-                    ],
+                              );
+                            }),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
 
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        log("canEdit: $canEdit");
-                        setState(() {
-                          canEdit = !canEdit;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: FaIcon(
-                          canEdit ? FontAwesomeIcons.xmark : FontAwesomeIcons.penToSquare,
-                          color: theme.textTheme.headlineLarge?.color,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
+                // Row(
+                //   crossAxisAlignment: CrossAxisAlignment.end,
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     InkWell(
+                //       onTap: () {
+                //         log("canEdit: $canEdit");
+                //         setState(() {
+                //           canEdit = !canEdit;
+                //         });
+                //       },
+                //       child: Padding(
+                //         padding: const EdgeInsets.all(10.0),
+                //         child: FaIcon(
+                //           canEdit ? FontAwesomeIcons.xmark : FontAwesomeIcons.penToSquare,
+                //           color: theme.textTheme.headlineLarge?.color,
+                //           size: 20,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -337,7 +355,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                             app.isSignedIn
                                 ? app.user?.mobileNumbers.first.mobileNumber.toString() ?? "N/A"
                                 : app.org?.mobileNumbers.first.mobileNumber.toString() ?? "N/A",
-                            style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12),
+                            style: GoogleFonts.inter(fontSize: canEdit ? 14 : 13),
                           ),
                         ],
                       ),
@@ -359,7 +377,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     ? "${app.org!.email?.substring(0, 20)}..."
                                     : app.org?.email.toString() ?? "N/A"),
                             style: GoogleFonts.inter(
-                              fontSize: canEdit ? 14 : 12,
+                              fontSize: canEdit ? 14 : 13,
                             ),
                           ),
                         ],
@@ -377,6 +395,20 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                               return _buildIconField(
                                   Icons.place, address, _addressController, theme, false, data);
                             }),
+
+                      if (app.isOrgSignedIn)
+                        Consumer<DataServices>(builder: (context, data, _) {
+                          return _buildIconField(Icons.badge, pan, _orgPanController, theme, false, data);
+                        }),
+                      if (app.isOrgSignedIn)
+                        Consumer<DataServices>(builder: (context, data, _) {
+                          return _buildIconField(Icons.apartment, cin, _orgCinController, theme, false, data);
+                        }),
+                      if (app.isOrgSignedIn)
+                        Consumer<DataServices>(builder: (context, data, _) {
+                          return _buildIconField(
+                              Icons.business, gstin, _orgGstInController, theme, false, data);
+                        }),
                       if (canEdit)
                         const SizedBox(
                           height: 30,
@@ -860,7 +892,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
           children: [
             FaIcon(
               label,
-              size: canEdit ? 20 : 16,
+              size: canEdit ? 20 : 13,
               color: theme.textTheme.bodyLarge?.color,
             ),
           ],
@@ -881,7 +913,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
             controller: controller,
             style: GoogleFonts.inter(
               color: theme.textTheme.bodyLarge?.color,
-              fontSize: canEdit ? 15 : 14, // Smaller font size when canEdit is false
+              fontSize: canEdit ? 15 : 13, // Smaller font size when canEdit is false
             ),
             onChanged: (value) {
               data.changeAddress(value);
@@ -893,12 +925,12 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                           ? const FaIcon(
                               FontAwesomeIcons.circleCheck,
                               color: Colors.green,
-                              size: 17,
+                              size: 15,
                             )
                           : const FaIcon(
                               FontAwesomeIcons.xmark,
                               color: Colors.red,
-                              size: 17,
+                              size: 15,
                             )
                       : null
                   : null,
@@ -908,7 +940,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
               hintStyle: GoogleFonts.inter(
                 color: theme.textTheme.bodyLarge?.color,
                 fontWeight: FontWeight.bold,
-                fontSize: canEdit ? 16 : 16, // Consistent font size
+                fontSize: canEdit ? 16 : 13, // Consistent font size
               ),
               border: canEdit
                   ? OutlineInputBorder(
