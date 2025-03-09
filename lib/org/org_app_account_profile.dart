@@ -408,7 +408,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                         _buildTableCell('Name', isHeader: true),
                                         _buildTableCell('Mobile ID', isHeader: true),
                                         _buildTableCell('Org App ID', isHeader: true),
-                                        _buildTableCell('Org App Name', isHeader: true),
+                                        _buildTableCell('Client Website', isHeader: true),
                                         _buildTableCell('Username', isHeader: true),
                                         _buildTableCell('Created App', isHeader: true),
                                         _buildTableCell('Last Login App', isHeader: true),
@@ -435,7 +435,7 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                                           _buildTableCell(
                                               (user.mobileID.toString() ?? 0.toString())), // Handle nulls
                                           _buildTableCell(user.orgAppId.toString()),
-                                          _buildTableCell(user.orgAppName ?? "___"),
+                                          _buildTableCell(user.client_website ?? "___"),
                                           _buildTableCell(user.username),
                                           _buildTableCell(user.createdApp ?? "___"),
                                           _buildTableCell(user.lastLoginApp ?? "___"),
@@ -522,24 +522,24 @@ class _OrgAppAccountProfileState extends State<OrgAppAccountProfile> {
                             color: theme.textTheme.headlineLarge?.color,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
                             child: widget.orgAccount.logo == null || widget.orgAccount.logo!.isEmpty
-                                ? Text(
-                                    widget.orgAccount.name[0] ?? "N/A",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: theme.textTheme.bodyLarge?.color,
+                                ? Center(
+                                    child: Text(
+                                      widget.orgAccount.name[0] ?? "N/A",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.textTheme.bodyLarge?.color,
+                                      ),
                                     ),
                                   )
-                                : ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      widget.orgAccount.logo!,
-                                      width: 105,
-                                      height: 60,
-                                      fit: BoxFit.cover,
-                                    ),
+                                : Image.network(
+                                    widget.orgAccount.logo!,
+                                    width: 105,
+                                    height: 70,
+                                    fit: BoxFit.cover, // Ensures image fills the container
                                   ),
                           ),
                         )

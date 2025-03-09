@@ -61,7 +61,7 @@ class UserNotch extends StatelessWidget {
                             //   width: 15,
                             // ),
                             Text(
-                              account.orgAppName ?? "N/A",
+                              account.client_website ?? "N/A",
                               style: GoogleFonts.inter(
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,

@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/widgets/custom_app_bar.dart';
@@ -79,6 +81,12 @@ class _UserHomeViewState extends State<UserHomeView> {
   }
 
   final bool _isHorizentalAccountShow = false;
+
+// Function to safely format the date
+  String formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return "N/A"; // Handle null case
+    return DateFormat("M/d/yy, h:mm a").format(dateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -402,9 +410,9 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                     children: [
                                                       const Text("   "),
                                                       Text(
-                                                        (account.username ?? "").length > 10
-                                                            ? '${account.username.substring(0, 10)}...'
-                                                            : account.username ?? "",
+                                                        (account.client_website ?? "").length > 10
+                                                            ? '${account.client_website?.substring(0, 10)}...'
+                                                            : account.client_website ?? "",
                                                         style: GoogleFonts.inter(
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.bold,
@@ -436,135 +444,198 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                           height: 15,
                                                         ),
 
-                                                        Row(
-                                                          crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Align to the start vertically
-                                                          children: [
-                                                            Text(
-                                                              "ID: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "${account.id}",
-                                                                style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  color: Theme.of(context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Ensure text wraps
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 5),
-                                                        Row(
-                                                          crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Align vertically to the start
-                                                          children: [
-                                                            Text(
-                                                              "Mobile No: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "${account.mobileNumber}",
-                                                                style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  color: Theme.of(context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Enable wrapping
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 5),
-                                                        Row(
-                                                          crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Aligns content to the start vertically
-                                                          children: [
-                                                            Text(
-                                                              "App Name: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "${account.orgAppName}",
-                                                                style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  color: Theme.of(context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Enable line breaks
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 5),
+                                                        // Row(
+                                                        //   crossAxisAlignment: CrossAxisAlignment
+                                                        //       .start, // Align to the start vertically
+                                                        //   children: [
+                                                        //     Text(
+                                                        //       "ID: ",
+                                                        //       style: GoogleFonts.inter(
+                                                        //         fontSize: 14,
+                                                        //         fontWeight: FontWeight.bold,
+                                                        //         color: Theme.of(context)
+                                                        //             .textTheme
+                                                        //             .bodyLarge
+                                                        //             ?.color,
+                                                        //       ),
+                                                        //     ),
+                                                        //     const SizedBox(
+                                                        //       width: 5,
+                                                        //     ),
+                                                        //     Flexible(
+                                                        //       child: Text(
+                                                        //         "${account.id}",
+                                                        //         style: GoogleFonts.inter(
+                                                        //           fontSize: 14,
+                                                        //           color: Theme.of(context)
+                                                        //               .textTheme
+                                                        //               .bodyLarge
+                                                        //               ?.color,
+                                                        //         ),
+                                                        //         overflow:
+                                                        //             TextOverflow.visible, // Allow wrapping
+                                                        //         softWrap: true, // Ensure text wraps
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
+                                                        // const SizedBox(height: 5),
+                                                        // Row(
+                                                        //   crossAxisAlignment: CrossAxisAlignment
+                                                        //       .start, // Align vertically to the start
+                                                        //   children: [
+                                                        //     Text(
+                                                        //       "Mobile No: ",
+                                                        //       style: GoogleFonts.inter(
+                                                        //         fontSize: 14,
+                                                        //         fontWeight: FontWeight.bold,
+                                                        //         color: Theme.of(context)
+                                                        //             .textTheme
+                                                        //             .bodyLarge
+                                                        //             ?.color,
+                                                        //       ),
+                                                        //     ),
+                                                        //     const SizedBox(
+                                                        //       width: 5,
+                                                        //     ),
+                                                        //     Flexible(
+                                                        //       child: Text(
+                                                        //         "${account.mobileNumber}",
+                                                        //         style: GoogleFonts.inter(
+                                                        //           fontSize: 14,
+                                                        //           color: Theme.of(context)
+                                                        //               .textTheme
+                                                        //               .bodyLarge
+                                                        //               ?.color,
+                                                        //         ),
+                                                        //         overflow:
+                                                        //             TextOverflow.visible, // Allow wrapping
+                                                        //         softWrap: true, // Enable wrapping
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
+                                                        // const SizedBox(height: 5),
+                                                        // Row(
+                                                        //   crossAxisAlignment: CrossAxisAlignment
+                                                        //       .start, // Aligns content to the start vertically
+                                                        //   children: [
+                                                        //     Text(
+                                                        //       "App Name: ",
+                                                        //       style: GoogleFonts.inter(
+                                                        //         fontSize: 14,
+                                                        //         fontWeight: FontWeight.bold,
+                                                        //         color: Theme.of(context)
+                                                        //             .textTheme
+                                                        //             .bodyLarge
+                                                        //             ?.color,
+                                                        //       ),
+                                                        //     ),
+                                                        //     const SizedBox(
+                                                        //       width: 5,
+                                                        //     ),
+                                                        //     Flexible(
+                                                        //       child: Text(
+                                                        //         "${account.orgAppName}",
+                                                        //         style: GoogleFonts.inter(
+                                                        //           fontSize: 14,
+                                                        //           color: Theme.of(context)
+                                                        //               .textTheme
+                                                        //               .bodyLarge
+                                                        //               ?.color,
+                                                        //         ),
+                                                        //         overflow:
+                                                        //             TextOverflow.visible, // Allow wrapping
+                                                        //         softWrap: true, // Enable line breaks
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
+                                                        // const SizedBox(height: 5),
+                                                        // Row(
+                                                        //   mainAxisAlignment: MainAxisAlignment.start,
+                                                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                                                        //   children: [
+                                                        //     FaIcon(
+                                                        //       FontAwesomeIcons.user, // User icon
+                                                        //       size: 13,
+                                                        //       color: Theme.of(context)
+                                                        //           .textTheme
+                                                        //           .bodyLarge
+                                                        //           ?.color,
+                                                        //     ),
+                                                        //     const SizedBox(
+                                                        //       width: 10,
+                                                        //     ),
+                                                        //     Flexible(
+                                                        //       child: Text(
+                                                        //         account.username,
+                                                        //         style: GoogleFonts.inter(
+                                                        //           fontSize: 14,
+                                                        //           color: Theme.of(context)
+                                                        //               .textTheme
+                                                        //               .bodyLarge
+                                                        //               ?.color,
+                                                        //         ),
+                                                        //         overflow: TextOverflow.visible,
+                                                        //         softWrap: true,
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
+                                                        // const SizedBox(height: 5),
+                                                        // Row(
+                                                        //   crossAxisAlignment: CrossAxisAlignment
+                                                        //       .center, // Aligns content to the top
+                                                        //   children: [
+                                                        //     FaIcon(
+                                                        //       FontAwesomeIcons
+                                                        //           .appStore, // Icon representing an app or mobile
+                                                        //       size: 13,
+                                                        //       color: Theme.of(context)
+                                                        //           .textTheme
+                                                        //           .bodyLarge
+                                                        //           ?.color,
+                                                        //     ),
+                                                        //     const SizedBox(
+                                                        //       width: 10,
+                                                        //     ),
+                                                        //     Flexible(
+                                                        //       child: Text(
+                                                        //         "${account.createdApp}",
+                                                        //         style: GoogleFonts.inter(
+                                                        //           fontSize: 14,
+                                                        //           color: Theme.of(context)
+                                                        //               .textTheme
+                                                        //               .bodyLarge
+                                                        //               ?.color,
+                                                        //         ),
+                                                        //         overflow:
+                                                        //             TextOverflow.visible, // Allow wrapping
+                                                        //         softWrap: true, // Enable line breaks
+                                                        //       ),
+                                                        //     ),
+                                                        //   ],
+                                                        // ),
+                                                        // const SizedBox(height: 5),
                                                         Row(
                                                           mainAxisAlignment: MainAxisAlignment.start,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
                                                           children: [
-                                                            Text(
-                                                              "Username: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
+                                                            FaIcon(
+                                                              FontAwesomeIcons.user, // User icon
+                                                              size: 13,
+                                                              color: Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge
+                                                                  ?.color,
                                                             ),
                                                             const SizedBox(
-                                                              width: 5,
+                                                              width: 10,
                                                             ),
                                                             Flexible(
                                                               child: Text(
-                                                                account.username,
+                                                                account.name ?? "N/A",
                                                                 style: GoogleFonts.inter(
                                                                   fontSize: 14,
                                                                   color: Theme.of(context)
@@ -572,9 +643,8 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                                       .bodyLarge
                                                                       ?.color,
                                                                 ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Ensure text wraps
+                                                                overflow: TextOverflow.visible,
+                                                                softWrap: true,
                                                               ),
                                                             ),
                                                           ],
@@ -582,93 +652,19 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                         const SizedBox(height: 5),
                                                         Row(
                                                           crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Aligns content to the top
+                                                              .center, // Aligns content to the top
                                                           children: [
-                                                            Text(
-                                                              "Created App: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
+                                                            FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .moneyCheckDollar, // Icon for "Pending"
+                                                              size: 13,
+                                                              color: Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge
+                                                                  ?.color, // Orange for pending
                                                             ),
                                                             const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "${account.createdApp}",
-                                                                style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  color: Theme.of(context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Enable line breaks
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 5),
-                                                        Row(
-                                                          crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Aligns content to the top
-                                                          children: [
-                                                            Text(
-                                                              "Last Login App: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                            Flexible(
-                                                              child: Text(
-                                                                "${account.lastLoginApp}",
-                                                                style: GoogleFonts.inter(
-                                                                  fontSize: 14,
-                                                                  color: Theme.of(context)
-                                                                      .textTheme
-                                                                      .bodyLarge
-                                                                      ?.color,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow.visible, // Allow wrapping
-                                                                softWrap: true, // Enable line breaks
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 5),
-                                                        Row(
-                                                          crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Aligns content to the top
-                                                          children: [
-                                                            Text(
-                                                              "Payment Status: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 5,
+                                                              width: 10,
                                                             ),
                                                             Flexible(
                                                               child: Text(
@@ -692,25 +688,58 @@ class _UserHomeViewState extends State<UserHomeView> {
                                                         const SizedBox(height: 5),
                                                         Row(
                                                           crossAxisAlignment: CrossAxisAlignment
-                                                              .start, // Aligns content to the top
+                                                              .center, // Aligns content to the top
                                                           children: [
-                                                            Text(
-                                                              "Last Login Time: ",
-                                                              style: GoogleFonts.inter(
-                                                                fontSize: 14,
-                                                                fontWeight: FontWeight.bold,
-                                                                color: Theme.of(context)
-                                                                    .textTheme
-                                                                    .bodyLarge
-                                                                    ?.color,
-                                                              ),
+                                                            FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .mobileAlt, // Icon for last login app
+                                                              size: 13,
+                                                              color: Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge
+                                                                  ?.color,
                                                             ),
                                                             const SizedBox(
-                                                              width: 5,
+                                                              width: 10,
                                                             ),
                                                             Flexible(
                                                               child: Text(
-                                                                "${account.lastLoginTime}",
+                                                                "${account.lastLoginApp}",
+                                                                style: GoogleFonts.inter(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(context)
+                                                                      .textTheme
+                                                                      .bodyLarge
+                                                                      ?.color,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow.visible, // Allow wrapping
+                                                                softWrap: true, // Enable line breaks
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 5),
+
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment
+                                                              .center, // Aligns content to the top
+                                                          children: [
+                                                            FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .clock, // Clock icon for last login time
+                                                              size: 13,
+                                                              color: Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyLarge
+                                                                  ?.color,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Flexible(
+                                                              child: Text(
+                                                                formatDateTime(account.lastLoginTime),
                                                                 style: GoogleFonts.inter(
                                                                   fontSize: 14,
                                                                   color: Theme.of(context)
@@ -748,15 +777,28 @@ class _UserHomeViewState extends State<UserHomeView> {
                                           color: theme.textTheme.headlineLarge?.color,
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: Center(
-                                            child: Text(
-                                          account.username[0],
-                                          style: GoogleFonts.inter(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        )),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: account.orgAppLogo == null || account.orgAppLogo!.isEmpty
+                                              ? Center(
+                                                  child: Text(
+                                                    (account.client_website?.isNotEmpty ?? false)
+                                                        ? account.client_website![0]
+                                                        : "N/A",
+                                                    style: GoogleFonts.inter(
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Image.network(
+                                                  account.orgAppLogo!,
+                                                  width: 60,
+                                                  height: 40,
+                                                  fit: BoxFit.cover, // Ensures image fills the container
+                                                ),
+                                        ),
                                       ),
                                     ),
                                     // Right-top notch

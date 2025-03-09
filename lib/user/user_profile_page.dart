@@ -1228,7 +1228,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     children: [
                                       // _buildTextField("PAN", panController, theme, app, showTaxProfile),
                                       _buildText(
-                                          FontAwesomeIcons.fileCode,
+                                          FontAwesomeIcons.creditCard,
                                           auth.userTaxProfile["panNumber"],
                                           context,
                                           theme,

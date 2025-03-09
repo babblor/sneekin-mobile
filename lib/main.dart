@@ -179,11 +179,7 @@ class _MyAppState extends State<MyApp> {
         });
 
         return ToastificationWrapper(
-          child:
-              //     MaterialApp(
-              //   home: AuthScreen(),
-              // )
-              MaterialApp.router(
+          child: MaterialApp.router(
             key: _key,
             debugShowCheckedModeBanner: false,
             theme: lightTheme,

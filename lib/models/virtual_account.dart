@@ -8,7 +8,7 @@ class VirtualAccount {
   final String? name;
   final int? mobileID;
   final int? orgAppId;
-  final String? orgAppName;
+  final String? client_website;
   final String? orgAppLogo;
   final String username;
   final String? createdApp;
@@ -27,7 +27,7 @@ class VirtualAccount {
       this.name,
       this.mobileID,
       this.orgAppId,
-      this.orgAppName,
+      this.client_website,
       this.orgAppLogo,
       required this.username,
       this.createdApp,

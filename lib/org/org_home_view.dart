@@ -151,15 +151,26 @@ class _OrgHomeViewState extends State<OrgHomeView> {
                                                 color: theme.textTheme.headlineLarge?.color,
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
-                                              child: Center(
-                                                child: Text(
-                                                  account.name[0],
-                                                  style: GoogleFonts.inter(
-                                                    fontSize: 17,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(12),
+                                                child: account.logo == null || account.logo!.isEmpty
+                                                    ? Center(
+                                                        child: Text(
+                                                          account.name.isNotEmpty ? account.name[0] : "N/A",
+                                                          style: GoogleFonts.inter(
+                                                            fontSize: 17,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Image.network(
+                                                        account.logo!,
+                                                        width: 60,
+                                                        height: 40,
+                                                        fit:
+                                                            BoxFit.cover, // Ensures image fills the container
+                                                      ),
                                               ),
                                             ),
                                             Text(

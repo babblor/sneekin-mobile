@@ -6,18 +6,13 @@ part of 'user_virtual_account.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VirtualAccountResponse _$VirtualAccountResponseFromJson(
-        Map<String, dynamic> json) =>
-    VirtualAccountResponse(
+VirtualAccountResponse _$VirtualAccountResponseFromJson(Map<String, dynamic> json) => VirtualAccountResponse(
       totalPages: (json['totalPages'] as num).toInt(),
-      groups: (json['groups'] as List<dynamic>)
-          .map((e) => Group.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      groups:
+          (json['groups'] as List<dynamic>).map((e) => Group.fromJson(e as Map<String, dynamic>)).toList(),
     );
 
-Map<String, dynamic> _$VirtualAccountResponseToJson(
-        VirtualAccountResponse instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$VirtualAccountResponseToJson(VirtualAccountResponse instance) => <String, dynamic>{
       'totalPages': instance.totalPages,
       'groups': instance.groups,
     };
@@ -36,20 +31,17 @@ Map<String, dynamic> _$GroupToJson(Group instance) => <String, dynamic>{
       'userVirtualAccounts': instance.userVirtualAccounts,
     };
 
-VirtualAccount _$VirtualAccountFromJson(Map<String, dynamic> json) =>
-    VirtualAccount(
+VirtualAccount _$VirtualAccountFromJson(Map<String, dynamic> json) => VirtualAccount(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String?,
       mobileId: (json['mobileId'] as num?)?.toInt(),
       orgAppId: (json['orgAppId'] as num?)?.toInt(),
-      orgAppName: json['orgAppName'] as String?,
+      client_website: json['client_website'] as String?,
       orgAppLogo: json['orgAppLogo'] as String?,
       username: json['username'] as String,
       createdApp: json['createdApp'] as String?,
       lastLoginApp: json['lastLoginApp'] as String?,
-      lastLoginTime: json['lastLoginTime'] == null
-          ? null
-          : DateTime.parse(json['lastLoginTime'] as String),
+      lastLoginTime: json['lastLoginTime'] == null ? null : DateTime.parse(json['lastLoginTime'] as String),
       age: (json['age'] as num?)?.toInt(),
       paymentDueStatus: json['paymentDueStatus'] as bool?,
       mobileNumber: json['mobileNumber'] as String?,
@@ -58,13 +50,12 @@ VirtualAccount _$VirtualAccountFromJson(Map<String, dynamic> json) =>
       lastLoginAppLogo: json['lastLoginAppLogo'] as String?,
     );
 
-Map<String, dynamic> _$VirtualAccountToJson(VirtualAccount instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$VirtualAccountToJson(VirtualAccount instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'mobileId': instance.mobileId,
       'orgAppId': instance.orgAppId,
-      'orgAppName': instance.orgAppName,
+      'client_website': instance.client_website,
       'orgAppLogo': instance.orgAppLogo,
       'username': instance.username,
       'createdApp': instance.createdApp,
