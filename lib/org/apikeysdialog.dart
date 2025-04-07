@@ -84,8 +84,8 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
               const SizedBox(width: 8.0),
               Container(
                 // padding: EdgeInsets.symmetric(horizontal: 3, vertical: 4),
-                decoration: BoxDecoration(
-                    color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
+                // decoration: BoxDecoration(
+                //     color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
                 child: Center(
                   child: IconButton(
                     onPressed: () {
@@ -95,7 +95,11 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       //   const SnackBar(content: Text("Client ID copied to clipboard")),
                       // );
                     },
-                    icon: const Icon(Icons.copy, color: Colors.white),
+                    icon: Icon(
+                      Icons.copy,
+                      color: theme.textTheme.headlineLarge?.color,
+                      size: 21,
+                    ),
                   ),
                 ),
               ),
@@ -132,8 +136,8 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                 ),
               ),
               Container(
-                decoration: BoxDecoration(
-                    color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
+                // decoration: BoxDecoration(
+                //     color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
                 child: Center(
                   child: IconButton(
                     onPressed: () {
@@ -143,7 +147,11 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       //   const SnackBar(content: Text("Client website copied to clipboard")),
                       // );
                     },
-                    icon: const Icon(Icons.copy, color: Colors.white),
+                    icon: Icon(
+                      Icons.copy,
+                      color: theme.textTheme.headlineLarge?.color,
+                      size: 21,
+                    ),
                   ),
                 ),
               ),
@@ -186,12 +194,13 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                 },
                 icon: Icon(
                   _isSecretHidden ? Icons.visibility_off : Icons.visibility,
+                  size: 22,
                   color: theme.textTheme.headlineLarge?.color,
                 ),
               ),
               Container(
-                decoration: BoxDecoration(
-                    color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
+                // decoration: BoxDecoration(
+                //     color: theme.textTheme.headlineLarge?.color, borderRadius: BorderRadius.circular(6)),
                 child: Center(
                   child: IconButton(
                     onPressed: () {
@@ -201,7 +210,11 @@ class _ApiKeysDialogState extends State<ApiKeysDialog> {
                       //   const SnackBar(content: Text("Client Secret copied to clipboard")),
                       // );
                     },
-                    icon: const Icon(Icons.copy, color: Colors.white),
+                    icon: Icon(
+                      Icons.copy,
+                      color: theme.textTheme.headlineLarge?.color,
+                      size: 21,
+                    ),
                   ),
                 ),
               ),

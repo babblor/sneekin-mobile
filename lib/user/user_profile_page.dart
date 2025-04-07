@@ -16,10 +16,7 @@ import '../widgets/custom_app_bar.dart';
 
 class UserProfilePage extends StatefulWidget {
   // User? user;
-  const UserProfilePage({super.key
-
-      // , this.user
-      });
+  const UserProfilePage({super.key});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -28,9 +25,7 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  // final TextEditingController ageController = TextEditingController();
   final TextEditingController panController = TextEditingController();
-  // final TextEditingController newPanController = TextEditingController();
   final TextEditingController panAddressController = TextEditingController();
   final TextEditingController panNameController = TextEditingController();
 
@@ -93,8 +88,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Future<void> _pickImage(setState) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      // _imageFile = File(image.path);
-      // _uploadProfileImage = await _getFileName(image.path);
       setState(() {
         _profileImage = File(image.path);
         hasImagePicked = true;
@@ -103,6 +96,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   double _age = 35;
+
+  String selectedTab = "INFO"; // Tracks selected tab
 
   @override
   void initState() {
@@ -189,12 +184,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(
                           width: 10,
                         ),
-                        // CircleAvatar(
-                        //     backgroundColor: theme.textTheme.headlineLarge?.color,
-                        //     child: const Icon(
-                        //       Icons.upload_file,
-                        //       color: Colors.white,
-                        //     ))
                         InkWell(
                           onTap: () {
                             _pickUpdatedPanImage(setState);
@@ -224,14 +213,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ],
                     ),
-                    // const SizedBox(height: 8),
-                    // Row(
-                    //   children: [
-                    //     _buildRadioButton('M', 'M'),
-                    //     const SizedBox(width: 10),
-                    //     _buildRadioButton('F', 'F'),
-                    //   ],
-                    // ),
                     Row(
                       children: [
                         Radio<String>(
@@ -257,7 +238,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           activeColor: const Color(0xFFFF6500),
                           onChanged: (String? newValue) {
                             setState(() {
-                              // log("new gender value: ${newValue}");
                               taxGender = newValue!;
                             });
                           },
@@ -598,10 +578,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         //   return
                         InkWell(
                             onTap: () async {
-                              log("panUpdateAddressController.text: ${panUpdateAddressController.text}");
-                              log("panUpdateNameController.text: ${panUpdateNameController.text}");
-                              log("panUpdatePanController.text: ${panUpdatePanController.text}");
-                              log("taxUpdateGender: $taxGender");
                               if (_updatedPanFile == null || _updatedPanFile!.path.isEmpty) {
                                 showToast(
                                     message: "Please upload pan file", type: ToastificationType.warning);
@@ -695,23 +671,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    // Positioned(
-                    //   top: -40, // Adjust the vertical offset as needed
-                    //   right: 0,
-                    //   child: Stack(
-                    //     clipBehavior: Clip.none,
-                    //     alignment: Alignment.center,
-                    //     children: [
-                    //       // Notch background shape
-
-                    //       CustomPaint(
-                    //         size: const Size(80, 70), // Adjust the size to best match your design
-                    //         painter: NotchPainter(context: context),
-                    //       ),
-                    //       // Icon on top of the notch
-                    //     ],
-                    //   ),
-                    // ),
                     Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -724,9 +683,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // const SizedBox(
-                                //   height: 25,
-                                // ),
                                 Center(
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -819,7 +775,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                   ),
                                 ),
-
                                 SizedBox(
                                   height: 25,
                                 ),
@@ -852,50 +807,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                // Column(
-                                //   mainAxisAlignment: MainAxisAlignment.start,
-                                //   crossAxisAlignment: CrossAxisAlignment.start,
-                                //   children: [
-                                //     Column(
-                                //       crossAxisAlignment: CrossAxisAlignment.start,
-                                //       mainAxisAlignment: MainAxisAlignment.start,
-                                //       children: [
-                                //         // Text(
-                                //         //   app.user?.name ?? "Alexa Rawles",
-                                //         //   style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
-                                //         // ),
-                                //         // _buildTextField("Name", nameController, theme, app, false),
-                                //         // if (canEdit)
-                                //         //   const SizedBox(
-                                //         //     height: 10,
-                                //         //   ),
-                                //         // Row(
-                                //         //   crossAxisAlignment: CrossAxisAlignment.center,
-                                //         //   mainAxisAlignment: MainAxisAlignment.start,
-                                //         //   children: [
-                                //         //     Icon(
-                                //         //       Icons.place_outlined,
-                                //         //       color: theme.textTheme.headlineLarge?.color,
-                                //         //       size: 13,
-                                //         //     ),
-                                //         //     const SizedBox(
-                                //         //       width: 5,
-                                //         //     ),
-                                //         //     Text(
-                                //         //       auth.userTaxProfile["address"] ?? "-",
-                                //         //       style: GoogleFonts.inter(
-                                //         //           color: Colors.grey.shade600, fontSize: 12),
-                                //         //     )
-                                //         //   ],
-                                //         // )
-                                //       ],
-                                //     )
-                                //   ],
-                                // ),
-                                // const SizedBox(
-                                //   height: 20,
-                                // ),
-                                // _buildTextField('Email', emailController, theme, app),
                                 Container(
                                   padding: canEdit ? const EdgeInsets.all(15) : const EdgeInsets.all(0),
                                   decoration: BoxDecoration(
@@ -921,7 +832,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                         ),
                                       Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
-                                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -945,7 +855,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                             children: [
                                               Text(app.user?.email ?? "N/A",
                                                   style: GoogleFonts.inter(
-                                                    // fontWeight: FontWeight.bold,
                                                     fontSize: canEdit
                                                         ? 14
                                                         : 12, // Smaller font size when canEdit is false
@@ -964,17 +873,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                         )
                                                       : const SizedBox.shrink()
                                                   : const SizedBox.shrink(),
-
-                                              // app.user!.isEmailVerified
-                                              //     ? FaIcon(
-                                              //         FontAwesomeIcons.circleCheck,
-                                              //         size: canEdit ? 15 : 13,
-                                              //         color: Colors.green,
-                                              //       )
-                                              //     :
-                                              //     FaIcon(FontAwesomeIcons.close,
-                                              //         size: canEdit ? 15 : 13, color: Colors.red
-                                              //         ),
                                             ],
                                           ),
                                         ],
@@ -1079,15 +977,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                           ],
                                         );
                                       }),
-                                      // if (canEdit)
-                                      //   SizedBox(
-                                      //     height: 15,
-                                      //   ),
-                                      // if (!canEdit)
-                                      //   SizedBox(
-                                      //     height: 5,
-                                      //   ),
-                                      // _buildAgeSlider(label: "Age", theme: theme),
                                       _buildAgeSlider2(context, theme),
                                       const SizedBox(
                                         height: 20,
@@ -1096,10 +985,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                         Consumer<AuthServices>(builder: (context, auth, _) {
                                           return InkWell(
                                             onTap: () async {
-                                              log("_profileImage: $_profileImage");
-                                              log("nameController.text == app.user?.name: ${nameController.text == app.user?.name}");
-                                              log("_selectedRange!.start == app.user?.age: ${_selectedRange!.start == app.user?.age}");
-                                              log(" _gender == app.user?.gender: ${_gender == app.user?.gender}");
                                               if ((_profileImage == null &&
                                                   nameController.text == app.user?.name &&
                                                   _selectedRange!.start == app.user?.age &&
@@ -1128,7 +1013,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                 showToast(
                                                     message: "User updated successfully!",
                                                     type: ToastificationType.success);
-                                                // context.go('root');
                                               }
                                             },
                                             child: Row(
@@ -1168,11 +1052,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   ),
                                 _buildPhoneScrollable(_phone!, theme, app),
                                 const SizedBox(height: 10),
-                                // if (canEdit)
-                                //   const SizedBox(
-                                //     height: 15,
-                                //   ),
-                                // _buildTextField('PAN', panController, theme),
                                 const SizedBox(height: 30),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -1226,7 +1105,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // _buildTextField("PAN", panController, theme, app, showTaxProfile),
                                       _buildText(
                                           FontAwesomeIcons.creditCard,
                                           auth.userTaxProfile["panNumber"],
@@ -1256,114 +1134,144 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ],
                                   ),
                                 if (auth.userTaxProfile["panNumber"] == null)
-                                  // Center(
-                                  //   child: Text(
-                                  //     "No tax profile has found!",
-                                  //     style: GoogleFonts.inter(
-                                  //         fontSize: 16, color: theme.textTheme.headlineLarge?.color),
-                                  //   ),
-                                  // ),
                                   _buildCreateTaxSection(app, theme),
                               ],
                             ),
                           ),
                         )),
-                    // Positioned(
-                    //   top: -35,
-                    //   left: 35,
-                    //   child: Stack(
-                    //     clipBehavior: Clip.none,
-                    //     children: [
-                    //       Container(
-                    //         width: 110,
-                    //         height: 70,
-                    //         decoration: BoxDecoration(
-                    //           color: theme.textTheme.headlineLarge?.color,
-                    //           borderRadius: BorderRadius.circular(12),
-                    //         ),
-                    //         child: Center(
-                    //           child: app.user?.profileImageUrl?.isNotEmpty == true
-                    //               ? CachedNetworkImage(
-                    //                   imageUrl: app.user!.profileImageUrl!,
-                    //                   width: 110,
-                    //                   height: 70,
-                    //                   fit: BoxFit.cover,
-                    //                   placeholder: (context, url) => const Center(
-                    //                     child: SizedBox(
-                    //                       height: 15,
-                    //                       width: 15,
-                    //                       child: CircularProgressIndicator(
-                    //                         color: Colors.white,
-                    //                         strokeWidth: 2,
-                    //                       ),
-                    //                     ),
-                    //                   ),
-                    //                   errorWidget: (context, url, error) => Text(
-                    //                     app.user?.name[0] ?? "N/A",
-                    //                     style: GoogleFonts.inter(
-                    //                       fontSize: 24,
-                    //                       color: Colors.white,
-                    //                       fontWeight: FontWeight.bold,
-                    //                     ),
-                    //                   ),
-                    //                 )
-                    //               : Text(
-                    //                   app.user?.name[0] ?? "N/A",
-                    //                   style: GoogleFonts.inter(
-                    //                     fontSize: 24,
-                    //                     color: Colors.white,
-                    //                     fontWeight: FontWeight.bold,
-                    //                   ),
-                    //                 ),
-                    //         ),
-                    //       ),
-                    //       if (canEdit)
-                    //         Positioned(
-                    //           bottom: -10,
-                    //           right: -10,
-                    //           child: StatefulBuilder(
-                    //               builder: (BuildContext context, void Function(void Function()) setState) {
-                    //             return GestureDetector(
-                    //               onTap: () {
-                    //                 // Handle edit button action here
-                    //                 log("Edit button tapped!");
-                    //                 _pickImage(setState);
-                    //               },
-                    //               child: Container(
-                    //                 width: 30,
-                    //                 height: 30,
-                    //                 decoration: BoxDecoration(
-                    //                   color: hasImagePicked
-                    //                       ? Colors.green
-                    //                       : theme.textTheme.headlineLarge?.color,
-                    //                   shape: BoxShape.circle,
-                    //                   boxShadow: [
-                    //                     BoxShadow(
-                    //                       color: Colors.black.withOpacity(0.1),
-                    //                       blurRadius: 5,
-                    //                       offset: const Offset(0, 3),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //                 child: const Center(
-                    //                   child: FaIcon(
-                    //                     FontAwesomeIcons.penToSquare,
-                    //                     color: Colors.white,
-                    //                     size: 15,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           }),
-                    //         ),
-                    //     ],
-                    //   ),
-                    // ),
                   ],
                 ),
               ],
             );
           }),
+        ),
+      ),
+    );
+  }
+
+  // Widget build(BuildContext context) {
+  //   log("user_profile_page.dart rebuilds");
+  //   final theme = Theme.of(context);
+
+  //   return SafeArea(
+  //     child: Container(
+  //       decoration: BoxDecoration(color: theme.scaffoldBackgroundColor),
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: SingleChildScrollView(
+  //         child: Consumer2<AuthServices, AppStore>(builder: (context, auth, app, _) {
+  //           if (app.isSignedIn) {
+  //             nameController.text = app.user?.name ?? "Alex Reyn";
+  //             _age = app.user?.age.toDouble() ?? 0.0;
+  //             _gender = app.user?.gender ?? "M";
+  //             _phone = app.user?.mobileNumbers.first.mobileNumber ?? "N/A";
+  //             _selectedRange = RangeValues((app.user!.age).toDouble(), ((app.user!.age + 5)).toDouble());
+  //             emailController.text = app.user?.email ?? "N/A";
+  //           }
+  //           panController.text = auth.userTaxProfile["panNumber"] ?? "";
+  //           panNameController.text = auth.userTaxProfile["name"] ?? "";
+  //           panAddressController.text = auth.userTaxProfile["address"] ?? "";
+  //           log("app.user?.profileImageUrl:${app.user?.profileImageUrl}");
+  //           return Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               // Website Name Heading
+  //               CustomAppBar(
+  //                 onDrawerButtonPressed: () {
+  //                   log("Button pressed");
+  //                   Scaffold.of(context).openDrawer();
+  //                 },
+  //               ),
+  //               SizedBox(
+  //                 height: 20,
+  //               ),
+  //               CircleAvatar(
+  //                 radius: 60,
+  //                 child: ClipOval(
+  //                   child: Container(
+  //                     decoration: BoxDecoration(
+  //                       color: app.user?.profileImageUrl?.isEmpty == true
+  //                           ? null
+  //                           : theme.textTheme.headlineLarge?.color,
+  //                     ),
+  //                     child: Center(
+  //                       child: app.user?.profileImageUrl?.isNotEmpty == true
+  //                           ? CachedNetworkImage(
+  //                               imageUrl: app.user!.profileImageUrl!,
+  //                               fit: BoxFit.cover,
+  //                               placeholder: (context, url) => const Center(
+  //                                 child: SizedBox(
+  //                                   height: 15,
+  //                                   width: 15,
+  //                                   child: CircularProgressIndicator(
+  //                                     color: Colors.white,
+  //                                     strokeWidth: 2,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                               errorWidget: (context, url, error) => Text(
+  //                                 app.user?.name[0] ?? "N/A",
+  //                                 style: GoogleFonts.inter(
+  //                                   fontSize: 24,
+  //                                   color: Colors.white,
+  //                                   fontWeight: FontWeight.bold,
+  //                                 ),
+  //                               ),
+  //                             )
+  //                           : Text(
+  //                               app.user?.name[0] ?? "N/A",
+  //                               style: GoogleFonts.inter(
+  //                                 fontSize: 24,
+  //                                 color: Colors.white,
+  //                                 fontWeight: FontWeight.bold,
+  //                               ),
+  //                             ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 20),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.start,
+  //                 children: [
+  //                   _buildTabButton("INFO"),
+  //                   const SizedBox(width: 10),
+  //                   _buildTabButton("INC."),
+  //                 ],
+  //               ),
+  //             ],
+  //           );
+  //         }),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildTabButton(String title) {
+    final isSelected = selectedTab == title;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedTab = title;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFFF6500) : Colors.transparent,
+          border: Border.all(
+            width: 1,
+            color: const Color(0xFFFF6500),
+          ),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: GoogleFonts.lato(
+              fontSize: 15,
+              color: isSelected ? Colors.white : const Color(0xFFFF6500),
+            ),
+          ),
         ),
       ),
     );
@@ -1678,81 +1586,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Widget _buildPhoneDropdown(String label, ThemeData theme, AppStore app) {
-  //   return Row(
-  //     crossAxisAlignment: CrossAxisAlignment.center,
-  //     children: [
-  //       // Left-aligned label
-  //       Text(
-  //         "Mobile",
-  //         style: GoogleFonts.inter(
-  //           fontWeight: FontWeight.bold,
-  //           fontSize: canEdit ? 14 : 12, // Smaller font size when canEdit is false
-  //           color: theme.textTheme.bodyLarge?.color,
-  //         ),
-  //       ),
-  //       const SizedBox(width: 10), // Space between label and dropdown
-  //       // Right-aligned Dropdown
-  //       Expanded(
-  //         child: DropdownButtonFormField<String>(
-  //           value: app.user?.mobileNumbers[0].mobileNumber, // Default value for phone
-  //           dropdownColor: theme.secondaryHeaderColor, // Dropdown background color
-  //           decoration: InputDecoration(
-  //             filled: true,
-  //             fillColor: theme.secondaryHeaderColor,
-  //             border: canEdit
-  //                 ? OutlineInputBorder(
-  //                     borderRadius: BorderRadius.circular(10),
-  //                     borderSide: BorderSide(color: Colors.grey.shade400), // Border when editable
-  //                   )
-  //                 : InputBorder.none, // No border when not editable
-  //             enabledBorder: canEdit
-  //                 ? OutlineInputBorder(
-  //                     borderRadius: BorderRadius.circular(10),
-  //                     borderSide: BorderSide(color: Colors.grey.shade400), // Border when enabled
-  //                   )
-  //                 : InputBorder.none,
-  //             focusedBorder: canEdit
-  //                 ? OutlineInputBorder(
-  //                     borderRadius: BorderRadius.circular(10),
-  //                     borderSide: BorderSide(color: Colors.grey.shade400, width: 2), // Border on focus
-  //                   )
-  //                 : InputBorder.none,
-  //           ),
-  //           items: app.user?.mobileNumbers
-  //               .map((MobileNumber mobile) => DropdownMenuItem<String>(
-  //                     value: mobile.mobileNumber,
-  //                     child: Text(
-  //                       mobile.mobileNumber,
-  //                     ),
-  //                   ))
-  //               .toList(),
-
-  //           onChanged: canEdit
-  //               ? (String? newValue) {
-  //                   setState(() {
-  //                     _phone = newValue ?? _phone;
-  //                   });
-  //                 }
-  //               : null, // Disable dropdown when canEdit is false
-  //           icon: Icon(
-  //             Icons.arrow_drop_down,
-  //             size: 15,
-  //             color: theme.textTheme.bodyLarge?.color, // Icon color
-  //           ),
-  //           disabledHint: Text(
-  //             _phone, // Show current value when disabled
-  //             style: GoogleFonts.inter(
-  //               fontSize: 12, // Smaller font size for disabled state
-  //               color: theme.textTheme.bodyLarge?.color?.withOpacity(0.6),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _buildPhoneScrollable(String label, ThemeData theme, AppStore app) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1842,96 +1675,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
   }
 
-  // Helper function to build age slider
-  // Widget _buildAgeSlider({required String label, required ThemeData theme}) {
-  //   return Row(
-  //     crossAxisAlignment: CrossAxisAlignment.center,
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       Row(
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         mainAxisAlignment: MainAxisAlignment.start,
-  //         children: [
-  //           Text(
-  //             label,
-  //             style: GoogleFonts.inter(
-  //               fontWeight: FontWeight.bold,
-  //               fontSize: canEdit ? 14 : 12, // Smaller font size when canEdit is false
-  //               color: theme.textTheme.bodyLarge?.color,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       const SizedBox(width: 10), // Space between label and text field
-  //       Expanded(
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             // Range Slider
-  //             RangeSlider(
-  //               values: _selectedRange,
-  //               min: 15,
-  //               max: 60,
-  //               divisions: 9,
-  //               activeColor: Theme.of(context).textTheme.headlineLarge?.color,
-  //               inactiveColor: Colors.white,
-  //               labels: RangeLabels(
-  //                 _selectedRange.start.round().toString(),
-  //                 _selectedRange.end.round().toString(),
-  //               ),
-  //               onChanged: (RangeValues values) {
-  //                 setState(() {
-  //                   // Determine which handle is being dragged
-  //                   if (values.start != _selectedRange.start) {
-  //                     // Start handle is being dragged
-  //                     _selectedRange = _moveStartHandle(values.start);
-  //                   } else if (values.end != _selectedRange.end) {
-  //                     // End handle is being dragged
-  //                     _selectedRange = _moveEndHandle(values.end);
-  //                   }
-  //                 });
-  //               },
-  //             ),
-  //             // Ticks and Labels
-  //             Padding(
-  //               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: List.generate(10, (index) {
-  //                   int value = 15 + (index * 5);
-  //                   return Column(
-  //                     children: [
-  //                       Container(
-  //                         height: 10,
-  //                         width: 2,
-  //                         color: Theme.of(context).textTheme.headlineLarge?.color,
-  //                       ),
-  //                       const SizedBox(height: 5),
-  //                       Text(
-  //                         value.toString(),
-  //                         style: GoogleFonts.inter(fontSize: 12, color: Colors.white),
-  //                       ),
-  //                     ],
-  //                   );
-  //                 }),
-  //               ),
-  //             ),
-  //             // const SizedBox(height: 20),
-  //             // // Selected Range Text
-  //             // Padding(
-  //             //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-  //             //   child: Text(
-  //             //     "Selected Age Range: ${_selectedRange.start.round()} - ${_selectedRange.end.round()}",
-  //             //     style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
-  //             //   ),
-  //             // ),
-  //           ],
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _buildAgeSlider(BuildContext context, ThemeData theme) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1960,88 +1703,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Widget _buildAgeSlider2(BuildContext context, ThemeData theme) {
-  //   return StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
-  //     return Row(
-  //       mainAxisAlignment: MainAxisAlignment.start,
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       children: [
-  //         Text("Age", style: GoogleFonts.inter(fontSize: canEdit ? 14 : 12, fontWeight: FontWeight.bold)),
-  //         const SizedBox(
-  //           width: 5,
-  //         ),
-  //         Consumer<AppStore>(builder: (context, value, _) {
-  //           return Expanded(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 // Range Slider
-  //                 RangeSlider(
-  //                   values: _selectedRange!,
-  //                   min: 15,
-  //                   max: 60,
-  //                   divisions: 9,
-  //                   activeColor: Theme.of(context).textTheme.headlineLarge?.color,
-  //                   inactiveColor: Colors.white,
-  //                   labels: RangeLabels(
-  //                     _selectedRange!.start.round().toString(),
-  //                     _selectedRange!.end.round().toString(),
-  //                   ),
-  //                   onChanged: (RangeValues values) {
-  //                     log("age values: ${values}");
-  //                     setState(() {
-  //                       // Determine which handle is being dragged
-  //                       if (canEdit) if (values.start != _selectedRange?.start) {
-  //                         // Start handle is being dragged
-  //                         _selectedRange = _moveStartHandle(values.start);
-  //                       } else if (values.end != _selectedRange?.end) {
-  //                         // End handle is being dragged
-  //                         _selectedRange = _moveEndHandle(values.end);
-  //                       }
-  //                       log("_selectedRange age inter: ${_selectedRange}");
-  //                       _age = _selectedRange?.start ?? 0;
-  //                     });
-  //                   },
-  //                 ),
-  //                 // Ticks and Labels
-  //                 Padding(
-  //                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-  //                   child: Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: List.generate(10, (index) {
-  //                       int value = 15 + (index * 5);
-  //                       return Column(
-  //                         children: [
-  //                           Container(
-  //                             height: 10,
-  //                             width: 2,
-  //                             color: Theme.of(context).textTheme.headlineLarge?.color,
-  //                           ),
-  //                           const SizedBox(height: 5),
-  //                           Text(
-  //                             index == 0
-  //                                 ? "< $value"
-  //                                 : index == 9
-  //                                     ? "$value >"
-  //                                     : "$value",
-  //                             style: GoogleFonts.inter(fontSize: 12, color: Colors.white),
-  //                           ),
-  //                         ],
-  //                       );
-  //                     }),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(
-  //                   height: 15,
-  //                 )
-  //               ],
-  //             ),
-  //           );
-  //         }),
-  //       ],
-  //     );
-  //   });
-  // }
   Widget _buildAgeSlider2(BuildContext context, ThemeData theme) {
     return StatefulBuilder(
       builder: (BuildContext context, void Function(void Function()) setState) {
@@ -2153,7 +1814,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return RangeValues(newStart, newEnd);
   }
 
-  // Helper function to snap values to the nearest multiple of 5
   double _snapToInterval(double value, int interval) {
     return (value / interval).round() * interval.toDouble();
   }

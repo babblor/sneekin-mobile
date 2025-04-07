@@ -860,7 +860,7 @@ class AuthServices with ChangeNotifier {
       }
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
       final resp = await _dio!.get(
-        "/org-app-accounts/new",
+        "/org-app-accounts",
         options: Options(
           contentType: Headers.jsonContentType,
         ),

@@ -342,7 +342,10 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
                   numberOfFields: 4,
                   filled: true,
                   keyboardType: TextInputType.phone,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(1),
+                  ],
                   fillColor: const Color(0xFF1F2937),
                   cursorColor: Colors.red,
                   borderColor: Colors.red,

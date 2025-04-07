@@ -6,7 +6,7 @@ import 'package:sneekin/services/helper_services.dart';
 
 class CustomIcons {
   static const IconData user_home_outline_rounded = Icons.home_outlined;
-  static const IconData qr_code_scanner = Icons.qr_code_scanner_outlined;
+  static const IconData qr_code_scanner = Icons.qr_code_scanner_rounded;
   static const IconData user_profile_outlined = Icons.person_outlined;
 }
 

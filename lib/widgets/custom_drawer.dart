@@ -169,12 +169,13 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                   child: Center(
                     child: Stack(
                       clipBehavior: Clip.none,
+                      alignment: Alignment.center,
                       children: [
                         CircleAvatar(
                           radius: 65,
                           backgroundColor: theme.textTheme.headlineLarge?.color,
-                          child: app.isSignedIn
-                              ? (app.user?.profileImageUrl?.isNotEmpty == true
+                          child: app.isSignedIn && !app.isOrgSignedIn
+                              ? (app.user?.profileImageUrl != null
                                   ? ClipOval(
                                       child: SizedBox(
                                         width: 130, // 2 * radius
@@ -189,10 +190,12 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                           ),
                                           errorWidget: (context, url, error) => Center(
                                             child: Text(
-                                              app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
+                                              (app.user?.name?.isNotEmpty == true
+                                                  ? app.user!.name![0]
+                                                  : "N/A"),
                                               style: GoogleFonts.inter(
                                                 fontSize: 35,
-                                                color: theme.textTheme.bodyLarge?.color,
+                                                color: theme.textTheme.bodyLarge?.color ?? Colors.white,
                                               ),
                                             ),
                                           ),
@@ -201,14 +204,14 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     )
                                   : Center(
                                       child: Text(
-                                        app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A",
+                                        (app.user?.name?.isNotEmpty == true ? app.user!.name![0] : "N/A"),
                                         style: GoogleFonts.inter(
                                           fontSize: 35,
                                           color: Colors.white,
                                         ),
                                       ),
                                     ))
-                              : (app.org?.logo?.isNotEmpty == true
+                              : (app.org?.logo?.isNotEmpty != null
                                   ? ClipOval(
                                       child: SizedBox(
                                         width: 130,
@@ -220,19 +223,17 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                             child: SizedBox(
                                               height: 15,
                                               width: 15,
-                                              child: Center(
-                                                child: CircularProgressIndicator(
-                                                  color: theme.textTheme.headlineLarge?.color,
-                                                ),
+                                              child: CircularProgressIndicator(
+                                                color: theme.textTheme.headlineLarge?.color,
                                               ),
                                             ),
                                           ),
                                           errorWidget: (context, url, error) => Center(
                                             child: Text(
-                                              app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
+                                              (app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A"),
                                               style: GoogleFonts.inter(
                                                 fontSize: 35,
-                                                color: theme.textTheme.headlineLarge?.color,
+                                                color: theme.textTheme.headlineLarge?.color ?? Colors.white,
                                               ),
                                             ),
                                           ),
@@ -241,59 +242,58 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     )
                                   : Center(
                                       child: Text(
-                                        app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A",
+                                        (app.org?.name?.isNotEmpty == true ? app.org!.name![0] : "N/A"),
                                         style: GoogleFonts.inter(
                                           fontSize: 35,
-                                          color: theme.textTheme.headlineLarge?.color,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     )),
                         ),
-                        if (canEdit)
-                          Positioned(
-                            bottom: 5,
-                            right: -2,
-                            child: StatefulBuilder(
-                                builder: (BuildContext context, void Function(void Function()) setState) {
-                              return GestureDetector(
-                                onTap: () {
-                                  // Handle edit action here
-                                  log("Edit button tapped!");
-                                  if (app.isSignedIn) _pickUserImage(setState);
-                                  if (app.isOrgSignedIn) _pickOrgImage(setState);
-                                },
-                                child: Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: theme.textTheme.headlineLarge?.color,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: FaIcon(
-                                      FontAwesomeIcons.penToSquare,
-                                      color: userImagePicked || orgImagePicked ? Colors.green : Colors.white,
-                                      size: 20,
+                        // Name text field with slight overlap
+                        Positioned(
+                          bottom: -10, // Adjust this value for the overlap effect
+                          child: Builder(
+                            builder: (context) {
+                              String displayName =
+                                  app.isSignedIn ? app.user?.name ?? "N/A" : app.org?.name ?? "N/A";
+                              bool isLong = displayName.length > 15;
+                              String truncatedName =
+                                  isLong ? "${displayName.substring(0, 15)}..." : displayName;
+                              double horizontalPadding = isLong ? 12.0 : 16.0; // Adjust padding dynamically
+
+                              return Container(
+                                padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: theme.secondaryHeaderColor, // Background color
+                                  borderRadius: BorderRadius.circular(20), // Border radius
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 3),
                                     ),
+                                  ],
+                                ),
+                                child: Text(
+                                  truncatedName,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    color: theme.textTheme.bodyLarge?.color, // Adjust text color as needed
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               );
-                            }),
+                            },
                           ),
+                        ),
                       ],
                     ),
                   ),
                 ),
 
                 const SizedBox(
-                  height: 10,
+                  height: 15,
                 ),
                 // Row(
                 //   crossAxisAlignment: CrossAxisAlignment.end,
@@ -331,9 +331,6 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Consumer<DataServices>(builder: (context, data, _) {
-                        return _buildTextField(false, '', name, _nameController, theme, data);
-                      }),
                       if (canEdit)
                         SizedBox(
                           height: verticalSpacing,

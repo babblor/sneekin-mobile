@@ -250,7 +250,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (_isExpanded)
                         Expanded(
@@ -300,7 +300,7 @@ class _UserHomeViewState extends State<UserHomeView> {
                       if (!_isExpanded)
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Center(
                               child: Text(
@@ -311,11 +311,12 @@ class _UserHomeViewState extends State<UserHomeView> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 5), // Space between text and icon
-                            IconButton(
-                              icon: const Icon(Icons.search, color: Color(0xFFFF6500)),
-                              onPressed: () => setState(() => _isExpanded = true),
-                            ),
+                            const SizedBox(width: 10), // Space between text and icon
+
+                            GestureDetector(
+                              onTap: () => setState(() => _isExpanded = true),
+                              child: Icon(Icons.search, color: Color(0xFFFF6500)),
+                            )
                           ],
                         ),
                     ],
