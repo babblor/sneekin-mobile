@@ -160,7 +160,7 @@ class _OrgDashboardViewState extends State<OrgDashboardView> {
                 // Profile Picture
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFFFF6500), width: 3), shape: BoxShape.circle),
+                      border: Border.all(color: const Color(0xFFFF6500), width: 3), shape: BoxShape.circle),
                   child: Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,

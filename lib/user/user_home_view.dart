@@ -315,7 +315,7 @@ class _UserHomeViewState extends State<UserHomeView> {
 
                             GestureDetector(
                               onTap: () => setState(() => _isExpanded = true),
-                              child: Icon(Icons.search, color: Color(0xFFFF6500)),
+                              child: const Icon(Icons.search, color: Color(0xFFFF6500)),
                             )
                           ],
                         ),

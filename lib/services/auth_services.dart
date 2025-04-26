@@ -66,7 +66,7 @@ class AuthServices with ChangeNotifier {
   initialize() async {
     _dio = Dio(
       BaseOptions(
-        baseUrl: dotenv.env["BASE_API_URL"]!,
+        baseUrl: dotenv.env["MAIN_API_URL"]!,
         receiveTimeout: const Duration(seconds: 200),
         connectTimeout: const Duration(seconds: 200),
       ),
@@ -208,7 +208,7 @@ class AuthServices with ChangeNotifier {
 
   // Verify Email OTP
 
-  verifyEmailOTP({required String email, required String otp}) async {
+  verifyEmailOTP({required String email, required String otp, required bool isOrg}) async {
     if (_isLoading) {
       return;
     }
@@ -219,41 +219,41 @@ class AuthServices with ChangeNotifier {
       _dio!.options.headers['Authorization'] = 'Bearer ${appStore.app?.accessToken}';
 
       final resp = await _dio!.post(
-        "/verify-email-otp?email=$email&otp=$otp",
+        "/verify-email-otp?email=$email&otp=$otp&isOrg=$isOrg",
         options: Options(
           contentType: Headers.jsonContentType,
+          validateStatus: (status) => status != null && status < 500,
         ),
       );
 
       log("resp.data in verifyEmailOTP: ${resp.data}");
 
-      if (resp.statusCode == 200 && resp.data["status"] == "true") {
+      if (resp.statusCode == 200 && resp.data["status"] == true) {
         log("verifyEmailOTP resp: ${resp.data}");
         _isLoading = false;
         notifyListeners();
-        // showToast(message: "${resp.data["message"]}", type: ToastificationType.success);
-        return true;
-      } else {
+        return {
+          'status': resp.data["status"],
+          'emailexist': resp.data["emailexist"],
+        };
+      } else if (resp.statusCode == 400 && resp.data["status"] == false) {
         _isLoading = false;
-        // _dio!.options.headers['Authorization'] = null;
-        // passKey = null;
         notifyListeners();
         showToast(message: resp.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
         log("could not received OTP");
-        return false;
+        return {
+          'status': resp.data["status"],
+          'emailexist': resp.data["emailexist"],
+        };
       }
     } on DioException catch (e) {
       _isLoading = false;
-      // _dio!.options.headers['Authorization'] = null;
-      // passKey = null;
       notifyListeners();
       showToast(message: e.response?.data["message"] ?? "Invalid OTP!", type: ToastificationType.error);
       log("error: $e");
       return false;
     } catch (e) {
       _isLoading = false;
-      // _dio!.options.headers['Authorization'] = null;
-      // passKey = null;
       notifyListeners();
       showToast(message: "Some error occurred", type: ToastificationType.error);
       log("error: $e");

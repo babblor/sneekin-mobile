@@ -686,7 +686,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 Center(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        border: Border.all(color: Color(0xFFFF6500), width: 3),
+                                        border: Border.all(color: const Color(0xFFFF6500), width: 3),
                                         shape: BoxShape.circle),
                                     child: Stack(
                                       clipBehavior: Clip.none,
@@ -775,7 +775,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 25,
                                 ),
                                 Row(

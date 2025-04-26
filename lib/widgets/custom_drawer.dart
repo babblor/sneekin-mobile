@@ -165,7 +165,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                 const SizedBox(height: 20),
                 Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFFFF6500), width: 3), shape: BoxShape.circle),
+                      border: Border.all(color: const Color(0xFFFF6500), width: 3), shape: BoxShape.circle),
                   child: Center(
                     child: Stack(
                       clipBehavior: Clip.none,
@@ -190,8 +190,8 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                           ),
                                           errorWidget: (context, url, error) => Center(
                                             child: Text(
-                                              (app.user?.name?.isNotEmpty == true
-                                                  ? app.user!.name![0]
+                                              (app.user?.name.isNotEmpty == true
+                                                  ? app.user!.name[0]
                                                   : "N/A"),
                                               style: GoogleFonts.inter(
                                                 fontSize: 35,
@@ -204,7 +204,7 @@ class _CustomDrawerWidgetState extends State<CustomDrawerWidget> {
                                     )
                                   : Center(
                                       child: Text(
-                                        (app.user?.name?.isNotEmpty == true ? app.user!.name![0] : "N/A"),
+                                        (app.user?.name.isNotEmpty == true ? app.user!.name[0] : "N/A"),
                                         style: GoogleFonts.inter(
                                           fontSize: 35,
                                           color: Colors.white,

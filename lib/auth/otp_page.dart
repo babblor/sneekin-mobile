@@ -12,6 +12,7 @@ import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 
+
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
 
@@ -156,128 +157,136 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1F2937),
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Back disabled")));
+        }
+      },
+      child: Scaffold(
         backgroundColor: const Color(0xFF1F2937),
-        elevation: 0,
-        title: Row(
-          children: [
-            GestureDetector(
-              child: Image.asset(
-                "assets/icons/launcher_icon.png",
-                height: 40,
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF1F2937),
+          elevation: 0,
+          title: Row(
+            children: [
+              GestureDetector(
+                child: Image.asset(
+                  "assets/icons/launcher_icon.png",
+                  height: 40,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "Sneek",
-              style: GoogleFonts.inter(
-                fontSize: 17,
-                color: Colors.white,
+              const SizedBox(width: 8),
+              Text(
+                "Sneek",
+                style: GoogleFonts.inter(
+                  fontSize: 17,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Banner Image Section with Controlled Height
-                SvgPicture.asset(
-                  "assets/images/otpbg.svg",
-                  width: MediaQuery.of(context).size.width,
-                  // height: MediaQuery.of(context).size.height * 0.3, // 30% of screen height
-                  fit: BoxFit.cover,
-                ),
-                // Title Section
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Secure Access Made \nSimple",
-                        style: GoogleFonts.inter(
-                          fontSize: 27,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Sharing is caring, but not when it comes to personal info. Protect your privacy.",
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
+        body: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Banner Image Section with Controlled Height
+                  SvgPicture.asset(
+                    "assets/images/otpbg.svg",
+                    width: MediaQuery.of(context).size.width,
+                    // height: MediaQuery.of(context).size.height * 0.3, // 30% of screen height
+                    fit: BoxFit.cover,
                   ),
-                ),
-                // const SizedBox(height: 20), // Add consistent spacing
-                // const Spacer(),
-                // Main PageView Section
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      phoneNumberWidget(),
-                      otpAuthWidget(context),
-                    ],
+                  // Title Section
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                // const SizedBox(height: 20), // Bottom spacing
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Secure Access Made \nSimple",
+                          style: GoogleFonts.inter(
+                            fontSize: 27,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Sharing is caring, but not when it comes to personal info. Protect your privacy.",
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // const SizedBox(height: 20), // Add consistent spacing
+                  // const Spacer(),
+                  // Main PageView Section
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        phoneNumberWidget(),
+                        otpAuthWidget(context),
+                      ],
+                    ),
+                  ),
+                  // const SizedBox(height: 20), // Bottom spacing
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      floatingActionButton: isError
-          ? GestureDetector(
-              onTap: () {
-                if (code != null) {
-                  log("Again executing verifyotp through _verifyOtp with ${_phoneController.text} ${code!}");
-                  _verifyOtp(code!, context);
-                } else {
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   const SnackBar(content: Text('Invalid OTP!')),
-                  // );
-                  log("code: $code");
-                  showToast(message: "Invalid OTP!", type: ToastificationType.info);
-                }
-              },
-              child: Consumer<AuthServices>(builder: (context, auth, _) {
-                return CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Theme.of(context).textTheme.headlineLarge?.color,
-                  child: auth.isLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
+        floatingActionButton: isError
+            ? GestureDetector(
+                onTap: () {
+                  if (code != null) {
+                    log("Again executing verifyotp through _verifyOtp with ${_phoneController.text} ${code!}");
+                    _verifyOtp(code!, context);
+                  } else {
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(content: Text('Invalid OTP!')),
+                    // );
+                    log("code: $code");
+                    showToast(message: "Invalid OTP!", type: ToastificationType.info);
+                  }
+                },
+                child: Consumer<AuthServices>(builder: (context, auth, _) {
+                  return CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Theme.of(context).textTheme.headlineLarge?.color,
+                    child: auth.isLoading
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).textTheme.bodyLarge?.color,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                            size: 25,
                           ),
-                        )
-                      : const Icon(
-                          Icons.chevron_right,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                );
-              }),
-            )
-          : null,
+                  );
+                }),
+              )
+            : null,
+      ),
     );
   }
 

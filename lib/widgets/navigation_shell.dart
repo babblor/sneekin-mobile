@@ -11,6 +11,7 @@ import 'package:sneekin/user/user_home_view.dart';
 import 'package:sneekin/user/user_profile_page.dart';
 import 'package:sneekin/widgets/custom_drawer.dart';
 import 'package:sneekin/widgets/custom_nav_shell.dart';
+import 'package:sneekin/widgets/quiet_dialogue.dart';
 
 class NavigationShell extends StatefulWidget {
   const NavigationShell({super.key});
@@ -37,84 +38,95 @@ class NavigationShellState extends State<NavigationShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AppStore, HelperServices>(
-      builder: (context, app, helper, child) {
-        log("initially isSigned in status: ${app.isSignedIn}");
-        log("initially isOrgSigned in status: ${app.isOrgSignedIn}");
+    return WillPopScope(
+      onWillPop: () => onWillPop(context),
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Back disabled")));
+          }
+        },
+        child: Consumer2<AppStore, HelperServices>(
+          builder: (context, app, helper, child) {
+            log("initially isSigned in status: ${app.isSignedIn}");
+            log("initially isOrgSigned in status: ${app.isOrgSignedIn}");
 
-        if (app.isLoading) {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).textTheme.headlineLarge?.color,
-              ),
-            ),
-          );
-        }
-
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) async {
-            if (didPop) {
-              log("PopScope didPop: $didPop");
-              return;
+            if (app.isLoading) {
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).textTheme.headlineLarge?.color,
+                  ),
+                ),
+              );
             }
 
-            log("Result: $result");
+            return PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) {
+                  log("PopScope didPop: $didPop");
+                  return;
+                }
 
-            final shouldExit = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text("Exit App"),
-                  content: const Text("Are you sure you want to quit the app?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text("Yes"),
-                    ),
-                  ],
+                log("Result: $result");
+
+                final shouldExit = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Exit App"),
+                      content: const Text("Are you sure you want to quit the app?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text("Yes"),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
+              child: Scaffold(
+                key: context.read<HelperServices>().globalScaffoldKey,
+                drawer: const CustomDrawerWidget(),
+                body: Navigator(
+                  key: _navigatorKey,
+                  pages: [
+                    MaterialPage(child: _getPage(_activeIndex, app.isSignedIn)),
+                  ],
+                  onPopPage: (route, result) {
+                    if (!route.didPop(result)) {
+                      return false;
+                    }
+                    return true;
+                  },
+                ),
+                bottomNavigationBar: CustomNavigationBar(
+                  currentIndex: _activeIndex,
+                  isOrg: !app.isSignedIn,
+                  onTap: (index) {
+                    if (index != _activeIndex) {
+                      setState(() {
+                        // helper.changeScreen(index);
+                        _activeIndex = index;
+                        log("User tapped tab: $index");
+                      });
+                    } else {
+                      log("User tapped the current tab: $index");
+                    }
+                  },
+                ),
+              ),
             );
           },
-          child: Scaffold(
-            key: context.read<HelperServices>().globalScaffoldKey,
-            drawer: const CustomDrawerWidget(),
-            body: Navigator(
-              key: _navigatorKey,
-              pages: [
-                MaterialPage(child: _getPage(_activeIndex, app.isSignedIn)),
-              ],
-              onPopPage: (route, result) {
-                if (!route.didPop(result)) {
-                  return false;
-                }
-                return true;
-              },
-            ),
-            bottomNavigationBar: CustomNavigationBar(
-              currentIndex: _activeIndex,
-              isOrg: !app.isSignedIn,
-              onTap: (index) {
-                if (index != _activeIndex) {
-                  setState(() {
-                    // helper.changeScreen(index);
-                    _activeIndex = index;
-                    log("User tapped tab: $index");
-                  });
-                } else {
-                  log("User tapped the current tab: $index");
-                }
-              },
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 

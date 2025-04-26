@@ -57,6 +57,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
   final String _uploadCINImage = 'No file chosen';
 
+  bool isEmailExists = false;
+  bool isOrgEmailExists = false;
+
   // final String _uploadOrgLogoImage = 'No file chosen';
 
   final String _userProfileImageName = 'No file chosen';
@@ -243,12 +246,23 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
         });
       }
-      final resp = await auth.verifyEmailOTP(email: email, otp: verificationCode);
-      if (resp == true) {
+      final resp = await auth.verifyEmailOTP(
+          email: email, otp: verificationCode, isOrg: selectedTab == "User" ? false : true);
+
+      log("Resp of resp in auth_screen(): $resp");
+      if (resp is Map) {
+        log("Executing this resp is Map block");
         setState(() {
           isError = false;
+          if (selectedTab == "User") {
+            isEmailExists = resp['emailexist'];
+          } else {
+            isOrgEmailExists = resp['emailexist'];
+          }
+        });
+
+        setState(() {
           selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
-          // hasEmailSent = false;
           selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
         });
         showToast(message: "Email verified successfully!", type: ToastificationType.success);
@@ -364,21 +378,126 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
         // Email Input Field
         _buildInputField(
-          controller: userEmailController,
-          labelText: 'Email',
-          hintText: 'Enter your email',
-          mandatory: true,
-          inputType: "Email",
-          isPicked: hasImagePicked,
-          hasEmail: true,
-          profileIcon: false,
-          keyboardType: TextInputType.emailAddress,
-          onTap: () {},
-          imageField: false,
-          hasPicked: false,
-          focusNode: _focusNodes[1],
-          isEditable: isEditable,
-        ),
+            controller: userEmailController,
+            labelText: 'Email',
+            hintText: 'Enter your email',
+            mandatory: true,
+            inputType: "Email",
+            isPicked: hasImagePicked,
+            hasEmail: true,
+            profileIcon: false,
+            keyboardType: TextInputType.emailAddress,
+            onTap: () {},
+            imageField: false,
+            hasPicked: false,
+            focusNode: _focusNodes[1],
+            isEditable: isEditable,
+            isEmailExists: isEmailExists),
+        if (isEmailExists)
+          const SizedBox(
+            height: 15,
+          ),
+
+        if (isEmailExists)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "This email is already exists with an another account. Do you want to merge it ?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        showToast(message: "Okay please use different email!", type: ToastificationType.info);
+                        setState(() {
+                          hasEmailSent = false;
+                          isEmailExists = false;
+                          userEmailController.clear();
+                          selectedTab == "User" ? isEmailVerified = false : isEmailVerified2 = false;
+                          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).textTheme.headlineLarge?.color,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "No",
+                            style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          isEmailExists = false;
+                          selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 6),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Yes",
+                            style: GoogleFonts.lato(
+                              color: Theme.of(context).textTheme.headlineLarge?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+
+        if (isEmailExists)
+          const SizedBox(
+            height: 15,
+          ),
 
         if (hasEmailSent)
           AnimatedBuilder(
@@ -599,6 +718,112 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           isEditable: isEditable,
         ),
         const SizedBox(height: 10),
+        if (isEmailExists)
+          const SizedBox(
+            height: 15,
+          ),
+
+        if (isEmailExists)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "This email is already exists with an another account. Do you want to merge it ?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(color: Colors.white, fontSize: 12),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        showToast(message: "Okay please use different email!", type: ToastificationType.info);
+                        setState(() {
+                          hasEmailSent = false;
+                          isEmailExists = false;
+                          userEmailController.clear();
+                          selectedTab == "User" ? isEmailVerified = false : isEmailVerified2 = false;
+                          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).textTheme.headlineLarge?.color,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "No",
+                            style: GoogleFonts.lato(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          isEmailExists = false;
+                          selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 6),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Yes",
+                            style: GoogleFonts.lato(
+                              color: Theme.of(context).textTheme.headlineLarge?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+
+        if (isEmailExists)
+          const SizedBox(
+            height: 15,
+          ),
+
         if (hasEmailSent2)
           AnimatedBuilder(
             animation: _shakeAnimation,
@@ -1041,23 +1266,23 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     return (value / interval).round() * interval.toDouble();
   }
 
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required bool isPicked,
-    required String labelText,
-    required String hintText,
-    required bool profileIcon,
-    required bool mandatory,
-    required bool hasEmail,
-    required bool imageField,
-    required String inputType,
-    TextInputType keyboardType = TextInputType.text,
-    required VoidCallback onTap,
-    File? img,
-    required bool hasPicked,
-    required FocusNode focusNode,
-    required bool isEditable,
-  }) {
+  Widget _buildInputField(
+      {required TextEditingController controller,
+      required bool isPicked,
+      required String labelText,
+      required String hintText,
+      required bool profileIcon,
+      required bool mandatory,
+      required bool hasEmail,
+      required bool imageField,
+      required String inputType,
+      TextInputType keyboardType = TextInputType.text,
+      required VoidCallback onTap,
+      File? img,
+      required bool hasPicked,
+      required FocusNode focusNode,
+      required bool isEditable,
+      bool? isEmailExists}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1146,27 +1371,29 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                   },
                   child: Container(
                     padding: const EdgeInsets.only(right: 6),
-                    child: selectedTab == "User"
-                        ? (isEmailVerified
-                            ? const Icon(
-                                Icons.verified_outlined,
-                                color: Color(0xFFFF6500),
-                                size: 16,
-                              )
-                            : Text(
-                                "Verify",
-                                style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
-                              ))
-                        : (isEmailVerified2
-                            ? const Icon(
-                                Icons.verified_outlined,
-                                color: Color(0xFFFF6500),
-                                size: 16,
-                              )
-                            : Text(
-                                "Verify",
-                                style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
-                              )),
+                    child: (isEmailExists == true)
+                        ? const Icon(Icons.info_outline)
+                        : selectedTab == "User"
+                            ? (isEmailVerified
+                                ? const Icon(
+                                    Icons.verified_outlined,
+                                    color: Color(0xFFFF6500),
+                                    size: 16,
+                                  )
+                                : Text(
+                                    "Verify",
+                                    style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                                  ))
+                            : (isEmailVerified2
+                                ? const Icon(
+                                    Icons.verified_outlined,
+                                    color: Color(0xFFFF6500),
+                                    size: 16,
+                                  )
+                                : Text(
+                                    "Verify",
+                                    style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                                  )),
                   ),
                 );
               }),
