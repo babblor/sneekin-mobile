@@ -238,41 +238,63 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   _verifyOtp(String verificationCode, String email, BuildContext context) async {
     try {
       final auth = Provider.of<AuthServices>(context, listen: false);
+
       if (verificationCode.isEmpty || email.isEmpty) {
         showToast(message: "Code is empty! Request again!", type: ToastificationType.success);
         _shakeController.forward(from: 0);
         setState(() {
-          // hasEmailSent = false;
           selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
         });
+        return;
       }
+
       final resp = await auth.verifyEmailOTP(
-          email: email, otp: verificationCode, isOrg: selectedTab == "User" ? false : true);
+        email: email,
+        otp: verificationCode,
+        isOrg: selectedTab == "User" ? false : true,
+      );
 
       log("Resp of resp in auth_screen(): $resp");
-      if (resp is Map) {
-        log("Executing this resp is Map block");
+
+      if (resp is Map && resp.containsKey('status') && resp['status'] == true) {
+        log("OTP verification successful");
+
         setState(() {
           isError = false;
           if (selectedTab == "User") {
             isEmailExists = resp['emailexist'];
+            isEmailVerified = true;
+            hasEmailSent = false;
           } else {
+            isOrgEmailExists = resp['emailexist'];
+            isEmailVerified2 = true;
+            hasEmailSent2 = false;
+          }
+        });
+
+        showToast(message: "Email verified successfully!", type: ToastificationType.success);
+      } else {
+        log("OTP verification failed or status is false");
+
+        final emailExists = resp is Map && resp['emailexist'] == true;
+
+        setState(() {
+          if (!emailExists) {
+            isError = true;
+          }
+          isEmailVerified = false;
+          isEmailVerified2 = false;
+
+          if (selectedTab == "User") {
+            hasEmailSent = true;
+            isEmailExists = resp['emailexist'];
+          } else {
+            hasEmailSent2 = true;
             isOrgEmailExists = resp['emailexist'];
           }
         });
 
-        setState(() {
-          selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
-          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
-        });
-        showToast(message: "Email verified successfully!", type: ToastificationType.success);
-      } else {
         _shakeController.forward(from: 0);
-        setState(() {
-          isError = true;
-          isEmailVerified2 = false;
-          isEmailVerified = false;
-        });
       }
     } catch (e) {
       _shakeController.forward(from: 0);
@@ -459,7 +481,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                       onTap: () {
                         setState(() {
                           isEmailExists = false;
-                          selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
+                          selectedTab == "User" ? isEmailVerified = true : isEmailVerified = true;
                         });
                       },
                       child: Container(
@@ -493,13 +515,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               )
             ],
           ),
-
         if (isEmailExists)
+          SizedBox(
+            height: 15,
+          ),
+        if (hasEmailSent && !isEmailExists && (!isEmailVerified && !isEmailVerified2))
           const SizedBox(
             height: 15,
           ),
 
-        if (hasEmailSent)
+        if (hasEmailSent && !isEmailExists && (!isEmailVerified && !isEmailVerified2))
           AnimatedBuilder(
             animation: _shakeAnimation,
             builder: (context, child) {
@@ -536,8 +561,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           ),
         // const SizedBox(height: 15),
 
-        if (hasEmailSent) const SizedBox(height: 10),
-        if (hasEmailSent)
+        if (hasEmailSent && !isEmailExists && (!isEmailVerified && !isEmailVerified2))
+          const SizedBox(height: 10),
+        if (hasEmailSent && !isEmailExists && (!isEmailVerified && !isEmailVerified2))
           if (isCountdownActive)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 5),
@@ -703,27 +729,27 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
         const SizedBox(height: 10),
 
         _buildInputField(
-          controller: orgEmailController,
-          labelText: 'Organization Email',
-          mandatory: true,
-          isPicked: hasImagePicked,
-          onTap: () {},
-          profileIcon: false,
-          hasEmail: true,
-          inputType: "Email",
-          hintText: 'Enter organization email',
-          imageField: false,
-          hasPicked: false,
-          focusNode: _focusNodes[5],
-          isEditable: isEditable,
-        ),
+            controller: orgEmailController,
+            labelText: 'Organization Email',
+            mandatory: true,
+            isPicked: hasImagePicked,
+            onTap: () {},
+            profileIcon: false,
+            hasEmail: true,
+            inputType: "Email",
+            hintText: 'Enter organization email',
+            imageField: false,
+            hasPicked: false,
+            focusNode: _focusNodes[5],
+            isEditable: isEditable,
+            isEmailExists: isOrgEmailExists),
         const SizedBox(height: 10),
-        if (isEmailExists)
+        if (isOrgEmailExists)
           const SizedBox(
             height: 15,
           ),
 
-        if (isEmailExists)
+        if (isOrgEmailExists)
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -745,9 +771,9 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                       onTap: () {
                         showToast(message: "Okay please use different email!", type: ToastificationType.info);
                         setState(() {
-                          hasEmailSent = false;
-                          isEmailExists = false;
-                          userEmailController.clear();
+                          hasEmailSent2 = false;
+                          isOrgEmailExists = false;
+                          orgEmailController.clear();
                           selectedTab == "User" ? isEmailVerified = false : isEmailVerified2 = false;
                           selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
                         });
@@ -783,7 +809,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                     child: InkWell(
                       onTap: () {
                         setState(() {
-                          isEmailExists = false;
+                          isOrgEmailExists = false;
                           selectedTab == "User" ? isEmailVerified = true : isEmailVerified2 = true;
                         });
                       },
@@ -818,13 +844,16 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               )
             ],
           ),
-
-        if (isEmailExists)
+        if (isOrgEmailExists)
+          SizedBox(
+            height: 15,
+          ),
+        if (hasEmailSent2 && !isOrgEmailExists && (!isEmailVerified && !isEmailVerified2))
           const SizedBox(
             height: 15,
           ),
 
-        if (hasEmailSent2)
+        if (hasEmailSent2 && !isOrgEmailExists && (!isEmailVerified && !isEmailVerified2))
           AnimatedBuilder(
             animation: _shakeAnimation,
             builder: (context, child) {
@@ -861,8 +890,8 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           ),
         // const SizedBox(height: 15),
 
-        if (hasEmailSent2) const SizedBox(height: 10),
-        if (hasEmailSent2)
+        if (hasEmailSent2 && !isOrgEmailExists && !isEmailVerified2) const SizedBox(height: 10),
+        if (hasEmailSent2 && !isOrgEmailExists && !isEmailVerified2)
           if (isCountdownActive)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 5),
@@ -885,13 +914,13 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                     email: selectedTab == "User" ? userEmailController.text : orgEmailController.text);
                 if (resp == true) {
                   setState(() {
-                    hasEmailSent = true;
+                    hasEmailSent2 = true;
                   });
                   startCountdown();
                   showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
                 } else {
                   setState(() {
-                    hasEmailSent = false;
+                    hasEmailSent2 = false;
                   });
                 }
               },
@@ -903,7 +932,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                 ),
               ),
             ),
-        if (hasEmailSent2)
+        if (hasEmailSent2 && !isEmailExists && (!isEmailVerified2))
           const SizedBox(
             height: 20,
           ),
@@ -1340,62 +1369,94 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
             if (hasEmail)
               Consumer<AuthServices>(builder: (context, auth, _) {
                 return InkWell(
-                  onTap: () async {
-                    if (auth.isLoading || isError) return;
-                    if (orgEmailController.text.isEmpty && userEmailController.text.isEmpty) {
-                      showToast(message: "Please enter email.", type: ToastificationType.error);
-                      return;
-                    }
+                    onTap: () async {
+                      if (auth.isLoading || isError) return;
+                      if (hasEmailSent || hasEmailSent2) return;
+                      if (orgEmailController.text.isEmpty && userEmailController.text.isEmpty) {
+                        showToast(message: "Please enter email.", type: ToastificationType.error);
+                        return;
+                      }
 
-                    log("orgEmailController.text: ${orgEmailController.text}");
-                    log("userEmailController.text: ${userEmailController.text}");
-                    final emailData =
-                        selectedTab == "User" ? userEmailController.text : orgEmailController.text;
-                    log("emailData: $emailData");
-                    if (emailData.isEmpty) {
-                      return showToast(message: "Please enter email.", type: ToastificationType.error);
-                    }
-                    final resp = await auth.sendEmailOTP(email: emailData);
-                    if (resp == true) {
-                      setState(() {
-                        // hasEmailSent = true;
-                        selectedTab == "User" ? hasEmailSent = true : hasEmailSent2 = true;
-                      });
-                      startCountdown();
-                      showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
-                    } else {
-                      setState(() {
-                        selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: (isEmailExists == true)
-                        ? const Icon(Icons.info_outline)
-                        : selectedTab == "User"
-                            ? (isEmailVerified
-                                ? const Icon(
-                                    Icons.verified_outlined,
-                                    color: Color(0xFFFF6500),
-                                    size: 16,
-                                  )
-                                : Text(
-                                    "Verify",
-                                    style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
-                                  ))
-                            : (isEmailVerified2
-                                ? const Icon(
-                                    Icons.verified_outlined,
-                                    color: Color(0xFFFF6500),
-                                    size: 16,
-                                  )
-                                : Text(
-                                    "Verify",
-                                    style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
-                                  )),
-                  ),
-                );
+                      log("orgEmailController.text: ${orgEmailController.text}");
+                      log("userEmailController.text: ${userEmailController.text}");
+                      final emailData =
+                          selectedTab == "User" ? userEmailController.text : orgEmailController.text;
+                      log("emailData: $emailData");
+                      if (emailData.isEmpty) {
+                        return showToast(message: "Please enter email.", type: ToastificationType.error);
+                      }
+                      final resp = await auth.sendEmailOTP(email: emailData);
+                      if (resp == true) {
+                        setState(() {
+                          // hasEmailSent = true;
+                          selectedTab == "User" ? hasEmailSent = true : hasEmailSent2 = true;
+                        });
+                        startCountdown();
+                        showToast(message: "We've sent OTP to your email!", type: ToastificationType.success);
+                      } else {
+                        setState(() {
+                          selectedTab == "User" ? hasEmailSent = false : hasEmailSent2 = false;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: selectedTab == "User"
+                          ? isError && !isEmailExists!
+                              ? GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      hasEmailSent = false;
+                                      isError = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    "Edit",
+                                    style: GoogleFonts.lato(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                )
+                              : isEmailVerified
+                                  ? const Icon(
+                                      Icons.verified_outlined,
+                                      color: Color(0xFFFF6500),
+                                      size: 16,
+                                    )
+                                  : Text(
+                                      "Verify",
+                                      style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                                    )
+                          : isError && !isOrgEmailExists
+                              ? GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      hasEmailSent2 = false;
+                                      isError = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    "Edit",
+                                    style: GoogleFonts.lato(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                )
+                              : isEmailVerified2
+                                  ? const Icon(
+                                      Icons.verified_outlined,
+                                      color: Color(0xFFFF6500),
+                                      size: 16,
+                                    )
+                                  : Text(
+                                      "Verify",
+                                      style: GoogleFonts.lato(fontSize: 13, color: const Color(0xFFFF6500)),
+                                    ),
+                    ));
               }),
             if (imageField) const SizedBox(width: 15),
             if (imageField)

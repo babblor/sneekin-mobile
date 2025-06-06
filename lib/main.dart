@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sneekin/auth/auth_screen.dart';
 import 'package:sneekin/models/app.dart';
 import 'package:sneekin/models/organization.dart';
 import 'package:sneekin/models/user.dart';
@@ -186,6 +187,9 @@ class _MyAppState extends State<MyApp> {
             themeMode: theme.themeMode,
             routerConfig: routerServices.getRouter(context),
           ),
+          // child: MaterialApp(
+          //   home: AuthScreen(),
+          // ),
         );
       },
     );

@@ -12,7 +12,6 @@ import 'package:sneekin/services/auth_services.dart';
 import 'package:sneekin/utils/toast.dart';
 import 'package:toastification/toastification.dart';
 
-
 class OtpPage extends StatefulWidget {
   const OtpPage({super.key});
 

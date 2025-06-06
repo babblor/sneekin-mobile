@@ -1,0 +1,2 @@
+/Users/mac/Downloads/sneekin/android/app/.cxx/RelWithDebInfo/242w2u63/x86_64/CMakeFiles/edit_cache.dir
+/Users/mac/Downloads/sneekin/android/app/.cxx/RelWithDebInfo/242w2u63/x86_64/CMakeFiles/rebuild_cache.dir

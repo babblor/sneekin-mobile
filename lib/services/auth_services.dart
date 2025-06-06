@@ -293,6 +293,8 @@ class AuthServices with ChangeNotifier {
         // ),
       );
 
+      log("Checking if post verify otp func is working or not");
+
       log("resp.data in verifyOTP: ${resp.data}");
       // log("resp.statusCode in verifyOTP: ${resp.statusCode}");
 
